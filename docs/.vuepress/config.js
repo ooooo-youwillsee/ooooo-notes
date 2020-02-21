@@ -34,14 +34,14 @@ module.exports = {
       { text: 'Guide', link: '/guide/index.html' },
       { text: 'Home', link: '/' }
     ],
-    sidebarDepth: 3,
+    sidebarDepth: 5,
     sidebar: {
       '/gk/mysql-45/': [
         ''
       ],
       '/gk/java-core-36/': [
         '',
-        ['01', '01、Java平台的理解'],
+        ['01', '01、谈谈你对 Java 的理解？'],
         '02',
         '03',
         ['04', 'Kafka入门指南']
@@ -49,7 +49,9 @@ module.exports = {
     }
   },
   markdown: {
-    lineNumbers: false,
-    extractHeaders: ['h2', 'h3', 'h4', 'h5']
+    extractHeaders: ['h2', 'h3'],
+    toc: {
+      includeLevel: [2, 3]
+    }
   }
 }
