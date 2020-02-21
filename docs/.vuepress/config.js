@@ -1,10 +1,9 @@
 module.exports = {
   title: 'ooooo-notes',
   description: 'ooooo-notes',
-  base: '/notes/',
+  base: '/ooooo-notes/',
   host: '0.0.0.0',
   port: 8080,
-  dest: '.vuepress/dist',
   plugins: ['@vuepress/back-to-top', '@vuepress/nprogress'],
   themeConfig: {
     search: true,
@@ -41,6 +40,7 @@ module.exports = {
         ''
       ],
       '/gk/java-core-36/': [
+        '',
         ['01', '01、Java平台的理解'],
         '02',
         '03',
