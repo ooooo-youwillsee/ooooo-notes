@@ -10,4 +10,4 @@ title: 笔记分类
 
 ## Java
 
-[Java 核心技术 36讲](/gk/java-core-36)
+[Java 核心技术 36讲](/gk/java-core-36/)
