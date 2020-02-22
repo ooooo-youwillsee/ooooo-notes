@@ -28,16 +28,22 @@ module.exports = {
               { text: 'MySQL实战 45 讲', link: '/gk/mysql-45/' },
               { text: 'Java核心技术 36 讲', link: '/gk/java-core-36/' }
             ]
+          },
+          {
+            text: '面试',
+            items: [
+              { text: 'Java 面试训练营', link: '/interview/training-camp/' }
+            ]
           }
         ]
       },
-      { text: 'Guide', link: '/guide/index.html' },
+      { text: 'Guide', link: '/guide/' },
       { text: 'Home', link: '/' }
     ],
-    sidebarDepth: 5,
     sidebar: {
       '/gk/mysql-45/': [
-        ''
+        '',
+        ['01', '01、一条SQL查询语句是如何执行的？']
       ],
       '/gk/java-core-36/': [
         '',
@@ -45,6 +51,11 @@ module.exports = {
         '02',
         '03',
         ['04', 'Kafka入门指南']
+      ],
+      '/interview/training-camp/': [
+        '',
+        ['01', '01、消息队列'],
+        ['02', '02、xxxxx']
       ]
     }
   },
