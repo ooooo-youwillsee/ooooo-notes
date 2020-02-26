@@ -41,9 +41,9 @@ module.exports = {
       ],
       '/gk/java-core-36/': [
         '',
-        ['01', '01、谈谈你对 Java 的理解？'],
-        ['02', '02、Exception和Error有什么区别？'],
-        '03',
+        ['01', '01、谈谈你对 Java 的理解'],
+        ['02', '02、Exception 和 Error 的区别'],
+        ['03', '03、final、finally、finalize 的区别'],
         ['04', 'Kafka入门指南']
       ]
     }
