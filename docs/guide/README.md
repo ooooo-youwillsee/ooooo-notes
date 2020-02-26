@@ -1,6 +1,6 @@
 ---
 sidebar: auto
-title: 笔记分类
+title: Outline
 ---
 
 ## MySQL

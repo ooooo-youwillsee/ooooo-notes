@@ -28,12 +28,6 @@ module.exports = {
               { text: 'MySQL实战 45 讲', link: '/gk/mysql-45/' },
               { text: 'Java核心技术 36 讲', link: '/gk/java-core-36/' }
             ]
-          },
-          {
-            text: '面试',
-            items: [
-              { text: 'Java 面试训练营', link: '/interview/training-camp/' }
-            ]
           }
         ]
       },
@@ -48,14 +42,9 @@ module.exports = {
       '/gk/java-core-36/': [
         '',
         ['01', '01、谈谈你对 Java 的理解？'],
-        '02',
+        ['02', '02、Exception和Error有什么区别？'],
         '03',
         ['04', 'Kafka入门指南']
-      ],
-      '/interview/training-camp/': [
-        '',
-        ['01', '01、消息队列'],
-        ['02', '02、xxxxx']
       ]
     }
   },
