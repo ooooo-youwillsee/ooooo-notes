@@ -25,8 +25,9 @@ module.exports = {
           {
             text: '极客时间',
             items: [
-              { text: 'MySQL实战 45 讲', link: '/gk/mysql-45/' },
-              { text: 'Java核心技术 36 讲', link: '/gk/java-core-36/' }
+              { text: 'MySQL 实战 45 讲', link: '/gk/mysql-45/' },
+              { text: 'Java 核心技术 36 讲', link: '/gk/java-core-36/' },
+              { text: 'Kafka 核心技术与实战', link: '/gk/kafka-core-tech/' }
             ]
           }
         ]
@@ -45,7 +46,11 @@ module.exports = {
         ['02', '02、Exception 和 Error 的区别'],
         ['03', '03、final、finally、finalize 的区别'],
         ['04', 'Kafka入门指南']
-      ]
+      ],
+      '/gk/kafka-core-tech/': [
+        '',
+        ['01', '01、消息引擎系统'],
+      ],
     }
   },
   markdown: {

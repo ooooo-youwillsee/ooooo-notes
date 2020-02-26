@@ -11,3 +11,8 @@ title: Outline
 ## Java
 
 [Java 核心技术 36讲](/gk/java-core-36/)
+
+
+## Kafka
+
+[Kafka 核心技术与实战](/gk/kafka-core-tech/)
