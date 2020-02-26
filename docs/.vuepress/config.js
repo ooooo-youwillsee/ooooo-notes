@@ -50,6 +50,7 @@ module.exports = {
       '/gk/kafka-core-tech/': [
         '',
         ['01', '01、消息引擎系统'],
+        ['02', '02、Kafka 术语'],
       ],
     }
   },
