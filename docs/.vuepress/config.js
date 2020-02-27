@@ -29,6 +29,12 @@ module.exports = {
               { text: 'Java 核心技术 36 讲', link: '/gk/java-core-36/' },
               { text: 'Kafka 核心技术与实战', link: '/gk/kafka-core-tech/' }
             ]
+          },
+          {
+            text: '书籍',
+            items: [
+              { text: 'Redis 开发与运维', link: '/bk/redis-dev-ops/' }
+            ]
           }
         ]
       },
@@ -50,14 +56,18 @@ module.exports = {
       '/gk/kafka-core-tech/': [
         '',
         ['01', '01、消息引擎系统'],
-        ['02', '02、Kafka 术语'],
+        ['02', '02、Kafka 术语']
       ],
+      '/bk/redis-dev-ops/': [
+        '',
+        ['01', '第一章 初始 Redis ']
+      ]
     }
   },
   markdown: {
-    extractHeaders: ['h2', 'h3'],
+    extractHeaders: ['h2', 'h3', 'h4'],
     toc: {
-      includeLevel: [2, 3]
+      includeLevel: [2, 3, 4]
     }
   }
 }
