@@ -44,7 +44,7 @@ module.exports = {
     sidebar: {
       '/gk/mysql-45/': [
         '',
-        ['01', '01、一条SQL查询语句是如何执行的？']
+        ['01', '01、SQL 查询语句的执行过程']
       ],
       '/gk/java-core-36/': [
         '',
@@ -60,7 +60,7 @@ module.exports = {
       ],
       '/bk/redis-dev-ops/': [
         '',
-        ['01', '第一章 初始 Redis ']
+        ['01', '第一章 初识 Redis ']
       ]
     }
   },
