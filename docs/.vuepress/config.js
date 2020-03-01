@@ -62,7 +62,8 @@ module.exports = {
       ],
       '/bk/redis-dev-ops/': [
         '',
-        ['01', '第一章 初识 Redis ']
+        ['01', '第一章 初识 Redis'],
+        ['02', '第二章 API 的理解和使用'],
       ]
     }
   },
