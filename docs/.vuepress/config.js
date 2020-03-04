@@ -60,7 +60,8 @@ module.exports = {
       '/gk/kafka-core-tech/': [
         '',
         ['01', '01、消息引擎系统'],
-        ['02', '02、Kafka 术语']
+        ['02', '02、Kafka 术语'],
+        ['03', '03、Kafka 是流处理平台'],
       ],
       '/bk/redis-development-and-operation-and-maintenance/': [
         '',
