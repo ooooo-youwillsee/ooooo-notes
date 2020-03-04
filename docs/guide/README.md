@@ -17,4 +17,4 @@ title: Outline
 
 ## Redis
 
-[Redis 开发与运维](/bk/redis-dev-ops/)
+[Redis 开发与运维](/bk/redis-development-and-operation-and-maintenance/)

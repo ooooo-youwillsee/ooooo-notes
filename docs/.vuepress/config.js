@@ -33,7 +33,8 @@ module.exports = {
           {
             text: '书籍',
             items: [
-              { text: 'Redis 开发与运维', link: '/bk/redis-dev-ops/' }
+              { text: 'Redis 开发与运维', link: '/bk/redis-development-and-operation-and-maintenance/' },
+              { text: 'Java 并发编程的艺术', link: '/bk/the-art-of-java-concurrent-programming/' },
             ]
           }
         ]
@@ -61,7 +62,7 @@ module.exports = {
         ['01', '01、消息引擎系统'],
         ['02', '02、Kafka 术语']
       ],
-      '/bk/redis-dev-ops/': [
+      '/bk/redis-development-and-operation-and-maintenance/': [
         '',
         ['01', '第一章 初识 Redis'],
         ['02', '第二章 API 的理解和使用']

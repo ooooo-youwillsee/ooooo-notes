@@ -2,10 +2,10 @@
 home: true
 heroImage: null
 heroText: null
-tagline: 个人学习的技术笔记
-actionText: 学习大纲 →
+tagline: null
+actionText: 技术笔记 →
 actionLink: /guide/
-footer: MIT Licensed | Copyright © 2018-present Evan You
+footer: MIT Licensed | Copyright © 2018-present ooooo
 ---
 
 ## Google 评分卡
