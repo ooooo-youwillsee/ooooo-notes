@@ -63,6 +63,7 @@ module.exports = {
         ['01', '01、消息引擎系统'],
         ['02', '02、Kafka 术语'],
         ['03', '03、Kafka 是流处理平台'],
+        ['04', '04、Kafka 不同的"发行版"'],
       ],
       '/bk/redis-development-and-operation-and-maintenance/': [
         '',
