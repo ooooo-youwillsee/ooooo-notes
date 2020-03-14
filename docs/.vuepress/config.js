@@ -69,6 +69,7 @@ module.exports = {
         ['05', '05、Kafka 的版本号'],
         ['06', '06、Kafka 线上部署方案'],
         ['07', '07、最重要的集群参数配置（上）'],
+        ['08', '08、最重要的集群参数配置（下）'],
       ],
       '/bk/redis-development-and-operation-and-maintenance/': [
         '',
