@@ -1,3 +1,5 @@
+const geektime = (dir) => '/notes/geektime' + dir
+const books = (dir) => '/notes/books' + dir
 module.exports = {
   title: 'ooooo-notes',
   description: 'ooooo-notes',
@@ -25,25 +27,26 @@ module.exports = {
           {
             text: '极客时间',
             items: [
-              { text: 'MySQL 实战 45 讲', link: '/gk/mysql-45/' },
-              { text: 'Java 核心技术 36 讲', link: '/gk/java-core-36/' },
-              { text: 'Kafka 核心技术与实战', link: '/gk/kafka-core-tech/' }
+              { text: 'MySQL 实战 45 讲', link: geektime('/mysql-45/') },
+              { text: 'Java 核心技术 36 讲', link: geektime('/java-core-36/') },
+              { text: 'Kafka 核心技术与实战', link: geektime('/kafka-core-tech/') }
             ]
           },
           {
             text: '书籍',
             items: [
-              { text: 'Redis 开发与运维', link: '/bk/redis-development-and-operation-and-maintenance/' },
-              { text: 'Java 并发编程的艺术', link: '/bk/the-art-of-java-concurrent-programming/' },
+              { text: 'Redis 开发与运维', link: books('/redis-development-and-operation-and-maintenance/') },
+              { text: 'Java 并发编程的艺术', link: books('/the-art-of-java-concurrent-programming/') }
             ]
           }
         ]
       },
-      { text: 'Guide', link: '/guide/' },
-      { text: 'Home', link: '/' }
+      { text: 'Guide', link: '/GUIDE' },
+      { text: 'Home', link: '/' },
+      { text: 'Me', link: '/ME' }
     ],
     sidebar: {
-      '/gk/mysql-45/': [
+      [geektime('/mysql-45/')]: [
         '',
         ['01', '01、SQL 查询语句的执行过程'],
         ['02', '02、SQL 更新语句的执行过程'],
@@ -51,16 +54,16 @@ module.exports = {
         ['04', '04、深入浅出索引（上）'],
         ['05', '05、深入浅出索引（下）'],
         ['06', '06、全局锁和表锁'],
-        ['07', '07、行锁'],
+        ['07', '07、行锁']
       ],
-      '/gk/java-core-36/': [
+      [geektime('/java-core-36/')]: [
         '',
         ['01', '01、谈谈你对 Java 的理解'],
         ['02', '02、Exception 和 Error 的区别'],
         ['03', '03、final、finally、finalize 的区别'],
         ['04', 'Kafka入门指南']
       ],
-      '/gk/kafka-core-tech/': [
+      [geektime('/kafka-core-tech/')]: [
         '',
         ['01', '01、消息引擎系统'],
         ['02', '02、Kafka 术语'],
@@ -69,9 +72,9 @@ module.exports = {
         ['05', '05、Kafka 的版本号'],
         ['06', '06、Kafka 线上部署方案'],
         ['07', '07、最重要的集群参数配置（上）'],
-        ['08', '08、最重要的集群参数配置（下）'],
+        ['08', '08、最重要的集群参数配置（下）']
       ],
-      '/bk/redis-development-and-operation-and-maintenance/': [
+      [books('/redis-development-and-operation-and-maintenance/')]: [
         '',
         ['01', '第一章 初识 Redis'],
         ['02', '第二章 API 的理解和使用'],

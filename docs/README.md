@@ -3,7 +3,7 @@ home: true
 heroImage: null
 heroText: null
 tagline: null
-actionText: 技术笔记 →
+actionText: 阅读笔记 →
 actionLink: /guide/
 footer: MIT Licensed | Copyright © 2018-present ooooo
 ---
