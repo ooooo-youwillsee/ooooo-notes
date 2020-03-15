@@ -74,7 +74,8 @@ module.exports = {
       '/bk/redis-development-and-operation-and-maintenance/': [
         '',
         ['01', '第一章 初识 Redis'],
-        ['02', '第二章 API 的理解和使用']
+        ['02', '第二章 API 的理解和使用'],
+        ['03', '第三章 小功能大用处']
       ],
       // fallback
       '/': [
