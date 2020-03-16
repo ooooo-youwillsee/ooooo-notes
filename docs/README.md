@@ -4,11 +4,11 @@ heroImage: null
 heroText: null
 tagline: null
 actionText: 阅读笔记 →
-actionLink: /guide/
-footer: MIT Licensed | Copyright © 2018-present ooooo
+actionLink: /GUIDE
+footer: MIT Licensed | Copyright © 2020-present ooooo
 ---
 
-## Google 评分卡
+##### Google 评分卡
 
 > 0 - you are unfamiliar with the subject area.
 
