@@ -29,7 +29,8 @@ module.exports = {
             items: [
               { text: 'MySQL 实战 45 讲', link: geektime('/mysql-45/') },
               { text: 'Java 核心技术 36 讲', link: geektime('/java-core-36/') },
-              { text: 'Kafka 核心技术与实战', link: geektime('/kafka-core-tech/') }
+              { text: 'Kafka 核心技术与实战', link: geektime('/kafka-core-tech/') },
+              { text: 'Java 并发编程实战', link: geektime('/java-con-practice/') }
             ]
           },
           {
@@ -77,6 +78,9 @@ module.exports = {
         ['07', '07、最重要的集群参数配置（上）'],
         ['08', '08、最重要的集群参数配置（下）'],
         ['09', '09、生产者消息分区机制原理'],
+      ],
+      [geektime('/java-con-practice/')]: [
+        '',
       ],
       [books('/redis-development-and-operation-and-maintenance/')]: [
         '',

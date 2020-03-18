@@ -42,6 +42,8 @@ title: 年度计划
     :two:. [《Kafka 核心技术与实战》](./notes/geektime/kafka-core-tech) :100:
     
     :three:. [《Java 核心技术 36 讲》](./notes/geektime/java-core-36)
+    
+    :four:. [《Java 并发编程实战》](./notes/geektime/java-con-practice)
         
     
 3. 通读 [Spring](https://spring.io/) 官网，+实践+代码+笔记。
