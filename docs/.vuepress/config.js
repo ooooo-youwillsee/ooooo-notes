@@ -39,6 +39,10 @@ module.exports = {
               { text: 'Redis 开发与运维', link: books('/redis-development-and-operation-and-maintenance/') },
               { text: 'Java 并发编程的艺术', link: books('/the-art-of-java-concurrent-programming/') }
             ]
+            // },
+            // {
+            //   text: '源码系列',
+            //   items: []
           }
         ]
       },
@@ -58,7 +62,7 @@ module.exports = {
         ['07', '07、行锁'],
         ['08', '08、事务的隔离性'],
         ['09', '09、普通索引和唯一索引'],
-        ['10', '10、选错索引'],
+        ['10', '10、选错索引']
       ],
       [geektime('/java-core-36/')]: [
         '',
@@ -77,16 +81,22 @@ module.exports = {
         ['06', '06、Kafka 线上部署方案'],
         ['07', '07、最重要的集群参数配置（上）'],
         ['08', '08、最重要的集群参数配置（下）'],
-        ['09', '09、生产者消息分区机制原理'],
+        ['09', '09、生产者消息分区机制原理']
       ],
       [geektime('/java-con-practice/')]: [
-        '',
+        ''
       ],
       [books('/redis-development-and-operation-and-maintenance/')]: [
         '',
         ['01', '第一章 初识 Redis'],
         ['02', '第二章 API 的理解和使用'],
         ['03', '第三章 小功能大用处']
+      ],
+      [books('/the-art-of-java-concurrent-programming/')]: [
+        '',
+        ['01', '第一章 并发编程的挑战'],
+        ['02', '第二章 Java 并发机制的底层实现原理'],
+        ['03', '第三章 Java 内存模型']
       ],
       // fallback
       '/': [
