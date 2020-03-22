@@ -30,7 +30,7 @@ title: 年度计划
 
     :one:. [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/) :100:
 
-    :two:. [《Redis 开发与运维》](https://book.douban.com/subject/26971561/)
+    :two:. [《Redis 开发与运维》](https://book.douban.com/subject/26971561/) :100:
     
     :three:. [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
     
@@ -41,6 +41,8 @@ title: 年度计划
     :six:. [《Effective Java 中文版（第2版）》](https://book.douban.com/subject/3360807/)
     
     :seven:. [《深入理解 Java 虚拟机（第3版）》](https://book.douban.com/subject/34907497/)
+    
+    :eight:. [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
     
     
     
