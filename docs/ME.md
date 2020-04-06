@@ -12,6 +12,7 @@ title: 年度计划
 - **学会做减法，再做加法。**
 - **学英语比学编程简单。**
 - **学习和实践要平衡。**
+- **学会投资，学会理财。**
 - **学英语很重要，学英语很重要，学英语很重要。**
 
 ### 1、关于英语
@@ -27,7 +28,7 @@ title: 年度计划
 ### 2、关于技术
 
 计划 [:tada:](./GUIDE)：
-1. 阅读 9 本书，+笔记。
+1. 阅读书籍，+笔记。
 
     :one:. [《Java 并发编程的艺术》](https://book.douban.com/subject/26591326/) :100:
 
@@ -39,7 +40,7 @@ title: 年度计划
     
     :five:. [《剑指 Offer》](https://book.douban.com/subject/25910559/)
 
-    :six:. [《Effective Java中文版（第3版）》](https://book.douban.com/subject/30412517/)
+    :six:. [《Effective Java中文版（第3版）》](https://book.douban.com/subject/30412517/) :100:
     
     :seven:. [《深入理解 Java 虚拟机（第3版）》](https://book.douban.com/subject/34907497/)
     
@@ -47,27 +48,59 @@ title: 年度计划
     
     :nine:. [《C++ Prime（第5版）](https://book.douban.com/subject/30437872/)
     
-2. 阅读 5 个文档，+笔记。
+2. 阅读文档，+笔记。
 
     :one:. [《MySQL 实战 45 讲》](https://time.geekbang.org/column/intro/139) :100: 
     
     :two:. [《Kafka 核心技术与实战》](https://time.geekbang.org/column/intro/100029201) :100:
     
-    :three:. [《Java 核心技术 36 讲》](https://time.geekbang.org/column/intro/100006701)
+    :three:. [《Java 核心技术 36 讲》](https://time.geekbang.org/column/intro/100006701) :100:
     
     :four:. [《Java 并发编程实战》](https://time.geekbang.org/column/intro/100023901)
     
     :five:. [《深入拆解 Java 虚拟机》](https://time.geekbang.org/column/intro/100010301)
     
+3. 观看视频，+代码
+
+    :one:. [《玩转算法系列--图论精讲》](https://coding.imooc.com/class/370.html)
+        
+    :two:. [《玩转算法系列--玩转数据结构》](https://coding.imooc.com/class/207.html) 
+        
+    :three:. [《玩转算法面试》](https://coding.imooc.com/class/82.html)  
+
+    :four:. [《看的见的算法》](https://coding.imooc.com/class/138.html)    
+
+    :five:. [《算法与数据结构》](https://coding.imooc.com/class/71.html) :100:    
+
+    :six:. [《玩转 Spring 全家桶》](https://time.geekbang.org/course/intro/100023501)  
+
+    :seven:. [《Go 语言从入门到实战》](https://time.geekbang.org/course/intro/100024001)    
+    
 3. 通读 [Spring 官网](https://spring.io/)，+实践+代码+笔记。
 4. 学习 Go 语言，通读 [Go 官网](https://golang.org/)，+实践+代码+笔记。
 5. 每周至少 5 道 [Leetcode](https://leetcode-cn.com/problemset/all/)。
 
-### 3、计划中  :tada:
+
+### 4、关于其他
+
+- 阅读，+笔记
+
+<indent/>:one:. [《指数基金投资指南》](https://book.douban.com/subject/27204860/) :100:
+
+<indent/>:two:. [《富爸爸穷爸爸》](https://book.douban.com/subject/3291111/) :100:
+
+<indent/>:three:. [《解读基金》](https://book.douban.com/subject/2051332/)
+
+<indent/>:four:. [《聪明的投资者》](https://book.douban.com/subject/5243775/)
+
+<indent/>:five:. [《富爸爸财务自由之路》](https://book.douban.com/subject/1004118/)
+
+
+### 5、计划中  :tada:
 
 <indent/>:one:. [《阿里巴巴 Java 开发手册》](https://book.douban.com/subject/27605355/)
      
-<indent/>:two:. [JMC 工具(Java Mission Control)](https://blog.overops.com/oracle-java-mission-control-the-ultimate-guide/#jfrhowto)
+<indent/>:two:. &ensp;[JMC 工具(Java Mission Control)](https://blog.overops.com/oracle-java-mission-control-the-ultimate-guide/#jfrhowto)
 
 <indent/>:three:. [《Java 性能优化权威指南》](https://book.douban.com/subject/25828043/)
 
@@ -76,4 +109,6 @@ title: 年度计划
 <indent/>:five:. [《Netty 实战》](https://book.douban.com/subject/27038538/)
 
 <indent/>:six:. [《Cloud Native Java》](https://book.douban.com/subject/26435857/)
+
+<indent/>:seven:. [《ZooKeeper》](https://book.douban.com/subject/25765743/)
     
