@@ -93,7 +93,8 @@ module.exports = {
         '',
         ['01', '第一章 初识 Redis'],
         ['02', '第二章 API 的理解和使用'],
-        ['03', '第三章 小功能大用处']
+        ['03', '第三章 小功能大用处'],
+        ['04', '第四章 客户端'],
       ],
       [books('/the-art-of-java-concurrent-programming/')]: [
         '',
