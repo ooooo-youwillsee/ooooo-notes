@@ -1,4 +1,4 @@
-const { notes, english } = require('../config')
+const { notes, english, me } = require('../config')
 
 module.exports = {
   title: 'ooooo-notes',
@@ -7,6 +7,9 @@ module.exports = {
   host: '0.0.0.0',
   port: 8080,
   plugins: ['@vuepress/back-to-top', '@vuepress/nprogress'],
+  extraWatchFiles: [
+    '/config/me.js'
+  ],
   themeConfig: {
     search: true,
     searchMaxSuggestions: 20,
@@ -22,13 +25,15 @@ module.exports = {
     nav: [
       notes.nav,
       english.nav,
+      me.nav,
       // { text: 'Guide', link: '/GUIDE' },
-      { text: 'Home', link: '/' },
-      { text: 'Me', link: '/ME' }
+      { text: 'Home', link: '/' }
+      // { text: 'Me', link: '/ME' }
     ],
     sidebar: {
       ...notes.sidebar,
       ...english.sidebar,
+      ...me.sidebar,
       '/': ['']  // fallback
     }
   },
