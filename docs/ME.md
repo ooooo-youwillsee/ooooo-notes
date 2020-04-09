@@ -9,10 +9,11 @@ title: 年度计划
 
 <br/>
 
-- **学会做减法，再做加法。**
-- **学英语比学编程简单。**
+- **英语比编程简单。**
 - **学习和实践要平衡。**
+- **学会和时间做朋友。**
 - **学会投资，学会理财。**
+- **学会先做减法，再做加法。**
 - **学英语很重要，学英语很重要，学英语很重要。**
 
 ### 1、关于英语
@@ -21,8 +22,9 @@ title: 年度计划
 
 计划；
 1. 目前我已经背单词 200 多天，我将会继续背单词（**墨墨背单词**）:smile: 。
-2. 看 [YouTube 视频](https://www.youtube.com/)。
+2. 看 [YouTube - English with Lucy](https://www.youtube.com/)。
 3. 看 [Spring Framework 官网](https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/index.html)。
+4. 看 [老友记](https://www.youtube.com/playlist?list=ELwQA2MMl54Cc)
 
 
 ### 2、关于技术
@@ -111,4 +113,6 @@ title: 年度计划
 <indent/>:six:. [《Cloud Native Java》](https://book.douban.com/subject/26435857/)
 
 <indent/>:seven:. [《ZooKeeper》](https://book.douban.com/subject/25765743/)
+
+<indent/>:eight:. [《MIT 高级数据课程》](https://courses.csail.mit.edu/6.851/fall17/)
     
