@@ -1,10 +1,10 @@
 ---
 home: true
 heroImage: null
-heroText: null
+heroText: 持续学习，未来可期 
 tagline: null
-actionText: 持续学习，未来可期 →
-actionLink: /GUIDE
+actionText: null
+actionLink: null
 footer: MIT Licensed | Copyright © 2020-present ooooo
 ---
 

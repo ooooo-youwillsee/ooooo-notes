@@ -4,13 +4,12 @@ const nav = {
   text: 'English',
   ariaLabel: 'English',
   items: [
-    { text: 'Friends', link: english('/friends/') }
+    { text: 'Friends', link: english('/friends/01') }
   ]
 }
 
 const sidebar = {
   [english('/friends/')]: [
-    '',
     ['01', 'Q1']
   ]
 }

@@ -7,9 +7,6 @@ module.exports = {
   host: '0.0.0.0',
   port: 8080,
   plugins: ['@vuepress/back-to-top', '@vuepress/nprogress'],
-  extraWatchFiles: [
-    '/config/me.js'
-  ],
   themeConfig: {
     search: true,
     searchMaxSuggestions: 20,
