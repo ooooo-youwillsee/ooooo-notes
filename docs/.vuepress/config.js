@@ -5,7 +5,7 @@ module.exports = {
   description: 'ooooo-notes',
   base: '/ooooo-notes/',
   host: '0.0.0.0',
-  port: 8080,
+  port: 9527,
   plugins: ['@vuepress/back-to-top', '@vuepress/nprogress'],
   themeConfig: {
     search: true,
