@@ -74,6 +74,7 @@ const sidebar = {
     ['03', '第三章 小功能大用处'],
     ['04', '第四章 客户端'],
     ['05', '第五章 持久化'],
+    ['06', '第六章 复制'],
   ],
   [books('/the-art-of-java-concurrent-programming/')]: [
     '',
