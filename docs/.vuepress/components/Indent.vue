@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <div v-for="i in c">&ensp;</div>
-    <slot />
-  </div>
+  <div><div v-for="i in c">&ensp;</div><slot /></div>
 </template>
 
 <script>

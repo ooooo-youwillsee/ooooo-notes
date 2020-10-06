@@ -1,9 +1,9 @@
-const notes = require('./notes')
+// const notes = require('./notes')
 const english = require('./english')
 const me = require('./me')
 
 module.exports = {
-  notes,
+  // notes,
   english,
   me,
 }

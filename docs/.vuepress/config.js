@@ -20,7 +20,7 @@ module.exports = {
     editLinks: true,
     editLinkText: '在 GitHub 上编辑此页',
     nav: [
-      notes.nav,
+      // notes.nav,
       english.nav,
       me.nav,
       // { text: 'Guide', link: '/GUIDE' },
@@ -28,7 +28,7 @@ module.exports = {
       // { text: 'Me', link: '/ME' }
     ],
     sidebar: {
-      ...notes.sidebar,
+      // ...notes.sidebar,
       ...english.sidebar,
       ...me.sidebar,
       '/': ['']  // fallback
