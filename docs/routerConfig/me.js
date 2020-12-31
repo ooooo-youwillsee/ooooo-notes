@@ -4,8 +4,8 @@ const nav = {
   text: 'Me',
   ariaLabel: 'Me',
   items: [
-    { text: 'Plan', link: me('/plan/2020') },
-    { text: 'Resolution', link: me('/resolution/2020') }
+    { text: 'Plan', link: me('/plan/2021') },
+    { text: 'Resolution', link: me('/resolution/2021') }
   ]
 }
 

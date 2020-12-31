@@ -1,4 +1,4 @@
-const { notes, english, me } = require('../config')
+const { notes, english, me } = require('../routerConfig')
 
 module.exports = {
   title: 'ooooo-notes',
@@ -6,7 +6,7 @@ module.exports = {
   base: '/ooooo-notes/',
   host: '0.0.0.0',
   port: 9527,
-  plugins: ['@vuepress/back-to-top', '@vuepress/nprogress'],
+  plugins: ['@vuepress/back-to-top', '@vuepress/nprogress', '@vuepress/active-header-links'],
   themeConfig: {
     search: true,
     searchMaxSuggestions: 20,
@@ -21,7 +21,7 @@ module.exports = {
     editLinkText: '在 GitHub 上编辑此页',
     nav: [
       // notes.nav,
-      english.nav,
+      // english.nav,
       me.nav,
       // { text: 'Guide', link: '/GUIDE' },
       { text: 'Home', link: '/' }
@@ -29,7 +29,7 @@ module.exports = {
     ],
     sidebar: {
       // ...notes.sidebar,
-      ...english.sidebar,
+      // ...english.sidebar,
       ...me.sidebar,
       '/': ['']  // fallback
     }
