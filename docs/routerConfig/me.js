@@ -17,7 +17,8 @@ const sidebar = {
   ],
   [me('/resolution/')]: [
     ['2019', '2019 Resolution'],
-    ['2020', '2020 Resolution']
+    ['2020', '2020 Resolution'],
+    ['2021', '2021 Resolution']
   ]
 }
 
