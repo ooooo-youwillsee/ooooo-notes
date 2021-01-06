@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: null
-heroText: 持续学习，未来可期 
+heroText: 持续学习者
 tagline: null
 actionText: null
 actionLink: null
