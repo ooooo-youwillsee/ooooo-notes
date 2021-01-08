@@ -1,4 +1,4 @@
-const { notes, english, me } = require('../routerConfig')
+const { notes, english, me } = require('../config')
 
 module.exports = {
   title: 'ooooo-notes',
@@ -24,8 +24,8 @@ module.exports = {
       // english.nav,
       me.nav,
       // { text: 'Guide', link: '/GUIDE' },
-      { text: 'Home', link: '/' }
-      // { text: 'Me', link: '/ME' }
+      { text: 'Home', link: '/' },
+      { text: 'LeetCode', link: 'https://github.com/ooooo-youwillsee/leetcode', target:'_blank', rel:'' }
     ],
     sidebar: {
       // ...notes.sidebar,
