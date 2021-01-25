@@ -36,3 +36,4 @@ title: 学英语方法
 > 3. bobo 老师 [看美剧学英语靠不靠谱？我说靠谱，方法都在这里了。](https://mp.weixin.qq.com/s/iTVqHKtik5C4LEn4_SsEIg)
 > 4. B 站 [北大学姐的高效背单词法！不看亏大了！1小时竟能背100多个？](https://www.bilibili.com/video/BV1g7411T7Py)
 > 5. B 站 [精背方法来了！北大学姐分享如何做英语笔记/积累，干货满满！](https://www.bilibili.com/video/BV1RE411W7rA)
+> 5. 极客时间 [工作后，程序员怎么高效学英语？](https://time.geekbang.org/column/article/330245)
