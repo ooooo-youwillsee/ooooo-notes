@@ -20,16 +20,16 @@ module.exports = {
     editLinks: true,
     editLinkText: '在 GitHub 上编辑此页',
     nav: [
-      notes.nav,
-      english.nav,
+      // notes.nav,
+      // english.nav,
       me.nav,
       // { text: 'Guide', link: '/GUIDE' },
       { text: 'Home', link: '/' },
       { text: 'LeetCode', link: 'https://github.com/ooooo-youwillsee/leetcode', target:'_blank', rel:'' }
     ],
     sidebar: {
-      ...notes.sidebar,
-      ...english.sidebar,
+      // ...notes.sidebar,
+      // ...english.sidebar,
       ...me.sidebar,
       '/': ['']  // fallback
     }
