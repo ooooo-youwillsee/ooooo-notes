@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "docs:dev": "vuepress dev docs --no-cache --open",
+    "docs:dev": "vuepress dev docs --no-cache",
     "docs:build": "vuepress build docs",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
