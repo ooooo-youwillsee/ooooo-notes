@@ -5,6 +5,7 @@ const nav = {
 	ariaLabel: 'Tours',
 	items: [
 		{text: 'kubernetes', link: tours('/kubernetes/')},
+        {text: 'wechat', link: tours('/wechat/')},
 	]
 }
 
@@ -20,7 +21,11 @@ const sidebar = {
         ['03'],
         ['04'],
         ['05'],
-    ]
+    ],
+    [tours('/wechat/')]: [
+        '',
+        ['01'],
+    ],
 }
 
 module.exports = {
