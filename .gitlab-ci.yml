@@ -1,0 +1,20 @@
+image: registry.gitlab.com/pages/hugo/hugo_extended:latest
+
+variables:
+  HUGO_ENV: production
+
+default:
+  before_script:
+    - apk add --update --no-cache git go npm
+    - npm install
+
+test:
+  script:
+    - hugo --gc --minify
+
+pages:
+  script:
+    - hugo --gc --minify
+  artifacts:
+    paths:
+      - public
