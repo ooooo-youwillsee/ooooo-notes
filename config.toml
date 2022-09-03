@@ -65,14 +65,6 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     name = "分类"
     url = "/categories/"
     title = ""
-  [[menu.main]]
-    weight = 4
-    identifier = "plans"
-    pre = ""
-    post = ""
-    name = "计划"
-    url = "/plans/"
-    title = ""
 [params]
   # 网站默认主题样式 ["auto", "light", "dark"]
   defaultTheme = "auto"
