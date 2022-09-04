@@ -1,6 +1,6 @@
 ---
 title: 搭建 kubernetes 1.24 版本的源码调试环境
-date: 2021-06-28T18:32:22+08:00
+date: 2022-06-28T18:32:22+08:00
 draft: false
 tags: [k8s, cloud native, source code]
 categories: [随笔]
