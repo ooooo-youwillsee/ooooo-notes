@@ -1,0 +1,222 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>在 centos 上安装 k8s - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="在 centos 上安装 k8s"><meta property="og:description" content="1. 两台机器初始化设置 1.1 hostname 设置 1 2 3 hostnamectl ## 查看当前的hostname hostnamectl set-hostname centos1 ## 设置主机名为centos1, 在 192.168.130.131 上执行 hostnamectl set-hostname centos2 ## 设置主机名为cento"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-01-01T18:32:22+08:00"><meta property="article:modified_time" content="2021-01-01T18:32:22+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="在 centos 上安装 k8s"><meta name=twitter:description content="1. 两台机器初始化设置 1.1 hostname 设置 1 2 3 hostnamectl ## 查看当前的hostname hostnamectl set-hostname centos1 ## 设置主机名为centos1, 在 192.168.130.131 上执行 hostnamectl set-hostname centos2 ## 设置主机名为cento"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-docker-%E4%B8%8A%E5%AE%89%E8%A3%85-nfs/><link rel=next href=https://ooooo-youwillsee.github.io/ooooo-notes/spring-%E4%B8%AD%E6%9C%89%E5%93%AA%E4%BA%9B%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%92%8C%E6%89%A9%E5%B1%95%E7%B1%BB/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"在 centos 上安装 k8s","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s\/"},"genre":"posts","keywords":"k8s, cloud native","wordcount":1199,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s\/","datePublished":"2021-01-01T18:32:22+08:00","dateModified":"2021-01-01T18:32:22+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/>文章 </a><a class=menu-item href=/ooooo-notes/tags/>标签 </a><a class=menu-item href=/ooooo-notes/categories/>分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title>文章</a><a class=menu-item href=/ooooo-notes/tags/ title>标签</a><a class=menu-item href=/ooooo-notes/categories/ title>分类</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">在 centos 上安装 k8s</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E9%9A%8F%E7%AC%94/><i class="far fa-folder fa-fw" aria-hidden=true></i>随笔</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2021-01-01 18:32:22">2021-01-01 18:32:22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1199 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;3 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#1-两台机器初始化设置>1. 两台机器初始化设置</a><ul><li><a href=#11-hostname-设置>1.1 hostname 设置</a></li><li><a href=#12-etchosts-文件-两个机器都需要>1.2 /etc/hosts 文件 (两个机器都需要)</a></li><li><a href=#13-创建非-root-用户-两个机器都需要>1.3 创建非 root 用户 (两个机器都需要)</a></li><li><a href=#14-添加-yum-代理-两个机器都需要>1.4 添加 yum 代理 (两个机器都需要)</a></li><li><a href=#15-安装-docker-服务-两个机器都需要>1.5 安装 docker 服务 (两个机器都需要)</a></li></ul></li><li><a href=#2-k8s-的-kubeadm-安装-两台都需要>2. k8s 的 kubeadm 安装 (两台都需要)</a></li><li><a href=#3-创建-k8s-集群-两台都需要>3. 创建 k8s 集群 (两台都需要)</a></li></ul></nav></div></div><div class=content id=content><h2 id=1-两台机器初始化设置>1. 两台机器初始化设置</h2><h3 id=11-hostname-设置>1.1 hostname 设置</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>hostnamectl <span class=c1>## 查看当前的hostname</span>
+</span></span><span class=line><span class=cl>hostnamectl set-hostname centos1 <span class=c1>## 设置主机名为centos1, 在 192.168.130.131 上执行</span>
+</span></span><span class=line><span class=cl>hostnamectl set-hostname centos2 <span class=c1>## 设置主机名为centos1, 在 192.168.130.132 上执行</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=12-etchosts-文件-两个机器都需要>1.2 /etc/hosts 文件 (两个机器都需要)</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>192.168.1.8 ooooo
+</span></span><span class=line><span class=cl>192.168.130.131 centos1 <span class=c1>## k8s master</span>
+</span></span><span class=line><span class=cl>192.168.130.132 centos2 <span class=c1>## k8s worker</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=13-创建非-root-用户-两个机器都需要>1.3 创建非 root 用户 (两个机器都需要)</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>useradd ooooo -g ooooo  <span class=c1>## 添加用户，两个机器都执行</span>
+</span></span><span class=line><span class=cl>passwd ooooo <span class=c1>## 修改用户密码，两个机器都执行</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=14-添加-yum-代理-两个机器都需要>1.4 添加 yum 代理 (两个机器都需要)</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo vim /etc/yum.conf <span class=c1>## 编辑 yum 配置文件</span>
+</span></span><span class=line><span class=cl><span class=nv>proxy</span><span class=o>=</span>http://ooooo:10800 <span class=c1>## 在文件中添加一行</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=15-安装-docker-服务-两个机器都需要>1.5 安装 docker 服务 (两个机器都需要)</h3><blockquote><p><a href=https://docs.docker.com/engine/install/centos/ target=_blank rel="noopener noreffer">官方 docker 安装文档</a></p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>参考文档安装 docker
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo vim /etc/docker/daemon.json <span class=c1>## 编辑 docker 配置文件， 添加下面 json 配置，这是因为 k8s 默认使用的 cgroup driver 是 systemd</span>
+</span></span><span class=line><span class=cl><span class=o>{</span>
+</span></span><span class=line><span class=cl>  <span class=s2>&#34;exec-opts&#34;</span>: <span class=o>[</span><span class=s2>&#34;native.cgroupdriver=systemd&#34;</span><span class=o>]</span> 
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo systemctl <span class=nb>enable</span> --now docker.service <span class=c1>## 设置 docker 服务开机启动，并且现在启动</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo systemctl status docker <span class=c1>## 查看 docker 服务的状态， 失败了，使用下一条命令查看日志</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>journalctl -xeu docker <span class=c1>## 查看 docker 日志服务</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=2-k8s-的-kubeadm-安装-两台都需要>2. k8s 的 kubeadm 安装 (两台都需要)</h2><blockquote><p><a href=https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/ target=_blank rel="noopener noreffer">官方 k8s 安装文档</a></p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>参考文档检查服务器的状态是否可以安装 k8s 服务
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 关闭 swap 分区</span>
+</span></span><span class=line><span class=cl>swapoff -a
+</span></span><span class=line><span class=cl>sudo <span class=nb>echo</span> vm.swappiness<span class=o>=</span><span class=m>0</span> &gt;&gt; /etc/sysctl.con <span class=c1>## 永久关闭 swap 分区， k8s 不能运行在有 swap 分区的机器上</span>
+</span></span><span class=line><span class=cl>free -h <span class=c1>## 查看 swap 分区是否关闭，显示 0 表示已关闭 </span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 检查 br_netfilter 是否被加载，没有任何输出，表示没有加载</span>
+</span></span><span class=line><span class=cl>lsmod <span class=p>|</span> grep br_netfilter 
+</span></span><span class=line><span class=cl>sudo modprobe br_netfilter <span class=c1>## 加载 br_netfilter 模块</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 配置网络</span>
+</span></span><span class=line><span class=cl>cat <span class=s>&lt;&lt;EOF | sudo tee /etc/modules-load.d/k8s.conf
+</span></span></span><span class=line><span class=cl><span class=s>br_netfilter
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>cat <span class=s>&lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf 
+</span></span></span><span class=line><span class=cl><span class=s>net.bridge.bridge-nf-call-ip6tables = 1
+</span></span></span><span class=line><span class=cl><span class=s>net.bridge.bridge-nf-call-iptables = 1
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>sudo sysctl --system
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>安装容器运行时<span class=o>(</span>runtime<span class=o>)</span>,k8s 高版本采用自动检查方式,不用做任何处理
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 添加 k8s 镜像仓库，在前面中，设置了 yum 代理</span>
+</span></span><span class=line><span class=cl><span class=c1>## 在官方文档中多了 exclude=kubelet kubeadm kubectl ，这里去掉, 直接安装最新版本的</span>
+</span></span><span class=line><span class=cl>cat <span class=s>&lt;&lt;EOF | sudo tee /etc/yum.repos.d/kubernetes.repo  
+</span></span></span><span class=line><span class=cl><span class=s>[kubernetes]
+</span></span></span><span class=line><span class=cl><span class=s>name=Kubernetes
+</span></span></span><span class=line><span class=cl><span class=s>baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+</span></span></span><span class=line><span class=cl><span class=s>enabled=1
+</span></span></span><span class=line><span class=cl><span class=s>gpgcheck=1
+</span></span></span><span class=line><span class=cl><span class=s>repo_gpgcheck=1
+</span></span></span><span class=line><span class=cl><span class=s>gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 关闭 selinux</span>
+</span></span><span class=line><span class=cl>sudo setenforce <span class=m>0</span> 
+</span></span><span class=line><span class=cl>sudo sed -i <span class=s1>&#39;s/^SELINUX=enforcing$/SELINUX=permissive/&#39;</span> /etc/selinux/config
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 安装 k8s 服务, --disableexcludes=kubernetes 表示排除 kubernetes 之外的镜像源</span>
+</span></span><span class=line><span class=cl>sudo yum install -y kubelet kubeadm kubectl --disableexcludes<span class=o>=</span>kubernetes
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 设置 kubelet 开机启动，并且现在启动</span>
+</span></span><span class=line><span class=cl><span class=c1>## 启动之后可能会报错，如果原因是 没有读取到 kubelet 的配置文件，这里可以不用管，稍后会重启这个服务</span>
+</span></span><span class=line><span class=cl>sudo systemctl <span class=nb>enable</span> --now kubelet
+</span></span><span class=line><span class=cl>sudo systemctl status kubelet <span class=c1>## 查看 kubelet 的状态</span>
+</span></span><span class=line><span class=cl>journalctl -xeu kubelet <span class=c1>## 查看 kubelet 的日志</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=3-创建-k8s-集群-两台都需要>3. 创建 k8s 集群 (两台都需要)</h2><blockquote><p><a href=https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/ target=_blank rel="noopener noreffer">创建 k8s 集群官方文档</a></p><p><a href=https://kubernetes.io/docs/concepts/cluster-administration/networking/##how-to-implement-the-kubernetes-networking-model target=_blank rel="noopener noreffer">k8s pod network 插件文档</a></p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1>## 执行 kubeadm init 命令， 在 k8s master 机器上执行，默认情况下， k8s 创建 pod 不会在 master 机器上</span>
+</span></span><span class=line><span class=cl><span class=c1>## 重点注意: --pod-network-cidr=10.244.0.0/16 这个参数必须要有，没有的话安装 cni 会报错</span>
+</span></span><span class=line><span class=cl><span class=c1>## 注意 preflight 的前置检查输出，可能需要添加 docker group，这个会输出有提示的命令</span>
+</span></span><span class=line><span class=cl>sudo kubeadm init --image-repository registry.aliyuncs.com/google_containers --apiserver-advertise-address<span class=o>=</span>192.168.130.131 --pod-network-cidr<span class=o>=</span>10.244.0.0/16
+</span></span><span class=line><span class=cl><span class=c1>## 执行命令之后，会有 kubeadm join 输出行</span>
+</span></span><span class=line><span class=cl><span class=c1>## （分为 master-token 和 worker-token）， 类似于下面的命令，在 centos2 上执行 worker-join-token 的命令</span>
+</span></span><span class=line><span class=cl>sudo kubeadm join 192.168.130.131:6443 --token 8auvt0.zfw0ayr45d80q8pb <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>	--discovery-token-ca-cert-hash sha256:efe854739efef5fbaf3f6e28c899481c8d7797c1997fc8315b921a9ede400ca8
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl><span class=c1>## 在机器上执行 kubeadm join 或者 kubeadm init 命令之后，重启 kubelet 服务	</span>
+</span></span><span class=line><span class=cl>sudo systemctl restart kubelet
+</span></span><span class=line><span class=cl>sudo systemctl status kubelet
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 设置 kubectl 的配置文件， 为 $HOME/.kube/config</span>
+</span></span><span class=line><span class=cl>mkdir -p <span class=nv>$HOME</span>/.kube
+</span></span><span class=line><span class=cl>sudo cp -i /etc/kubernetes/admin.conf <span class=nv>$HOME</span>/.kube/config
+</span></span><span class=line><span class=cl>sudo chown <span class=k>$(</span>id -u<span class=k>)</span>:<span class=k>$(</span>id -g<span class=k>)</span> <span class=nv>$HOME</span>/.kube/config
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 安装 pod network 插件, 这里使用 flannel 插件</span>
+</span></span><span class=line><span class=cl>kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 查看 flannel 是否已经启动完成, cni 也启动成功</span>
+</span></span><span class=line><span class=cl>kubectl get pods -A
+</span></span><span class=line><span class=cl><span class=c1>## 成功之后会有下面的服务， 都是 running 状态</span>
+</span></span><span class=line><span class=cl>kube-system   coredns-7f6cbbb7b8-5hqt5          1/1     Running   <span class=m>15</span> <span class=o>(</span>76m ago<span class=o>)</span>   26h
+</span></span><span class=line><span class=cl>kube-system   coredns-7f6cbbb7b8-lwdrv          1/1     Running   <span class=m>15</span> <span class=o>(</span>76m ago<span class=o>)</span>   26h
+</span></span><span class=line><span class=cl>kube-system   etcd-centos1                      1/1     Running   <span class=m>18</span> <span class=o>(</span>76m ago<span class=o>)</span>   26h
+</span></span><span class=line><span class=cl>kube-system   kube-apiserver-centos1            1/1     Running   <span class=m>25</span> <span class=o>(</span>76m ago<span class=o>)</span>   26h
+</span></span><span class=line><span class=cl>kube-system   kube-controller-manager-centos1   1/1     Running   <span class=m>12</span> <span class=o>(</span>76m ago<span class=o>)</span>   26h
+</span></span><span class=line><span class=cl>kube-system   kube-flannel-ds-6lx7s             1/1     Running   <span class=m>6</span> <span class=o>(</span>76m ago<span class=o>)</span>    21h
+</span></span><span class=line><span class=cl>kube-system   kube-flannel-ds-n5tfn             1/1     Running   <span class=m>6</span> <span class=o>(</span>76m ago<span class=o>)</span>    21h
+</span></span><span class=line><span class=cl>kube-system   kube-proxy-78jrm                  1/1     Running   <span class=m>8</span> <span class=o>(</span>76m ago<span class=o>)</span>    26h
+</span></span><span class=line><span class=cl>kube-system   kube-proxy-wl5jg                  1/1     Running   <span class=m>8</span> <span class=o>(</span>76m ago<span class=o>)</span>    26h
+</span></span><span class=line><span class=cl>kube-system   kube-scheduler-centos1            1/1     Running   <span class=m>16</span> <span class=o>(</span>76m ago<span class=o>)</span>   26h
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2021-01-01 18:32:22</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/ data-title="在 centos 上安装 k8s"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/ data-title="在 centos 上安装 k8s"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/ data-title="在 centos 上安装 k8s"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/k8s/>k8s</a>,&nbsp;<a href=/ooooo-notes/tags/cloud-native/>cloud native</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E5%9C%A8-docker-%E4%B8%8A%E5%AE%89%E8%A3%85-nfs/ class=prev rel=prev title="在 docker 上安装 nfs"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>在 docker 上安装 nfs</a>
+<a href=/ooooo-notes/spring-%E4%B8%AD%E6%9C%89%E5%93%AA%E4%BA%9B%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%92%8C%E6%89%A9%E5%B1%95%E7%B1%BB/ class=next rel=next title="Spring 中有哪些核心类和扩展类">Spring 中有哪些核心类和扩展类<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.102.3">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>

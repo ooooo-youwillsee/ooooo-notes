@@ -1,0 +1,350 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>调试 deployment-controller 的源码 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="调试 deployment-controller 的源码"><meta property="og:description" content="调试 deployment-controller 的源码 deployment 资源是我们经常需要使用的，也是我们最应该熟悉的源码. 对于调试源码，我使用是 deployment_controller_test.go 测试类， TestSyncDeploymentCreatesReplicaSet 方法. TestSyncDeploymentCreatesReplicaSet 测试方法的结构 源码路径：kube"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-06-01T18:32:22+08:00"><meta property="article:modified_time" content="2021-06-01T18:32:22+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="调试 deployment-controller 的源码"><meta name=twitter:description content="调试 deployment-controller 的源码 deployment 资源是我们经常需要使用的，也是我们最应该熟悉的源码. 对于调试源码，我使用是 deployment_controller_test.go 测试类， TestSyncDeploymentCreatesReplicaSet 方法. TestSyncDeploymentCreatesReplicaSet 测试方法的结构 源码路径：kube"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/2021%E5%B9%B4%E8%AE%A1%E5%88%92/><link rel=next href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%90%AD%E5%BB%BA-kubernetes-1.24-%E7%89%88%E6%9C%AC%E7%9A%84%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"调试 deployment-controller 的源码","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81\/"},"genre":"posts","keywords":"k8s, cloud native, source code","wordcount":1554,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81\/","datePublished":"2021-06-01T18:32:22+08:00","dateModified":"2021-06-01T18:32:22+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/>文章 </a><a class=menu-item href=/ooooo-notes/tags/>标签 </a><a class=menu-item href=/ooooo-notes/categories/>分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title>文章</a><a class=menu-item href=/ooooo-notes/tags/ title>标签</a><a class=menu-item href=/ooooo-notes/categories/ title>分类</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">调试 deployment-controller 的源码</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E9%9A%8F%E7%AC%94/><i class="far fa-folder fa-fw" aria-hidden=true></i>随笔</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2021-06-01 18:32:22">2021-06-01 18:32:22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1554 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;4 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#testsyncdeploymentcreatesreplicaset-测试方法的结构>TestSyncDeploymentCreatesReplicaSet 测试方法的结构</a></li><li><a href=#测试方法的执行-fruntestutilgetkeyd-t>测试方法的执行 f.run(testutil.GetKey(d, t))</a></li></ul></nav></div></div><div class=content id=content><h1 id=调试-deployment-controller-的源码>调试 deployment-controller 的源码</h1><ol><li><code>deployment</code> 资源是我们经常需要使用的，也是我们最应该熟悉的源码.</li><li>对于调试源码，我使用是 <code>deployment_controller_test.go</code> 测试类， <code>TestSyncDeploymentCreatesReplicaSet</code> 方法.</li></ol><h2 id=testsyncdeploymentcreatesreplicaset-测试方法的结构>TestSyncDeploymentCreatesReplicaSet 测试方法的结构</h2><p>源码路径：<code>kubernetes\pkg\controller\deployment\deployment_controller_test.go</code></p><ol><li>测试配置对象</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>f</span> <span class=o>:=</span> <span class=nf>newFixture</span><span class=p>(</span><span class=nx>t</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>创建一个 fixture 对象， 里面有 <strong>objects</strong> 属性，这个用来<strong>模拟 clientSet</strong>, 也就是<strong>请求 etcd 的接口</strong>，后面将会详细描述。</p><ol start=2><li>创建一个 <strong>Deployment</strong> 对象， 标签为 &ldquo;foo&rdquo;: &ldquo;bar&rdquo;</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>d</span> <span class=o>:=</span> <span class=nf>newDeployment</span><span class=p>(</span><span class=s>&#34;foo&#34;</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=kc>nil</span><span class=p>,</span> <span class=kc>nil</span><span class=p>,</span> <span class=kc>nil</span><span class=p>,</span> <span class=kd>map</span><span class=p>[</span><span class=kt>string</span><span class=p>]</span><span class=kt>string</span><span class=p>{</span><span class=s>&#34;foo&#34;</span><span class=p>:</span> <span class=s>&#34;bar&#34;</span><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li>添加缓存对象，用于后续的<strong>List</strong>接口</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>f</span><span class=p>.</span><span class=nx>dLister</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>dLister</span><span class=p>,</span> <span class=nx>d</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>f</span><span class=p>.</span><span class=nx>objects</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>objects</span><span class=p>,</span> <span class=nx>d</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=4><li>创建一个 <strong>ReplicaSet</strong> 对象</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>rs</span> <span class=o>:=</span> <span class=nf>newReplicaSet</span><span class=p>(</span><span class=nx>d</span><span class=p>,</span> <span class=s>&#34;deploymentrs-4186632231&#34;</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=5><li>希望的测试结果</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>f</span><span class=p>.</span><span class=nf>expectCreateRSAction</span><span class=p>(</span><span class=nx>rs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>f</span><span class=p>.</span><span class=nf>expectUpdateDeploymentStatusAction</span><span class=p>(</span><span class=nx>d</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>f</span><span class=p>.</span><span class=nf>expectUpdateDeploymentStatusAction</span><span class=p>(</span><span class=nx>d</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>从上面的语句就可以发现，kubernetes 的测试类，意图非常明确。</p><p>也就是说 <strong>我创建一个 Deployment ** 对象，肯定会产生一个 ReplicaSet 对象，并且 DeploymentStatus 会被更新两次</strong>, 接下来，我们来看看是<strong>kubernetes如何做到的</strong>。</p><h2 id=测试方法的执行-fruntestutilgetkeyd-t>测试方法的执行 f.run(testutil.GetKey(d, t))</h2><ol><li>获取 Deployment 的 key 属性</li></ol><p>代码</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>testutil</span><span class=p>.</span><span class=nf>GetKey</span><span class=p>(</span><span class=nx>d</span><span class=p>,</span> <span class=nx>t</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>GetKey</span><span class=p>(</span><span class=nx>obj</span> <span class=kd>interface</span><span class=p>{},</span> <span class=nx>t</span> <span class=o>*</span><span class=nx>testing</span><span class=p>.</span><span class=nx>T</span><span class=p>)</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 每个删除的对象都是这个类型, 这里取出了真实的对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>tombstone</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>obj</span><span class=p>.(</span><span class=nx>cache</span><span class=p>.</span><span class=nx>DeletedFinalStateUnknown</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// if tombstone , try getting the value from tombstone.Obj
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=nx>obj</span> <span class=p>=</span> <span class=nx>tombstone</span><span class=p>.</span><span class=nx>Obj</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 取出指针类型中 value，获取 Name 属性
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>val</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=nx>obj</span><span class=p>).</span><span class=nf>Elem</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=nx>name</span> <span class=o>:=</span> <span class=nx>val</span><span class=p>.</span><span class=nf>FieldByName</span><span class=p>(</span><span class=s>&#34;Name&#34;</span><span class=p>).</span><span class=nf>String</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>t</span><span class=p>.</span><span class=nf>Errorf</span><span class=p>(</span><span class=s>&#34;Unexpected object %v&#34;</span><span class=p>,</span> <span class=nx>obj</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 获取key, 结果就是 {namespace}/{name}
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>key</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>keyFunc</span><span class=p>(</span><span class=nx>obj</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>t</span><span class=p>.</span><span class=nf>Errorf</span><span class=p>(</span><span class=s>&#34;Unexpected error getting key for %T %v: %v&#34;</span><span class=p>,</span> <span class=nx>val</span><span class=p>.</span><span class=nf>Interface</span><span class=p>(),</span> <span class=nx>name</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>key</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li>调用 fixture.run_() 方法</li></ol><p>这个函数有三个入参：<code>run_(deploymentName string, startInformers bool, expectError bool)</code>.</p><p>当前的测试方法 <strong>TestSyncDeploymentCreatesReplicaSet</strong> 的 <code>startInformers</code> 参数为 <strong>false</strong>, 表示不启动 Informer, 后续会用<strong>另外一个测试类</strong>来说明 <strong>Informer 的启动过程</strong>.</p><p>接下来详细看看 <code>fixture.run_()</code> 方法都干了啥。</p><ol start=3><li>创建一个 controller</li></ol><p><code>c, informers, err := f.newController()</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>f</span> <span class=o>*</span><span class=nx>fixture</span><span class=p>)</span> <span class=nf>newController</span><span class=p>()</span> <span class=p>(</span><span class=o>*</span><span class=nx>DeploymentController</span><span class=p>,</span> <span class=nx>informers</span><span class=p>.</span><span class=nx>SharedInformerFactory</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 这个也就是之前说的，objects 会用来构建 模拟的 clientSet
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>f</span><span class=p>.</span><span class=nx>client</span> <span class=p>=</span> <span class=nx>fake</span><span class=p>.</span><span class=nf>NewSimpleClientset</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>objects</span><span class=o>...</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 创建了 informer 和 deploymentController
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>informers</span> <span class=o>:=</span> <span class=nx>informers</span><span class=p>.</span><span class=nf>NewSharedInformerFactory</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>client</span><span class=p>,</span> <span class=nx>controller</span><span class=p>.</span><span class=nf>NoResyncPeriodFunc</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>	<span class=nx>c</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>NewDeploymentController</span><span class=p>(</span><span class=nx>informers</span><span class=p>.</span><span class=nf>Apps</span><span class=p>().</span><span class=nf>V1</span><span class=p>().</span><span class=nf>Deployments</span><span class=p>(),</span> <span class=nx>informers</span><span class=p>.</span><span class=nf>Apps</span><span class=p>().</span><span class=nf>V1</span><span class=p>().</span><span class=nf>ReplicaSets</span><span class=p>(),</span> <span class=nx>informers</span><span class=p>.</span><span class=nf>Core</span><span class=p>().</span><span class=nf>V1</span><span class=p>().</span><span class=nf>Pods</span><span class=p>(),</span> <span class=nx>f</span><span class=p>.</span><span class=nx>client</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 模拟一个 recorder
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>eventRecorder</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>record</span><span class=p>.</span><span class=nx>FakeRecorder</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 所有状态默认为 synced
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>dListerSynced</span> <span class=p>=</span> <span class=nx>alwaysReady</span>
+</span></span><span class=line><span class=cl>	<span class=nx>c</span><span class=p>.</span><span class=nx>rsListerSynced</span> <span class=p>=</span> <span class=nx>alwaysReady</span>
+</span></span><span class=line><span class=cl>	<span class=nx>c</span><span class=p>.</span><span class=nx>podListerSynced</span> <span class=p>=</span> <span class=nx>alwaysReady</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 下面这个代码很关键
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>// 先前在 fixture 对象中加入了相应的 Lister，在这里遍历这些 Lister, 就是为了模拟 Informer 的本地缓存
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>// kube_controller_manager 程序启动之后，会请求 kube_apiserver 来获取相应的资源，从而更新到自己的缓存中
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>d</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>f</span><span class=p>.</span><span class=nx>dLister</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>informers</span><span class=p>.</span><span class=nf>Apps</span><span class=p>().</span><span class=nf>V1</span><span class=p>().</span><span class=nf>Deployments</span><span class=p>().</span><span class=nf>Informer</span><span class=p>().</span><span class=nf>GetIndexer</span><span class=p>().</span><span class=nf>Add</span><span class=p>(</span><span class=nx>d</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>rs</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>f</span><span class=p>.</span><span class=nx>rsLister</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>informers</span><span class=p>.</span><span class=nf>Apps</span><span class=p>().</span><span class=nf>V1</span><span class=p>().</span><span class=nf>ReplicaSets</span><span class=p>().</span><span class=nf>Informer</span><span class=p>().</span><span class=nf>GetIndexer</span><span class=p>().</span><span class=nf>Add</span><span class=p>(</span><span class=nx>rs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>pod</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>f</span><span class=p>.</span><span class=nx>podLister</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>informers</span><span class=p>.</span><span class=nf>Core</span><span class=p>().</span><span class=nf>V1</span><span class=p>().</span><span class=nf>Pods</span><span class=p>().</span><span class=nf>Informer</span><span class=p>().</span><span class=nf>GetIndexer</span><span class=p>().</span><span class=nf>Add</span><span class=p>(</span><span class=nx>pod</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>c</span><span class=p>,</span> <span class=nx>informers</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>详细分析是怎么模拟 clientSet 的？</p><p><code>f.client = fake.NewSimpleClientset(f.objects...)</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewSimpleClientset</span><span class=p>(</span><span class=nx>objects</span> <span class=o>...</span><span class=nx>runtime</span><span class=p>.</span><span class=nx>Object</span><span class=p>)</span> <span class=o>*</span><span class=nx>Clientset</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 这个是模拟的最终实现对象，所有操作都是依赖它来完成的
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>o</span> <span class=o>:=</span> <span class=nx>testing</span><span class=p>.</span><span class=nf>NewObjectTracker</span><span class=p>(</span><span class=nx>scheme</span><span class=p>,</span> <span class=nx>codecs</span><span class=p>.</span><span class=nf>UniversalDecoder</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 遍历对象，依次添加
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>obj</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>objects</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>o</span><span class=p>.</span><span class=nf>Add</span><span class=p>(</span><span class=nx>obj</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 创建一个 clientSet
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>cs</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>Clientset</span><span class=p>{</span><span class=nx>tracker</span><span class=p>:</span> <span class=nx>o</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 下面三个都是依赖 tracker 来实现的， 通过不同的 Action, 比如 ListActionImpl、GetActionImpl 等
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>cs</span><span class=p>.</span><span class=nx>discovery</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>fakediscovery</span><span class=p>.</span><span class=nx>FakeDiscovery</span><span class=p>{</span><span class=nx>Fake</span><span class=p>:</span> <span class=o>&amp;</span><span class=nx>cs</span><span class=p>.</span><span class=nx>Fake</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>cs</span><span class=p>.</span><span class=nf>AddReactor</span><span class=p>(</span><span class=s>&#34;*&#34;</span><span class=p>,</span> <span class=s>&#34;*&#34;</span><span class=p>,</span> <span class=nx>testing</span><span class=p>.</span><span class=nf>ObjectReaction</span><span class=p>(</span><span class=nx>o</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=nx>cs</span><span class=p>.</span><span class=nf>AddWatchReactor</span><span class=p>(</span><span class=s>&#34;*&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>action</span> <span class=nx>testing</span><span class=p>.</span><span class=nx>Action</span><span class=p>)</span> <span class=p>(</span><span class=nx>handled</span> <span class=kt>bool</span><span class=p>,</span> <span class=nx>ret</span> <span class=nx>watch</span><span class=p>.</span><span class=nx>Interface</span><span class=p>,</span> <span class=nx>err</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>gvr</span> <span class=o>:=</span> <span class=nx>action</span><span class=p>.</span><span class=nf>GetResource</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>		<span class=nx>ns</span> <span class=o>:=</span> <span class=nx>action</span><span class=p>.</span><span class=nf>GetNamespace</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>		<span class=nx>watch</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>o</span><span class=p>.</span><span class=nf>Watch</span><span class=p>(</span><span class=nx>gvr</span><span class=p>,</span> <span class=nx>ns</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>false</span><span class=p>,</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>true</span><span class=p>,</span> <span class=nx>watch</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>	<span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>cs</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>ObjectTracker 如果添加对象的？</p><p><code>testing.NewObjectTracker(scheme, codecs.UniversalDecoder())</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>tracker</span><span class=p>)</span> <span class=nf>Add</span><span class=p>(</span><span class=nx>obj</span> <span class=nx>runtime</span><span class=p>.</span><span class=nx>Object</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 添加 List
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>if</span> <span class=nx>meta</span><span class=p>.</span><span class=nf>IsListType</span><span class=p>(</span><span class=nx>obj</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>t</span><span class=p>.</span><span class=nf>addList</span><span class=p>(</span><span class=nx>obj</span><span class=p>,</span> <span class=kc>false</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 用来获取 namespace
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>objMeta</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>meta</span><span class=p>.</span><span class=nf>Accessor</span><span class=p>(</span><span class=nx>obj</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// 获取 gvk
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>gvks</span><span class=p>,</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>t</span><span class=p>.</span><span class=nx>scheme</span><span class=p>.</span><span class=nf>ObjectKinds</span><span class=p>(</span><span class=nx>obj</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>gvk</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>gvks</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// NOTE: UnsafeGuessKindToResource is a heuristic and default match. The
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=c1>// actual registration in apiserver can specify arbitrary route for a
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=c1>// gvk. If a test uses such objects, it cannot preset the tracker with
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=c1>// objects via Add(). Instead, it should trigger the Create() function
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=c1>// of the tracker, where an arbitrary gvr can be specified.
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=nx>gvr</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>meta</span><span class=p>.</span><span class=nf>UnsafeGuessKindToResource</span><span class=p>(</span><span class=nx>gvk</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// Resource doesn&#39;t have the concept of &#34;__internal&#34; version, just set it to &#34;&#34;.
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=k>if</span> <span class=nx>gvr</span><span class=p>.</span><span class=nx>Version</span> <span class=o>==</span> <span class=nx>runtime</span><span class=p>.</span><span class=nx>APIVersionInternal</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=nx>gvr</span><span class=p>.</span><span class=nx>Version</span> <span class=p>=</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>		<span class=c1>// 添加这个
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=nx>err</span> <span class=o>:=</span> <span class=nx>t</span><span class=p>.</span><span class=nf>add</span><span class=p>(</span><span class=nx>gvr</span><span class=p>,</span> <span class=nx>obj</span><span class=p>,</span> <span class=nx>objMeta</span><span class=p>.</span><span class=nf>GetNamespace</span><span class=p>(),</span> <span class=kc>false</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>tracker</span><span class=p>)</span> <span class=nf>add</span><span class=p>(</span><span class=nx>gvr</span> <span class=nx>schema</span><span class=p>.</span><span class=nx>GroupVersionResource</span><span class=p>,</span> <span class=nx>obj</span> <span class=nx>runtime</span><span class=p>.</span><span class=nx>Object</span><span class=p>,</span> <span class=nx>ns</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>replaceExisting</span> <span class=kt>bool</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>t</span><span class=p>.</span><span class=nx>lock</span><span class=p>.</span><span class=nf>Lock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>t</span><span class=p>.</span><span class=nx>lock</span><span class=p>.</span><span class=nf>Unlock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>gr</span> <span class=o>:=</span> <span class=nx>gvr</span><span class=p>.</span><span class=nf>GroupResource</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// To avoid the object from being accidentally modified by caller
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>// after it&#39;s been added to the tracker, we always store the deep
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>// copy.
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>obj</span> <span class=p>=</span> <span class=nx>obj</span><span class=p>.</span><span class=nf>DeepCopyObject</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>newMeta</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>meta</span><span class=p>.</span><span class=nf>Accessor</span><span class=p>(</span><span class=nx>obj</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>_</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>t</span><span class=p>.</span><span class=nx>objects</span><span class=p>[</span><span class=nx>gvr</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>t</span><span class=p>.</span><span class=nx>objects</span><span class=p>[</span><span class=nx>gvr</span><span class=p>]</span> <span class=p>=</span> <span class=nb>make</span><span class=p>(</span><span class=kd>map</span><span class=p>[</span><span class=nx>types</span><span class=p>.</span><span class=nx>NamespacedName</span><span class=p>]</span><span class=nx>runtime</span><span class=p>.</span><span class=nx>Object</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// replaceExisting 策略来放入新对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>namespacedName</span> <span class=o>:=</span> <span class=nx>types</span><span class=p>.</span><span class=nx>NamespacedName</span><span class=p>{</span><span class=nx>Namespace</span><span class=p>:</span> <span class=nx>newMeta</span><span class=p>.</span><span class=nf>GetNamespace</span><span class=p>(),</span> <span class=nx>Name</span><span class=p>:</span> <span class=nx>newMeta</span><span class=p>.</span><span class=nf>GetName</span><span class=p>()}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>ok</span> <span class=p>=</span> <span class=nx>t</span><span class=p>.</span><span class=nx>objects</span><span class=p>[</span><span class=nx>gvr</span><span class=p>][</span><span class=nx>namespacedName</span><span class=p>];</span> <span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>replaceExisting</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>w</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>t</span><span class=p>.</span><span class=nf>getWatches</span><span class=p>(</span><span class=nx>gvr</span><span class=p>,</span> <span class=nx>ns</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=c1>// To avoid the object from being accidentally modified by watcher
+</span></span></span><span class=line><span class=cl><span class=c1></span>				<span class=c1>// 最终操作： f.result &lt;- Event{Modified, obj}
+</span></span></span><span class=line><span class=cl><span class=c1></span>				<span class=nx>w</span><span class=p>.</span><span class=nf>Modify</span><span class=p>(</span><span class=nx>obj</span><span class=p>.</span><span class=nf>DeepCopyObject</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=c1>// 覆盖原先的对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>			<span class=nx>t</span><span class=p>.</span><span class=nx>objects</span><span class=p>[</span><span class=nx>gvr</span><span class=p>][</span><span class=nx>namespacedName</span><span class=p>]</span> <span class=p>=</span> <span class=nx>obj</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>errors</span><span class=p>.</span><span class=nf>NewAlreadyExists</span><span class=p>(</span><span class=nx>gr</span><span class=p>,</span> <span class=nx>newMeta</span><span class=p>.</span><span class=nf>GetName</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>replaceExisting</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// Tried to update but no matching object was found.
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=k>return</span> <span class=nx>errors</span><span class=p>.</span><span class=nf>NewNotFound</span><span class=p>(</span><span class=nx>gr</span><span class=p>,</span> <span class=nx>newMeta</span><span class=p>.</span><span class=nf>GetName</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 最终也就是放到这个 map 中
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>t</span><span class=p>.</span><span class=nx>objects</span><span class=p>[</span><span class=nx>gvr</span><span class=p>][</span><span class=nx>namespacedName</span><span class=p>]</span> <span class=p>=</span> <span class=nx>obj</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 实现 objectTracker, 每添加一个新的对象，就会向 chan 中放入这个新对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>// 最终操作： f.result &lt;- Event{Added, obj)
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>w</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>t</span><span class=p>.</span><span class=nf>getWatches</span><span class=p>(</span><span class=nx>gvr</span><span class=p>,</span> <span class=nx>ns</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// To avoid the object from being accidentally modified by watcher
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=nx>w</span><span class=p>.</span><span class=nf>Add</span><span class=p>(</span><span class=nx>obj</span><span class=p>.</span><span class=nf>DeepCopyObject</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2021-06-01 18:32:22</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/ data-title="调试 deployment-controller 的源码"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/ data-title="调试 deployment-controller 的源码"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/ data-title="调试 deployment-controller 的源码"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/k8s/>k8s</a>,&nbsp;<a href=/ooooo-notes/tags/cloud-native/>cloud native</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/2021%E5%B9%B4%E8%AE%A1%E5%88%92/ class=prev rel=prev title=2021年学习计划><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>2021年学习计划</a>
+<a href=/ooooo-notes/%E6%90%AD%E5%BB%BA-kubernetes-1.24-%E7%89%88%E6%9C%AC%E7%9A%84%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/ class=next rel=next title="搭建 kubernetes 1.24 版本的源码调试环境">搭建 kubernetes 1.24 版本的源码调试环境<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.102.3">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>

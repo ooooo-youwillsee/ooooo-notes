@@ -1,0 +1,380 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>在 ubuntu 上安装 k8s - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="在 ubuntu 上安装 k8s"><meta property="og:description" content="使用 ubuntu 来安装 kubernetes 1.24 版本 1. 机器初始化设置 hostname 设置 1 2 hostnamectl ## 查看当前的hostname hostnamectl set-hostname node1 ## 设置主机名为node1 /etc/hosts 文件 和 DNS 配置 1 2 3 4 5 6 7 8 9 10"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-01-01T18:32:22+08:00"><meta property="article:modified_time" content="2022-01-01T18:32:22+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="在 ubuntu 上安装 k8s"><meta name=twitter:description content="使用 ubuntu 来安装 kubernetes 1.24 版本 1. 机器初始化设置 hostname 设置 1 2 hostnamectl ## 查看当前的hostname hostnamectl set-hostname node1 ## 设置主机名为node1 /etc/hosts 文件 和 DNS 配置 1 2 3 4 5 6 7 8 9 10"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%90%AD%E5%BB%BA-tomcat-%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/><link rel=next href=https://ooooo-youwillsee.github.io/ooooo-notes/2022%E5%B9%B4%E8%AE%A1%E5%88%92/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"在 ubuntu 上安装 k8s","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s\/"},"genre":"posts","keywords":"k8s, cloud native","wordcount":1417,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s\/","datePublished":"2022-01-01T18:32:22+08:00","dateModified":"2022-01-01T18:32:22+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/>文章 </a><a class=menu-item href=/ooooo-notes/tags/>标签 </a><a class=menu-item href=/ooooo-notes/categories/>分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title>文章</a><a class=menu-item href=/ooooo-notes/tags/ title>标签</a><a class=menu-item href=/ooooo-notes/categories/ title>分类</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">在 ubuntu 上安装 k8s</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E9%9A%8F%E7%AC%94/><i class="far fa-folder fa-fw" aria-hidden=true></i>随笔</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2022-01-01 18:32:22">2022-01-01 18:32:22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1417 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;3 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#1-机器初始化设置>1. 机器初始化设置</a><ul><li><a href=#hostname-设置>hostname 设置</a></li><li><a href=#etchosts-文件-和-dns-配置>/etc/hosts 文件 和 DNS 配置</a></li><li><a href=#创建非-root-用户可选>创建非 root 用户(可选)</a></li><li><a href=#安装-containerd-和-runc>安装 containerd 和 runc</a></li></ul></li><li><a href=#2-k8s-安装>2. k8s 安装</a></li><li><a href=#3-创建-k8s-集群>3. 创建 k8s 集群</a></li></ul></nav></div></div><div class=content id=content><h1 id=使用-ubuntu-来安装-kubernetes-124-版本>使用 ubuntu 来安装 kubernetes 1.24 版本</h1><h2 id=1-机器初始化设置>1. 机器初始化设置</h2><h3 id=hostname-设置>hostname 设置</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>hostnamectl <span class=c1>## 查看当前的hostname</span>
+</span></span><span class=line><span class=cl>hostnamectl set-hostname node1 <span class=c1>## 设置主机名为node1</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=etchosts-文件-和-dns-配置>/etc/hosts 文件 和 DNS 配置</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># k8s master</span>
+</span></span><span class=line><span class=cl>192.168.130.131 node1 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 更改dns配置</span>
+</span></span><span class=line><span class=cl>vim /etc/systemd/resolved.conf 
+</span></span><span class=line><span class=cl><span class=c1># 更改下面内容</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>Resolve<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>DNS</span><span class=o>=</span>8.8.8.8 8.8.4.4
+</span></span><span class=line><span class=cl><span class=c1># 重启dns</span>
+</span></span><span class=line><span class=cl>systemctl restart systemd-resolved.service
+</span></span></code></pre></td></tr></table></div></div><p>refer:</p><ol><li><a href=https://askubuntu.com/questions/1012641/dns-set-to-systemds-127-0-0-53-how-to-change-permanently target=_blank rel="noopener noreffer">ubuntu dns resolver</a></li></ol><h3 id=创建非-root-用户可选>创建非 root 用户(可选)</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 添加用户</span>
+</span></span><span class=line><span class=cl>useradd ooooo -g ooooo 
+</span></span><span class=line><span class=cl><span class=c1># 修改用户密码</span>
+</span></span><span class=line><span class=cl>passwd ooooo
+</span></span></code></pre></td></tr></table></div></div><h3 id=安装-containerd-和-runc>安装 containerd 和 runc</h3><p>安装 containerd</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>wget https://github.com/containerd/containerd/releases/download/v1.6.6/containerd-1.6.6-linux-amd64.tar.gz
+</span></span><span class=line><span class=cl>tar Cxzvf /usr/local containerd-1.6.6-linux-amd64.tar.gz
+</span></span><span class=line><span class=cl>mkdir -p /usr/local/lib/systemd/system/
+</span></span></code></pre></td></tr></table></div></div><p>通过 systemd 来启动 containerd</p><p>将下面的内容写入 <code>/usr/local/lib/systemd/system/containerd.service</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># Copyright The containerd Authors.</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);</span>
+</span></span><span class=line><span class=cl><span class=c1># you may not use this file except in compliance with the License.</span>
+</span></span><span class=line><span class=cl><span class=c1># You may obtain a copy of the License at</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1>#     http://www.apache.org/licenses/LICENSE-2.0</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># Unless required by applicable law or agreed to in writing, software</span>
+</span></span><span class=line><span class=cl><span class=c1># distributed under the License is distributed on an &#34;AS IS&#34; BASIS,</span>
+</span></span><span class=line><span class=cl><span class=c1># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+</span></span><span class=line><span class=cl><span class=c1># See the License for the specific language governing permissions and</span>
+</span></span><span class=line><span class=cl><span class=c1># limitations under the License.</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>Unit<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>Description</span><span class=o>=</span>containerd container runtime
+</span></span><span class=line><span class=cl><span class=nv>Documentation</span><span class=o>=</span>https://containerd.io
+</span></span><span class=line><span class=cl><span class=nv>After</span><span class=o>=</span>network.target local-fs.target
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>Service<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>ExecStartPre</span><span class=o>=</span>-/sbin/modprobe overlay
+</span></span><span class=line><span class=cl><span class=nv>ExecStart</span><span class=o>=</span>/usr/local/bin/containerd
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>Type</span><span class=o>=</span>notify
+</span></span><span class=line><span class=cl><span class=nv>Delegate</span><span class=o>=</span>yes
+</span></span><span class=line><span class=cl><span class=nv>KillMode</span><span class=o>=</span>process
+</span></span><span class=line><span class=cl><span class=nv>Restart</span><span class=o>=</span>always
+</span></span><span class=line><span class=cl><span class=nv>RestartSec</span><span class=o>=</span><span class=m>5</span>
+</span></span><span class=line><span class=cl><span class=c1># Having non-zero Limit*s causes performance problems due to accounting overhead</span>
+</span></span><span class=line><span class=cl><span class=c1># in the kernel. We recommend using cgroups to do container-local accounting.</span>
+</span></span><span class=line><span class=cl><span class=nv>LimitNPROC</span><span class=o>=</span>infinity
+</span></span><span class=line><span class=cl><span class=nv>LimitCORE</span><span class=o>=</span>infinity
+</span></span><span class=line><span class=cl><span class=nv>LimitNOFILE</span><span class=o>=</span>infinity
+</span></span><span class=line><span class=cl><span class=c1># Comment TasksMax if your systemd version does not supports it.</span>
+</span></span><span class=line><span class=cl><span class=c1># Only systemd 226 and above support this version.</span>
+</span></span><span class=line><span class=cl><span class=nv>TasksMax</span><span class=o>=</span>infinity
+</span></span><span class=line><span class=cl><span class=nv>OOMScoreAdjust</span><span class=o>=</span>-999
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>Install<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>WantedBy</span><span class=o>=</span>multi-user.target
+</span></span></code></pre></td></tr></table></div></div><p>启动 containerd</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>systemctl daemon-reload
+</span></span><span class=line><span class=cl>systemctl <span class=nb>enable</span> --now containerd
+</span></span></code></pre></td></tr></table></div></div><p>配置 containerd</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>mkdir -p /etc/containerd
+</span></span><span class=line><span class=cl><span class=c1># 生成默认配置文件</span>
+</span></span><span class=line><span class=cl>containerd config default <span class=p>|</span> tee /etc/containerd/config.toml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 修改 /etc/containerd/config.toml 配置</span>
+</span></span><span class=line><span class=cl><span class=c1># image 使用阿里云的地址， SystemdCgroup 更改为 true</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>sandbox_image</span> <span class=o>=</span> <span class=s2>&#34;registry.aliyuncs.com/google_containers/pause:3.6&#34;</span>
+</span></span><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl><span class=o>[</span>plugins.<span class=s2>&#34;io.containerd.grpc.v1.cri&#34;</span>.containerd.runtimes.runc.options<span class=o>]</span>
+</span></span><span class=line><span class=cl>            ...
+</span></span><span class=line><span class=cl>            <span class=nv>SystemdCgroup</span> <span class=o>=</span> <span class=nb>true</span>
+</span></span><span class=line><span class=cl><span class=c1># 修改完成后</span>
+</span></span><span class=line><span class=cl>systemctl restart containerd
+</span></span></code></pre></td></tr></table></div></div><p>安装 runc</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>wget https://github.com/opencontainers/runc/releases/download/v1.1.3/runc.amd64
+</span></span><span class=line><span class=cl>install -m <span class=m>755</span> runc.amd64 /usr/local/sbin/runc
+</span></span></code></pre></td></tr></table></div></div><p>安装 cni 插件</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>wget https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+</span></span><span class=line><span class=cl>mkdir -p /opt/cni/bin
+</span></span><span class=line><span class=cl>tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.1.1.tgz
+</span></span></code></pre></td></tr></table></div></div><h2 id=2-k8s-安装>2. k8s 安装</h2><blockquote><p><a href=https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/ target=_blank rel="noopener noreffer">官方 k8s 安装文档</a></p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 参考文档检查服务器的状态是否可以安装 k8s 服务</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 临时关闭 swap 分区</span>
+</span></span><span class=line><span class=cl>swapoff -a
+</span></span><span class=line><span class=cl><span class=c1># 查看 swap 分区是否关闭，显示 0 表示已关闭 </span>
+</span></span><span class=line><span class=cl>free -h 
+</span></span><span class=line><span class=cl><span class=c1># 永久关闭 swap 分区 </span>
+</span></span><span class=line><span class=cl>编辑 /etc/fstab 文件, 注释最后一行
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 检查 br_netfilter 是否被加载，没有任何输出，表示没有加载</span>
+</span></span><span class=line><span class=cl>lsmod <span class=p>|</span> grep br_netfilter 
+</span></span><span class=line><span class=cl><span class=c1># 加载 br_netfilter 模块</span>
+</span></span><span class=line><span class=cl>sudo modprobe br_netfilter 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## 配置网络</span>
+</span></span><span class=line><span class=cl>cat <span class=s>&lt;&lt;EOF | sudo tee /etc/modules-load.d/k8s.conf
+</span></span></span><span class=line><span class=cl><span class=s>br_netfilter
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>cat <span class=s>&lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf 
+</span></span></span><span class=line><span class=cl><span class=s>net.bridge.bridge-nf-call-ip6tables = 1
+</span></span></span><span class=line><span class=cl><span class=s>net.bridge.bridge-nf-call-iptables  = 1
+</span></span></span><span class=line><span class=cl><span class=s>net.ipv4.ip_forward                 = 1
+</span></span></span><span class=line><span class=cl><span class=s>EOF</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo sysctl --system
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 安装软件</span>
+</span></span><span class=line><span class=cl>sudo apt-get update
+</span></span><span class=line><span class=cl>sudo apt-get install -y apt-transport-https ca-certificates curl
+</span></span><span class=line><span class=cl>sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main&#34;</span> <span class=p>|</span> sudo tee /etc/apt/sources.list.d/kubernetes.list
+</span></span><span class=line><span class=cl>sudo apt-get update
+</span></span><span class=line><span class=cl><span class=c1># 默认安装最新版本</span>
+</span></span><span class=line><span class=cl>sudo apt-get install -y kubelet kubeadm kubectl
+</span></span><span class=line><span class=cl><span class=c1># 不自动更新</span>
+</span></span><span class=line><span class=cl>sudo apt-mark hold kubelet kubeadm kubectl 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看镜像列表， 报错需要添加配置, crictl 是官方提供的</span>
+</span></span><span class=line><span class=cl>crictl images
+</span></span><span class=line><span class=cl><span class=c1># vim /etc/crictl.yaml 添加以下内容</span>
+</span></span><span class=line><span class=cl>runtime-endpoint: unix:///run/containerd/containerd.sock
+</span></span><span class=line><span class=cl>image-endpoint: unix:///run/containerd/containerd.sock
+</span></span><span class=line><span class=cl>timeout: <span class=m>10</span>
+</span></span><span class=line><span class=cl>debug: <span class=nb>false</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 设置 kubelet 开机启动，并且现在启动</span>
+</span></span><span class=line><span class=cl><span class=c1># 启动之后可能会报错，如果原因是 没有读取到 kubelet 的配置文件，这里可以不用管，稍后会重启这个服务</span>
+</span></span><span class=line><span class=cl>sudo systemctl <span class=nb>enable</span> --now kubelet
+</span></span><span class=line><span class=cl><span class=c1># 查看 kubelet 的状态</span>
+</span></span><span class=line><span class=cl>sudo systemctl status kubelet 
+</span></span><span class=line><span class=cl><span class=c1># 查看 kubelet 的日志</span>
+</span></span><span class=line><span class=cl>journalctl -xeu kubelet
+</span></span></code></pre></td></tr></table></div></div><h2 id=3-创建-k8s-集群>3. 创建 k8s 集群</h2><blockquote><p><a href=https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/ target=_blank rel="noopener noreffer">创建 k8s 集群官方文档</a></p><p><a href=https://kubernetes.io/docs/concepts/cluster-administration/networking/##how-to-implement-the-kubernetes-networking-model target=_blank rel="noopener noreffer">k8s pod network 插件文档</a></p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 执行 kubeadm init 命令， 在 k8s master 机器上执行，默认情况下， k8s 创建 pod 不会在 master 机器上</span>
+</span></span><span class=line><span class=cl><span class=c1># 重点注意: --pod-network-cidr=10.244.0.0/16 这个参数必须要有，没有的话安装 cni 会报错</span>
+</span></span><span class=line><span class=cl><span class=c1># 注意 preflight 的前置检查输出，如果有问题，百度自行解决</span>
+</span></span><span class=line><span class=cl><span class=c1># 替换为你自己的 ip 和 hostname</span>
+</span></span><span class=line><span class=cl>sudo kubeadm init --image-repository registry.aliyuncs.com/google_containers --apiserver-advertise-address<span class=o>=</span>192.168.130.128 --pod-network-cidr<span class=o>=</span>10.244.0.0/16 --control-plane-endpoint<span class=o>=</span>node1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 执行命令之后，会有 kubeadm join 输出行</span>
+</span></span><span class=line><span class=cl><span class=c1># （分为 master-token 和 worker-token）， 类似于下面的命令，可以在另一个节点上执行 worker-join-token 的命令</span>
+</span></span><span class=line><span class=cl>sudo kubeadm join 192.168.130.128:6443 --token 8auvt0.zfw0ayr45d80q8pb <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>	--discovery-token-ca-cert-hash sha256:efe854739efef5fbaf3f6e28c899481c8d7797c1997fc8315b921a9ede400ca8
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 去掉污点，让单个节点也可以运行, (我这里只有一个节点)</span>
+</span></span><span class=line><span class=cl>kubectl taint nodes --all node-role.kubernetes.io/control-plane- node-role.kubernetes.io/master-
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl><span class=c1>## 在机器上执行 kubeadm join 或者 kubeadm init 命令之后，重启 kubelet 服务	</span>
+</span></span><span class=line><span class=cl>sudo systemctl restart kubelet
+</span></span><span class=line><span class=cl>sudo systemctl status kubelet
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 设置 kubectl 的配置文件， 为 $HOME/.kube/config</span>
+</span></span><span class=line><span class=cl>mkdir -p <span class=nv>$HOME</span>/.kube
+</span></span><span class=line><span class=cl>sudo cp -i /etc/kubernetes/admin.conf <span class=nv>$HOME</span>/.kube/config
+</span></span><span class=line><span class=cl>sudo chown <span class=k>$(</span>id -u<span class=k>)</span>:<span class=k>$(</span>id -g<span class=k>)</span> <span class=nv>$HOME</span>/.kube/config
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 安装 pod network 插件, 这里使用 calico 插件</span>
+</span></span><span class=line><span class=cl>curl -o calico-operator.yaml https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
+</span></span><span class=line><span class=cl>curl -o calico-custom-resources.yaml https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 重点</span>
+</span></span><span class=line><span class=cl><span class=c1># 更改 calico-custom-resources.yaml 的 cidr 配置, 值为 --pod-network-cidr （在 kubeadm init 指定了）</span>
+</span></span><span class=line><span class=cl><span class=c1># 多个网卡，也可以更改，否则可能会报错，搜索 interface </span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kubectl create -f calico-operator.yaml
+</span></span><span class=line><span class=cl>kubectl create -f calico-custom-resources.yaml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看 calico 是否已经启动完成, cni 也启动成功</span>
+</span></span><span class=line><span class=cl>kubectl get pods -A
+</span></span><span class=line><span class=cl><span class=c1># 成功之后会有下面的服务， 都是 running 状态</span>
+</span></span><span class=line><span class=cl>calico-apiserver   calico-apiserver-78c5f69667-gbxbv          1/1     Running   <span class=m>0</span>          88s
+</span></span><span class=line><span class=cl>calico-apiserver   calico-apiserver-78c5f69667-h64wk          1/1     Running   <span class=m>0</span>          88s
+</span></span><span class=line><span class=cl>calico-system      calico-kube-controllers-68884f975d-q4l8s   1/1     Running   <span class=m>0</span>          40m
+</span></span><span class=line><span class=cl>calico-system      calico-node-4d7hs                          1/1     Running   <span class=m>0</span>          40m
+</span></span><span class=line><span class=cl>calico-system      calico-typha-854c6b9b4b-s8ls7              1/1     Running   <span class=m>0</span>          40m
+</span></span><span class=line><span class=cl>kube-system        coredns-74586cf9b6-4pkxf                   1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>kube-system        coredns-74586cf9b6-9hxwl                   1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>kube-system        etcd-node1                                 1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>kube-system        kube-apiserver-node1                       1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>kube-system        kube-controller-manager-node1              1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>kube-system        kube-proxy-mn6fr                           1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>kube-system        kube-scheduler-node1                       1/1     Running   <span class=m>0</span>          76m
+</span></span><span class=line><span class=cl>tigera-operator    tigera-operator-5fb55776df-gjs7s           1/1     Running   <span class=m>0</span>          64m
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2022-01-01 18:32:22</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s/ data-title="在 ubuntu 上安装 k8s"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s/ data-title="在 ubuntu 上安装 k8s"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-ubuntu-%E4%B8%8A%E5%AE%89%E8%A3%85-k8s/ data-title="在 ubuntu 上安装 k8s"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/k8s/>k8s</a>,&nbsp;<a href=/ooooo-notes/tags/cloud-native/>cloud native</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%90%AD%E5%BB%BA-tomcat-%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/ class=prev rel=prev title="搭建 tomcat 源码调试环境"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>搭建 tomcat 源码调试环境</a>
+<a href=/ooooo-notes/2022%E5%B9%B4%E8%AE%A1%E5%88%92/ class=next rel=next title=2022年学习计划>2022年学习计划<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.102.3">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>
