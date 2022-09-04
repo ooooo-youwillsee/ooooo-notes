@@ -1,5 +1,9 @@
 ---
-sidebarDepth: 3
+title: 在 windows 上调试 redis
+date: 2022-06-01T18:32:22+08:00
+draft: false
+tags: [redis]
+categories: [随笔]
 ---
 
 ## debug redis in window
@@ -30,7 +34,7 @@ sudo apt install build-essential
 1. open `File | Settings | Build, Execution, Deployment | Toolchains` menu.
 2. add **new toolchains** and select **wsl**.
 
-![clion toolchains](../imgs/03-02.png)
+![clion toolchains](http://notes.ooooo-youwillsee.com/static/images/debug-redis-with-windows-01.png "在 clion 中创建工具链")
 
 3. setting wsl configuration, you maybe install **cmake, gcc, g++, gdb**.
 
@@ -43,4 +47,4 @@ sudo apt install build-essential
 
 7. execute command `make`, you maybe need to execute `cd src && ls | grep .sh | xargs chmod a+x`
 
-8. ![redis debug](../imgs/03-01.png)
+![makefile application](http://notes.ooooo-youwillsee.com/static/images/debug-redis-with-windows-02.png "选择可执行文件")

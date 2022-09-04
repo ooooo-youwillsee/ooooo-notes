@@ -1,5 +1,9 @@
 ---
-sidebarDepth: 3
+title: 在 docker 上安装 nfs
+date: 2021-01-01T18:32:22+08:00
+draft: false
+tags: [docker, nfs]
+categories: [随笔]
 ---
 
 ## install nfs in docker

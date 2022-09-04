@@ -1,11 +1,20 @@
-# logstash 
+---
+title: logstash 的简单使用
+date: 2021-06-01T18:32:22+08:00
+draft: false
+tags: [logstash]
+categories: [随笔]
+---
 
 
-1. install logstash 
+## logstash 
+
+
+### 1. install logstash 
 
 refer to [logstash document](https://www.elastic.co/guide/en/logstash/current/index.html)
 
-2. logstash example config file
+### 2. logstash example config file
 
 ```
 input { 

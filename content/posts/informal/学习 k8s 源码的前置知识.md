@@ -1,3 +1,11 @@
+---
+title: 学习 k8s 源码的前置知识
+date: 2022-07-02T18:32:22+08:00
+draft: false
+tags: [k8s, cloud native, source code]
+categories: [随笔]
+---
+
 # 学习源码的前置知识
 
 ## 1. GVK 定义

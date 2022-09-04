@@ -1,3 +1,11 @@
+---
+title: 搭建 kubernetes 1.24 版本的源码调试环境
+date: 2021-06-01T18:32:22+08:00
+draft: false
+tags: [k8s, cloud native, source code]
+categories: [随笔]
+---
+
 # 搭建 kubernetes 1.24 版本的源码调试环境
 
 
@@ -7,7 +15,7 @@
 
 具体步骤如下：
 
-1. 下载源码 (go 的版本要求 1.18.x)
+### 1. 下载源码 (go 的版本要求 1.18.x)
 ```shell
 git clone git@github.com:kubernetes/kubernetes.git
 cd kubernetes
@@ -15,9 +23,9 @@ git checkout -b origin/release-1.24
 go mod download 
 ```
 
-2. 用 IDE 打开 kubernetes 源码
+### 2. 用 IDE 打开 kubernetes 源码
 
-3. 找到服务的启动参数（比如 kube-controller-manager）
+### 3. 找到服务的启动参数（比如 kube-controller-manager）
 ```shell
 # 执行命令
 ps aux | grep kube-controller-manager | grep -v grep
@@ -27,23 +35,23 @@ root        1584  4.0  0.8 820020 110072 ?       Ssl  23:28   0:02 kube-controll
 
 ```
 
-4. 移动 kubernetes 的静态 pod （比如 kube-controller-manager）
+### 4. 移动 kubernetes 的静态 pod （比如 kube-controller-manager）
 ```shell
 cd /etc/kubernetes
 mv manifests/kube-controller-manager.yaml ./
 ```
 
-5. 用 IDE 启动服务（比如 kube-controller-manager）
+### 5. 用 IDE 启动服务（比如 kube-controller-manager）
 
 程序的入口： `cmd/kube-controller-manager/controller-manager.go` (其他的服务也是类似的路径)
 
 点击，配置启动参数，如下图
 
-![02-配置启动参数](./imgs/02-IDE-config-launch-parameter.png)
+![02-配置启动参数](http://notes.ooooo-youwillsee.com/static/images/k8s-source-code-env-config-launch-parameter.png "配置启动参数")
 
 现在基本就配置好了
 
-6. 检查服务是否正常启动 （比如 kube-controller-manager）
+### 6. 检查服务是否正常启动 （比如 kube-controller-manager）
 ```shell
 # 执行命令看没有 kube-controller-manager
 kubectl get pods -A
@@ -55,7 +63,7 @@ kubectl get pods -A
 
 具体步骤如下：
 
-1. 下载源码 (go 的版本要求 1.18.x) 
+### 1. 下载源码 (go 的版本要求 1.18.x) 
 ```shell
 git clone git@github.com:kubernetes/kubernetes.git
 cd kubernetes
@@ -66,13 +74,13 @@ go mod download
 
 注意：由于是远端调试，所以需要在 k8s master 节点上，重新编译源码，去掉 `-N -l`.
 
-2. 在 k8s master 节点上，重新编译源码
+### 2. 在 k8s master 节点上，重新编译源码
 ```shell
 cd kubernetes 
 make DBG=1 # 在 hack/lib/golang.sh 中
 ```
 
-3. 下载可能用到的工具，如 `dlv` (你可能需要提前设置 **GOPATH** 环境变量)
+### 3. 下载可能用到的工具，如 `dlv` (你可能需要提前设置 **GOPATH** 环境变量)
 ```shell
 # 可能非常慢，需要设置代理
 go get -u github.com/cloudflare/cfssl/cmd/cfssl
@@ -82,7 +90,7 @@ go get -u github.com/go-delve/delve/cmd/dlv
 PATH=$PATH:$GOPATH/bin 
 ```
 
-3. 找到服务的启动参数（比如 kube-controller-manager）
+### 4. 找到服务的启动参数（比如 kube-controller-manager）
 ```shell
 # 执行命令
 ps aux | grep kube-controller-manager | grep -v grep
@@ -91,13 +99,13 @@ ps aux | grep kube-controller-manager | grep -v grep
 root        1584  4.0  0.8 820020 110072 ?       Ssl  23:28   0:02 kube-controller-manager --allocate-node-cidrs=true --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf --bind-address=127.0.0.1 --client-ca-file=/etc/kubernetes/pki/ca.crt --cluster-cidr=10.244.0.0/16 --cluster-name=kubernetes --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt --cluster-signing-key-file=/etc/kubernetes/pki/ca.key --controllers=*,bootstrapsigner,tokencleaner --kubeconfig=/etc/kubernetes/controller-manager.conf --leader-elect=true --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --root-ca-file=/etc/kubernetes/pki/ca.crt --service-account-private-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --use-service-account-credentials=true
 ```
 
-4. 移动 kubernetes 的静态 pod （比如 kube-controller-manager）
+### 5. 移动 kubernetes 的静态 pod （比如 kube-controller-manager）
 ```shell
 cd /etc/kubernetes
 mv manifests/kube-controller-manager.yaml ./
 ```
 
-5. 用 `dlv` 启动服务
+### 6. 用 `dlv` 启动服务
 
 注意:
 * **启动参数**和**程序路径**，配置成你自己的，监听的端口是 `2346`
@@ -108,7 +116,7 @@ mv manifests/kube-controller-manager.yaml ./
 dlv --listen=:2346 --headless=true --api-version=2 --accept-multiclient exec /root/kubernetes/_output/bin/kube-controller-manager -- --allocate-node-cidrs=true --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf --bind-address=127.0.0.1 --client-ca-file=/etc/kubernetes/pki/ca.crt --cluster-cidr=10.244.0.0/16 --cluster-name=kubernetes --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt --cluster-signing-key-file=/etc/kubernetes/pki/ca.key --controllers=*,bootstrapsigner,tokencleaner --kubeconfig=/etc/kubernetes/controller-manager.conf --leader-elect=true --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --root-ca-file=/etc/kubernetes/pki/ca.crt --service-account-private-key-file=/etc/kubernetes/pki/sa.key --service-cluster-ip-range=10.96.0.0/12 --use-service-account-credentials=true
 ```
 
-6. 用 IDE 连接 dlv 服务（比如 kube-controller-manager）
+### 7. 用 IDE 连接 dlv 服务（比如 kube-controller-manager）
 
 程序的入口： `cmd/kube-controller-manager/controller-manager.go` (其他的服务也是类似的路径)
 
@@ -116,11 +124,11 @@ dlv --listen=:2346 --headless=true --api-version=2 --accept-multiclient exec /ro
 * 添加 **Go Remote**， 配置 **host** 和 **port**。
 * 点击 ok，然后启动服务。
 
-![02-连接dlv](./imgs/02-connect-dlv.png)
+![02-连接dlv](http://notes.ooooo-youwillsee.com/static/images/k8s-source-code-env-connect-dlv.png "连接dlv")
 
 现在基本就配置好了
 
-7. 提供一个调试的脚本 （可选）
+### 8. 提供一个调试的脚本 （可选）
 
 你现在会发现，如果想要调试，就必须要把 `manifests/kube-controller-manager.yaml` 移出去，等不需要调试了，再把**这个文件**移回来，这样非常麻烦。所以使用一个脚本来实现。
 

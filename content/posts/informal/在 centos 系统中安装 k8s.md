@@ -1,5 +1,9 @@
 ---
-sidebarDepth: 3
+title: 在 centos 上安装 k8s
+date: 2021-01-01T18:32:22+08:00
+draft: false
+tags: [k8s, cloud native]
+categories: [随笔]
 ---
 
 ## 1. 两台机器初始化设置

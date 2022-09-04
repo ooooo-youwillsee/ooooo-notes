@@ -1,3 +1,10 @@
+---
+title: 搭建 tomcat 源码调试环境
+date: 2021-08-15T18:32:22+08:00
+draft: false
+tags: [tomcat, source code]
+categories: [随笔]
+---
 
 # Tomcat 源码调试环境搭建
 
@@ -44,7 +51,7 @@ TOMCAT_BUILD_LIBS = ${base.path}
 * 检查你的**项目依赖**有没有问题
 
 
-![项目依赖配置](./imgs/05-01.png)
+![项目依赖配置](http://notes.ooooo-youwillsee.com/static/images/tomcat-source-code-env-dependencies.png "项目依赖配置")
 
 上面的**三个依赖**，其实就是 **ServletContainerInitializer** 的实现, 比如 `res/META-INF/jasper.jar/services/jakarta.servlet.ServletContainerInitializer`.
 
