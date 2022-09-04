@@ -1,6 +1,6 @@
 ---
 title: logstash 的简单使用
-date: 2021-06-01T18:32:22+08:00
+date: 2022-06-01T18:32:22+08:00
 draft: false
 tags: [logstash]
 categories: [随笔]

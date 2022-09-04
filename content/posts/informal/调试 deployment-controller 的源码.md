@@ -1,6 +1,6 @@
 ---
 title: 调试 deployment-controller 的源码
-date: 2021-06-01T18:32:22+08:00
+date: 2022-07-15T18:32:22+08:00
 draft: false
 tags: [k8s, cloud native, source code]
 categories: [随笔]
