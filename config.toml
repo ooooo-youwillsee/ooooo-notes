@@ -42,7 +42,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     weight = 1
     identifier = "posts"
     # 你可以在名称 (允许 HTML 格式) 之前添加其他信息, 例如图标
-    pre = ""
+    pre = "<i class='fa fa-list' aria-hidden='true'></i>"
     # 你可以在名称 (允许 HTML 格式) 之后添加其他信息, 例如图标
     post = ""
     name = "文章"
@@ -52,7 +52,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
   [[menu.main]]
     weight = 2
     identifier = "tags"
-    pre = ""
+    pre = "<i class='fa fa-tags' aria-hidden='true'></i>"
     post = ""
     name = "标签"
     url = "/tags/"
@@ -60,11 +60,19 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
   [[menu.main]]
     weight = 3
     identifier = "categories"
-    pre = ""
+    pre = "<i class='fa fa-archive' aria-hidden='true'></i>"
     post = ""
     name = "分类"
     url = "/categories/"
     title = ""
+  [[menu.main]]
+    weight = 6
+    identifier = "github"
+    pre = "<i class='fab fa-github fa-fw' aria-hidden='true'></i>"
+    post = ""
+    name = ""
+    url = "https://github.com/ooooo-youwillsee"
+    title = "GitHub"
 [params]
   # 网站默认主题样式 ["auto", "light", "dark"]
   defaultTheme = "auto"
@@ -383,11 +391,11 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
       # {{< link "https://github.com/gitalk/gitalk" Gitalk >}} 评论系统设置
       [params.page.comment.gitalk]
         # {{< version 0.1.1 >}}
-        enable = false
-        owner = ""
-        repo = ""
-        clientId = ""
-        clientSecret = ""
+        enable = true
+        owner = "ooooo-youwillsee"
+        repo = "ooooo-notes-gitalk"
+        clientId = "9fcbefe148801287b34f"
+        clientSecret = "3833b0f8bda400fb1ea7093446f340821394e501"
       # {{< link "https://github.com/xCss/Valine" Valine >}} 评论系统设置
       [params.page.comment.valine]
         enable = false
