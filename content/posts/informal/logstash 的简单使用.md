@@ -7,10 +7,7 @@ categories: [随笔]
 ---
 
 
-## logstash 
-
-
-### 1. install logstash 
+## 1. install logstash 
 
 refer to [logstash document](https://www.elastic.co/guide/en/logstash/current/index.html)
 
