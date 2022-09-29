@@ -1,12 +1,10 @@
 ---
-title: "在 ubuntu 上安装 k8s"
+title: 使用 ubuntu 来安装 kubernetes 1.24 版本
 date: 2022-04-01T18:32:22+08:00
 draft: false
 tags: [k8s, cloud native]
 categories: [随笔]
 ---
-
-# 使用 ubuntu 来安装 kubernetes 1.24 版本
 
 ## 1. 机器初始化设置
 

@@ -6,8 +6,6 @@ tags: [k8s, cloud native, source code]
 categories: [随笔]
 ---
 
-# 学习源码的前置知识
-
 ## 1. GVK 定义
 
 GVK(group version kind): 资源组、资源版本、资源类型
