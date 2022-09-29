@@ -1,9 +1,7 @@
 # 在 windows 上调试 redis
 
 
-## debug redis in window
-
-### 1. install wsl
+## 1. install wsl
 
 open **Microsoft Store**, then search `ubuntu`  and click to install it.
 
@@ -24,7 +22,7 @@ ln -s /usr/local/cmake-3.22.0-linux-x86_64/bin/cmake /usr/bin
 sudo apt install build-essential
 ```
 
-### 2. setting clion
+## 2. setting clion
 
 1. open `File | Settings | Build, Execution, Deployment | Toolchains` menu.
 2. add **new toolchains** and select **wsl**.

@@ -1,10 +1,8 @@
 # 调试 deployment-controller 的源码
 
 
-# 调试 deployment-controller 的源码
-
-1. `deployment` 资源是我们经常需要使用的，也是我们最应该熟悉的源码.
-2. 对于调试源码，我使用是 `deployment_controller_test.go` 测试类， `TestSyncDeploymentCreatesReplicaSet` 方法.
+> 1. `deployment` 资源是我们经常需要使用的，也是我们最应该熟悉的源码.
+> 2. 对于调试源码，我使用是 `deployment_controller_test.go` 测试类， `TestSyncDeploymentCreatesReplicaSet` 方法.
 
 ## TestSyncDeploymentCreatesReplicaSet 测试方法的结构
 

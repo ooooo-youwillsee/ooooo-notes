@@ -1,7 +1,5 @@
-# 在 ubuntu 上安装 k8s
-
-
 # 使用 ubuntu 来安装 kubernetes 1.24 版本
+
 
 ## 1. 机器初始化设置
 
