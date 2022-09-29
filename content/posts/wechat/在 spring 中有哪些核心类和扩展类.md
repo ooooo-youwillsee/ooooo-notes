@@ -3,7 +3,7 @@ title: 在 spring 中有哪些核心类和扩展类
 date: 2022-09-05T18:00:00+08:00
 lastmod: 2022-09-05T21:01:00+08:00
 draft: false
-tags: [spring]
+tags: [java, spring]
 categories: [微信文章]
 ---
 

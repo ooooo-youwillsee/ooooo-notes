@@ -3,7 +3,7 @@ title: 在 spring 中如何设计一个获取配置的接口
 date: 2022-09-05T21:09:00+08:00
 lastmod: 2022-09-12T10:16:00+08:00
 draft: false
-tags: [spring, spring-extension]
+tags: [java, spring, spring-extension]
 categories: [微信文章]
 ---
 

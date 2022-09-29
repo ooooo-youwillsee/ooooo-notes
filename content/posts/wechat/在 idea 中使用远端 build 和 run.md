@@ -7,6 +7,7 @@ tags: [IDE]
 categories: [微信文章]
 ---
 
+# 在 idea 中使用远端 build 和 run
 
 在 idea 中实际有一个非常有用的功能，那就是**远端构建**和**远端运行**。
 
