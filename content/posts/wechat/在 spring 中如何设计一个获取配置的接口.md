@@ -1,13 +1,11 @@
 ---
-title: 在 spring 中如何设计一个获取配置的接口
+title: 在 spring 中如何设计一个获取配置的接口?
 date: 2022-09-05T21:09:00+08:00
 lastmod: 2022-09-12T10:16:00+08:00
 draft: false
 tags: [java, spring, spring-extension]
 categories: [微信文章]
 ---
-
-# 在 spring 中如何设计一个获取配置的接口 ?
 
 ## 1. 需求
 
@@ -229,4 +227,4 @@ public class CompositePropertySources implements PropertySources {
 
 ## 5. 完整代码实现
 
-[github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-examples/spring-boot-webmvc/src/main/java/com/ooooo/autoconfigure/env/CompositePropertySources.java)
+[github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-compositePropertySources)
