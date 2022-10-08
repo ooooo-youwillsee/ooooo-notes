@@ -47,7 +47,7 @@
 
 :zero::six:. [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
 
-:zero::seven:. [《从零开始学架构》](https://book.douban.com/subject/30335935/)
+:zero::seven:. [《从零开始学架构》](https://book.douban.com/subject/30335935/) :o:
 
 :zero::eight:. [《高可用可伸缩微服务架构》](https://book.douban.com/subject/33417842/) :x:
 
@@ -63,7 +63,7 @@
 
 :one::five:. [《Go语言设计与实现》](https://book.douban.com/subject/35635836/)
 
-:one::six:. [《wireshark网络分析的艺术》](https://book.douban.com/subject/26710788/)
+:one::six:. [《wireshark网络分析的艺术》](https://book.douban.com/subject/26710788/) :white_check_mark:
 
 :one::seven:. [《Vim实用技巧（第2版）》](https://book.douban.com/subject/26967597/) :o:
 
@@ -113,7 +113,7 @@
 
 :three::nine:. [《深入解析Java虚拟机HotSpot》](https://book.douban.com/subject/35292715/)
 
-:four::zero:. [《Rust权威指南》](https://book.douban.com/subject/35081743/)
+:four::zero:. [《Rust权威指南》](https://book.douban.com/subject/35081743/) :o:
 
 :four::one:. [《深入剖析Kubernetes》](https://book.douban.com/subject/35424872/)
 
@@ -215,6 +215,8 @@
 :one::six:. [《蛤蟆先生去看心理医生》](https://book.douban.com/subject/35143790/) :white_check_mark:
 
 :one::seven:. [《刻意练习》](https://book.douban.com/subject/26895993/) :o:
+
+:one::seven:. [《卓有成效的工程师》](https://book.douban.com/subject/35948443/) :o:
 
 ### 2、选读  :tada:
 
