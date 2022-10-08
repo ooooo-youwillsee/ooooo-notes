@@ -1,7 +1,5 @@
-# 在 spring 中如何设计一个获取配置的接口
+# 在 spring 中如何设计一个获取配置的接口?
 
-
-# 在 spring 中如何设计一个获取配置的接口 ?
 
 ## 1. 需求
 
@@ -223,4 +221,5 @@ public class CompositePropertySources implements PropertySources {
 
 ## 5. 完整代码实现
 
-[github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-examples/spring-boot-webmvc/src/main/java/com/ooooo/autoconfigure/env/CompositePropertySources.java)
+[github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-compositePropertySources)
+
