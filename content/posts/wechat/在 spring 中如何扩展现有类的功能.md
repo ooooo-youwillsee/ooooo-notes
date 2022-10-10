@@ -65,7 +65,7 @@ public class CompositePropertySources implements PropertySources {
 
 ## 2. 新的需求
 
-由于之前的功能是**根据 key 来获取 value **的，而现在需要**根据业务编号和 key 来获取 value**。
+由于之前的功能是**根据 key 来获取 value**的，而现在需要**根据业务编号和 key 来获取 value**。
 
 * 先根据 businType.key 来获取 value
 * 如果结果不是 null，则返回
