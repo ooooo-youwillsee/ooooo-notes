@@ -1,6 +1,6 @@
 ---
 title: 在 spring 中如何扩展现有类的功能2 ?
-date: 2022-09-05T21:09:00+08:01
+date: 2022-09-05T21:09:01+08:00
 lastmod: 2022-09-05T21:01:00+08:00
 draft: false
 tags: [java, spring, spring-extension]
