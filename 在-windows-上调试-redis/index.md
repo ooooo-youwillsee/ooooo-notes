@@ -31,7 +31,8 @@ sudo apt install build-essential
 
 3. setting wsl configuration, you maybe install **cmake, gcc, g++, gdb**.
 
-4. you must execute command `git config --global core.autocrlf input` in your terminal, because window is CRLF.
+4. you must execute command `git config core.autocrlf input` in your terminal, because windows is CRLF, then `git clone`
+   .
 
 5. select **wsl** in `File | Settings | Build, Execution, Deployment | Makefile`, because building redis by using
    makefile.
