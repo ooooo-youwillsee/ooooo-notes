@@ -1,6 +1,6 @@
 ---
 title: tomcat 自定义错误页
-date: 2020-01-03T08:00:00+08:00
+date: 2021-01-01T08:00:00+08:00
 draft: false
 tags: [resolution]
 categories: [随笔]
