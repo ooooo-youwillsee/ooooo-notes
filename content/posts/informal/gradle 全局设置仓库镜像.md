@@ -19,7 +19,7 @@ allprojects {
 	buildscript {
 		repositories {
 			maven { name "Alibaba" ; url 'https://maven.aliyun.com/repository/public' }
-			maven { name "Bstek" ; url 'http://nexus.bsdn.org/content/groups/public/' }
+			maven { name "Bstek" ; url 'https://nexus.bsdn.org/content/groups/public/' }
 			maven { name "M2" ; url 'https://plugins.gradle.org/m2/' }
 		}
 	}
