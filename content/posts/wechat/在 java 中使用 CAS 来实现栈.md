@@ -1,5 +1,5 @@
 ---
-title: 在 java 中使用CAS来实现栈
+title: 在 java 中使用 CAS 来实现栈
 date: 2022-11-09T08:00:00+08:00
 draft: false
 tags: [IDE]
