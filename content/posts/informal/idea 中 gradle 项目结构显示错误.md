@@ -1,5 +1,5 @@
 ---
-title: gradle 全局设置仓库镜像
+title: idea 中 gradle 项目结构显示错误
 date: 2022-01-01T08:00:00+08:00
 draft: false
 tags: [resolution]
