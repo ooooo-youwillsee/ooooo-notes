@@ -35,15 +35,15 @@
 
 ### 1、书籍
 
-:zero::one:. [《Java 性能优化权威指南》](https://book.douban.com/subject/25828043/)
+:zero::one:. [《Java 性能优化权威指南》](https://book.douban.com/subject/25828043/) :o:
 
-:zero::two:. [《深入理解 Java 虚拟机（第3版）》](https://book.douban.com/subject/34907497/) :o:
+:zero::two:. [《深入理解 Java 虚拟机（第3版）》](https://book.douban.com/subject/34907497/) :white_check_mark:
 
 :zero::three:. [《Spring Cloud 微服务：入门、实战与进阶》](https://book.douban.com/subject/34441728/) :x:
 
 :zero::four:. [《arthas》](https://github.com/alibaba/arthas)
 
-:zero::five:. [《Java 并发编程实战》](https://book.douban.com/subject/10484692/)
+:zero::five:. [《Java 并发编程实战》](https://book.douban.com/subject/10484692/) :white_check_mark:
 
 :zero::six:. [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
 
@@ -128,6 +128,8 @@
 :four::six:. [《Knative实战:基于Kubernetes的无服务器架构实践》](https://book.douban.com/subject/35396025/) :white_check_mark:
 
 :four::seven:. [《深入剖析Java虚拟机》](https://book.douban.com/subject/35571969/)
+
+:four::eight:. [《Groovy程序设计》](https://book.douban.com/subject/26115995/) :o:
 
 ### 2、文档
 
@@ -242,8 +244,14 @@
 
 ### 5、娱乐
 
-:zero::one:. [荒岛余生](https://movie.douban.com/subject/1298653/)
+:zero::one:. [《荒岛余生》](https://movie.douban.com/subject/1298653/) :white_check_mark:
 
-:zero::two:. [星际穿越](https://movie.douban.com/subject/1889243/)
+:zero::two:. [《星际穿越》](https://movie.douban.com/subject/1889243/) :white_check_mark:
+
+:zero::three:. [《这个杀手不太冷》](https://movie.douban.com/subject/1295644/) :white_check_mark:
+
+:zero::four:. [《美丽人生》](https://movie.douban.com/subject/1292063/) :white_check_mark:
+
+:zero::five:. [《阿甘正传 》](https://movie.douban.com/subject/1292720/) :white_check_mark:
 
 
