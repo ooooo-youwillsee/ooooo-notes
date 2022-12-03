@@ -129,7 +129,7 @@
 
 :four::seven:. [《深入剖析Java虚拟机》](https://book.douban.com/subject/35571969/)
 
-:four::eight:. [《Groovy程序设计》](https://book.douban.com/subject/26115995/) :o:
+:four::eight:. [《Groovy程序设计》](https://book.douban.com/subject/26115995/) :white_check_mark:
 
 ### 2、文档
 
