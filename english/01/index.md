@@ -154,5 +154,55 @@ He often does this.
 'The play may begin at any moment' I said. 'It may have begun already' Susan answered. I hurried to the ticket
 office, 'May I have two tickets please?' I asked. 'I'm sorry, We've sold out' the girl said. 'What a pity!' Susan
 exclaimed. Just then, a man hurried to the ticket office, 'Can I returned these two ticket?' he asked. 'Certainly.'
-the girl said. I went back to the ticket office at once. 'Could I have those two tickets please?' 'Certainly, but 
+the girl said. I went back to the ticket office at once. 'Could I have those two tickets please?' 'Certainly, but
 they're for next Wednesday's performance. Do you still want them?'. 'I might as well have them' I said sadly.
+
+## lesson 20, 2022.12.5
+
+Fishing is my favorite sport. I often fish for hours without catching anything. But this does not worry me. Some
+fishermen are unlucky. Instead of catching, they catch old boots and rubbish. I am even less unlucky. I never catch
+anything, not even old boots. After having spent whole mornings on the river, I always go home with an empty bag. 'You
+must give up fishing.' My friends say. 'It's a waste of time.' But they don't realize one important thing. I am not
+really interested in fishing. I am only interested in sitting in a boat and doing nothing at all.
+
+## lesson 21, 2022.12.8
+
+Aeroplanes are slowly driving me mad. I live near an airport and passing planes can be heard night and day. The
+airport was built years ago, but for some seasons it could not be used then. Last year, however, it came into use.
+Over a hundred people must have been driven away from their homes by the noise. I am one of the few people left.
+Sometimes I think this house will be knocked down by a passing plane. I have been offered a large sum of money to go
+away. but I am determined to stay here. Everyone says I must be mad and they are probably right.
+
+## lesson 22, 2022.12.12
+
+My daughter, Jane, never dreamed of receiving a letter from a girl of her own age in Holland. Last year, we were
+traveling across the Channel and Jane put a piece of paper with her name and address on it into a bottle. She threw
+the bottle into the sea. Jane never thought of it again, but ten months later, she received a letter from a girl in
+Holland. Both girls write to each other regularly now. However, they have decided to use the post office. Letters will
+cost a little more, but they will certainly travel faster.
+
+## lesson 23, 2022.12.13
+
+I had a letter from my sister yesterday. She lives in Nigeria. In her letter, she said me that she would come to
+England next year. If she comes, she will get a surprise. We are now living in a beautiful new house in the country.
+Work on it had begun before my sister left. The house was completed five months ago. In my letter, I told her that she
+could stay with us. The house has many larger rooms and there is a lovely garden. It is a very modern house, so it looks
+strange to some people. It must be the only modern house in the district.
+
+## lesson 24, 2022.12.15
+
+I entered a hotel manager's office and sat down. I had just lost $50 and I felt very upset. 'I left the money in my
+room'. I said, 'and it's not there now'. The manager was sympathetic, but he could do nothing. "Everyone's losing
+money these days" he said. He started to complain about this wicked world, but was interrupted by a knock at the
+door. A girl came in and put an envelope on his desk. It contained $50. "I found this outside this gentleman's room."
+she said. "Well", I said to the manager. "there is still some honesty in this world".
+
+## lesson 25, 2022.12.16
+
+I arrived in London at last. The railway station was big, black and dark. I didn't know the way to my hotel, so I
+asked a porter. I not only spoke English very carefully, but very clearly as well. The porter, however, could not
+understand me. I repeated my question several times and at last he understood. He answered me, but he spoke neither
+slowly nor clearly. "I am a foreigner." I said. Then he spoke slowly, but I could not understand him. My teacher
+never spoke English like that. The porter and I looked at each other and smiled. Then he said something and I
+understood it. "You'll soon learn english" he said. I wonder. In England, each person speaks a different language.
+The English understand each other, but I don't understand them. Do they speak English?

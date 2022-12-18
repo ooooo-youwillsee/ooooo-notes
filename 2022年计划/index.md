@@ -79,7 +79,7 @@
 
 :two::four:. [《etcd 源码》](https://github.com/etcd-io/etcd)
 
-:two::five:. [《dubbo3 源码》](https://github.com/apache/dubbo) :o:
+:two::five:. [《dubbo 源码》](https://github.com/apache/dubbo) :o:
 
 :two::six:. [《pulsar 源码》](https://github.com/apache/pulsar) :x:
 
@@ -252,6 +252,16 @@
 
 :zero::four:. [《美丽人生》](https://movie.douban.com/subject/1292063/) :white_check_mark:
 
-:zero::five:. [《阿甘正传 》](https://movie.douban.com/subject/1292720/) :white_check_mark:
+:zero::five:. [《阿甘正传》](https://movie.douban.com/subject/1292720/) :white_check_mark:
+
+:zero::six:. [《奇遇人生 第一季》](https://movie.douban.com/subject/30304024/)
+
+:zero::seven:. [《一本好书 1》](https://movie.douban.com/subject/30337114/)
+
+:zero::eight:. [《一本好书 2》](https://movie.douban.com/subject/34820448/)
+
+:zero::nine:. [《楚门的世界》](https://movie.douban.com/subject/1292064/) :white_check_mark:
+
+:one::zero:. [《穿越时空的少女》](https://movie.douban.com/subject/1937946/) :white_check_mark:
 
 
