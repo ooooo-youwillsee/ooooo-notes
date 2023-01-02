@@ -35,7 +35,7 @@
 
 ### 1、书籍
 
-:zero::one:. [《Java 性能优化权威指南》](https://book.douban.com/subject/25828043/) :o:
+:zero::one:. [《Java 性能优化权威指南》](https://book.douban.com/subject/25828043/) :white_check_mark:
 
 :zero::two:. [《深入理解 Java 虚拟机（第3版）》](https://book.douban.com/subject/34907497/) :white_check_mark:
 
@@ -47,7 +47,7 @@
 
 :zero::six:. [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
 
-:zero::seven:. [《从零开始学架构》](https://book.douban.com/subject/30335935/) :o:
+:zero::seven:. [《从零开始学架构》](https://book.douban.com/subject/30335935/) :white_check_mark:
 
 :zero::eight:. [《高可用可伸缩微服务架构》](https://book.douban.com/subject/33417842/) :x:
 
@@ -263,5 +263,11 @@
 :zero::nine:. [《楚门的世界》](https://movie.douban.com/subject/1292064/) :white_check_mark:
 
 :one::zero:. [《穿越时空的少女》](https://movie.douban.com/subject/1937946/) :white_check_mark:
+
+:one::one:. [《五等分的新娘 剧场版》](https://movie.douban.com/subject/35417834/) :white_check_mark:
+
+:one::two:. [《你的名字》](https://movie.douban.com/subject/26683290/) :white_check_mark:
+
+:one::three:. [《工作细胞》](https://movie.douban.com/subject/28514091/) :white_check_mark: 
 
 
