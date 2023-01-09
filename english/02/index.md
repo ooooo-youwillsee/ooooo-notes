@@ -209,30 +209,70 @@ The English understand each other, but I don't understand them. Do they speak En
 
 ## lesson 26, 2022.12.20
 
-I am an art student and paint a lot of pictures. Many people pretend that they understand modern art. They always 
-tell you what a picture is about. Of course, Many pictures are not about anything. They are just pretty patterns. We 
-like them in the same way that we like pretty curtain material. I think that young children often appreciate modern 
-pictures better than anyone else. The notice more. My sister is only seven，but she always tells me whether my 
-pictures are good or not. She came into my room yesterday. "What are you doing?" she asked. "I'm hanging this 
-picture on the wall" I answered. "It's a new no, Do you like it?". She looked at it critically for a moment. "It's 
+I am an art student and paint a lot of pictures. Many people pretend that they understand modern art. They always
+tell you what a picture is about. Of course, Many pictures are not about anything. They are just pretty patterns. We
+like them in the same way that we like pretty curtain material. I think that young children often appreciate modern
+pictures better than anyone else. The notice more. My sister is only seven，but she always tells me whether my
+pictures are good or not. She came into my room yesterday. "What are you doing?" she asked. "I'm hanging this
+picture on the wall" I answered. "It's a new no, Do you like it?". She looked at it critically for a moment.  "It's
 all right." she said. "But isn't it upside down?" I looked at it again. She was right！It was.
 
 ## lesson 27, 2022.12.24
 
-Late in the afternoon. The boys put up their tent in the middle of a field. As soon as this was done, they cooked a 
-meal over an open fire. They were all hungry and the food smelled good. After a wonderful meal, they told stories 
-and sang songs by the campfire. But some time later it began to rain. The boys felt tired, so they put out the fire 
-and crept into their tent. Their sleeping bags were warm and comfortable, so they all slept soundly. In the middle 
-of the night. two boys woke up and began shouting. The tent was full of water. They leapt out of their sleeping bags 
-and hurried outside. It was raining heavily and they found that a stream had formed in the field. The stream wound 
+Late in the afternoon. The boys put up their tent in the middle of a field. As soon as this was done, they cooked a
+meal over an open fire. They were all hungry and the food smelled good. After a wonderful meal, they told stories
+and sang songs by the campfire. But some time later it began to rain. The boys felt tired, so they put out the fire
+and crept into their tent. Their sleeping bags were warm and comfortable, so they all slept soundly. In the middle
+of the night. two boys woke up and began shouting. The tent was full of water. They leapt out of their sleeping bags
+and hurried outside. It was raining heavily and they found that a stream had formed in the field. The stream wound
 its way across the field and then flowed right under their tent.
 
 ## lesson 28, 2022.12.24
 
-Jasper White is one of those rare people who believes in ancient myths. he has just bought a new house in the city. 
-But ever since he moved in, he has had trouble with cars and their owners. When he returns home at night, he always 
-finds that someone has parked a car outside his gate. Because of this, he has not been able to get his own car into 
-his garage even once. Jasper has put up "No parking" signs outside his gate, but these have not had any effect. Now he 
-has put an ugly stone head over the gate. It is one of the ugliest faces I have ever seen. I asked him what it was, he 
-told me that it was Medusa, the Gorgon, Jasper hopes that she will turn cars and their owners to stone. But none of 
+Jasper White is one of those rare people who believes in ancient myths. he has just bought a new house in the city.
+But ever since he moved in, he has had trouble with cars and their owners. When he returns home at night, he always
+finds that someone has parked a car outside his gate. Because of this, he has not been able to get his own car into
+his garage even once. Jasper has put up "No parking" signs outside his gate, but these have not had any effect. Now he
+has put an ugly stone head over the gate. It is one of the ugliest faces I have ever seen. I asked him what it was, he
+told me that it was Medusa, the Gorgon, Jasper hopes that she will turn cars and their owners to stone. But none of
 them has been turned to stone yet.
+
+## lesson 29, 2023.1.4
+
+Captain Ben Fawcett has bought an unusual taxi and has begun a new service. The "taxi" is a small Swiss aeroplane
+called a "Pilatus Porter". This wonderful plane can carry seven passengers. The most surprising thing about it, however,
+is that it can land anywhere, on snow, water or even on a ploughed field. Captain Fawcett's first passenger was a
+doctor who flew from Birmingham to a lonely village in the Welsh mountains. Since then, Captain Fawcett has flown
+passengers to many unusual places. Once he landed on the roof of a block of flats and on another occasion he landed in a
+deserted car park. Captain Fawcett has just refused a strange request from a businessman. The man wanted to fly Rockall,
+a lonely island in the Atlantic Ocean, but Captain Fawcett did not take him, because the trip was too dangerous.
+
+## lesson 30. 2023.1.4
+
+The Wayle is a small river that cuts across the park near my home. I like sitting by the Wayle on fine afternoons. It
+was warm last Sunday, so I went and sat on the river bank as usual. Some children were playing games on the bank and
+there were some people rowing on the river. Suddenly, one of the children kicked a ball very hard and
+it went towards a passing boat. Some people on the bank called out to the man in the boat, but he did not hear him.
+The ball struck him so hard that he nearly fell into the water. I turned to look at the children, but there weren't any
+in sight. They had all run away. The man laughed when he realized what had happened, he called out to the children
+and threw the ball back to the bank.
+
+## lesson 31, 2023.1.6
+
+Yesterday afternoon Frank was telling me about his experiences as a young man. Before he retired, he was the head of
+a large business company, but as a boy he used to work in a small shop. It is his job to repair bicycles and at that
+time he used to work fourteen hours a day. He saved money for years and in 1958 he bought a small workshop of his own.
+In his twenties Frank used to make spare parts for aeroplanes. At that time he had two helpers. In a few years the
+small workshop had become a large factory which employed seven hundred and twenty-eight people. Frank smiled when he
+remembered his hard early years and a long road to success. Frank was still smiling when the door opened and his
+wife came in. She wanted him to repair their grandson's bicycle.
+
+## lesson 32, 2023.1.6
+
+People are not so honest as they once were. The temptation to steal is greater than ever before, especially in large
+shops. The detective recently watched a well-dressed woman who always went into a large store on Monday mornings. One
+Monday, there were fewer people in the shop than usual when the woman came in, so it was easier for the detective to
+watch him. The woman first bought a few small articles. After a little time, she chose one of the most expensive
+dresses in the shop and handed it to an assistant who wrapped it up for her as quick as possible. Then the woman simply
+took the parcel and walked out of the shop without paying. When she was arrested, the detective found out that the
+shop assistant was her daughter. The girl "gave" her mother a free dress once a week.

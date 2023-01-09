@@ -38,7 +38,7 @@
 
 :zero::two:. [《分布式一致性算法开发实战》](https://book.douban.com/subject/35051108/)
 
-:zero::three:. [《Go Web 编程》](https://book.douban.com/subject/27204133/) :o:
+:zero::three:. [《Go Web 编程》](https://book.douban.com/subject/27204133/) :white_check_mark:
 
 :zero::four:. [《Effective C++》](https://book.douban.com/subject/1842426/)
 
@@ -74,7 +74,7 @@
 
 :two::zero:. [《TCP/IP详解 卷1：协议》](https://book.douban.com/subject/1088054/)
 
-:two::one:. [《自己动手写Docker》](https://book.douban.com/subject/27082348/)
+:two::one:. [《自己动手写Docker》](https://book.douban.com/subject/27082348/) :o:
 
 :two::two:. [《UNIX网络编程 卷1：套接字联网API（第3版）》](https://book.douban.com/subject/26434583/)
 
