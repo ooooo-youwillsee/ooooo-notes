@@ -276,3 +276,31 @@ watch him. The woman first bought a few small articles. After a little time, she
 dresses in the shop and handed it to an assistant who wrapped it up for her as quick as possible. Then the woman simply
 took the parcel and walked out of the shop without paying. When she was arrested, the detective found out that the
 shop assistant was her daughter. The girl "gave" her mother a free dress once a week.
+
+## lesson 33, 2023.1.10
+
+Nearly a week passed before the girl was able to explain what had happened to her. One afternoon she set out from
+the coast in a small boat and was caught in a storm. Towards evening, the boat struck a rock and the girl jumped into
+the sea. Then she swam to the shore after spending the whole night in the water. During that time she covered a
+distance of eight miles. Early next morning, she saw a light ahead. She knew she was near the shore because the light
+was high up on the cliffs. On arriving at the shore, the girl struggled up the cliff towards the light she had seen.
+That was all she remembered. When she woke up a day later, she found herself in hospital.
+
+## lesson 34, 2023.1.10
+
+Dan Robinson has been worried all week. Last Tuesday he received a letter from the local police. In the letter, he was
+asked to call at the station. Dan wondered why he was wanted by the police. but he went into the station yesterday and
+now he is not worried anymore. At the station, he was told by a smiling policeman that his bicycle had been found. Five
+days ago, the policeman told him, the bicycle was picked up in a small village four hundred miles away. It is now
+being sent to his home by train. Dan was most surprised when he heard the news. He was amused too, because he never
+expected the bicycle to be found. It was stolen twenty years ago when Dan was a boy of fifteen.
+
+## lesson 35, 2023.1.12
+
+Roy used to drive a taxi. A short while ago, however, he became to a bus driver and he has not regretted it. He is
+finding his new work far more exciting. When he was driving along Carford street recently, he saw two thieves rush out
+of a shop and run towards a waiting car. One of them was carrying a bag full of money. Roy acted quickly and drove his
+bus straight at two thieves. The one with the money got such a fright that he dropped the bag. As two thieves were
+trying to get away in their car, Roy drove his bus into the back of it. While the battered car was moving away, Roy
+stopped his bus and telephoned the police. The thieves' car was badly damaged and easy to recognize. Shortly afterwards,
+the police stopped the car and both men were arrested.

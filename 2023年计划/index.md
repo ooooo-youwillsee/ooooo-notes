@@ -122,7 +122,7 @@
 
 ### 1、书籍 :tada:
 
-:zero::one:. [《卓有成效的工程师》](https://book.douban.com/subject/35948443/) :o:
+:zero::one:. [《卓有成效的工程师》](https://book.douban.com/subject/35948443/) :white_check_mark:
 
 :zero::two:. [《非暴力沟通》](https://book.douban.com/subject/3533221/) :o:
 
