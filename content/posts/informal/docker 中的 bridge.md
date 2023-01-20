@@ -2,7 +2,7 @@
 title: docker 中的 bridge 
 date: 2020-01-03T08:00:00+08:00
 draft: false
-tags: [resolution]
+tags: [docker, network]
 categories: [随笔]
 ---
 
