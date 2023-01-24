@@ -1,6 +1,6 @@
 ---
-title: docker 中的 bridge 
-date: 2020-01-03T08:00:00+08:00
+title: docker 单主机网络
+date: 2023-01-20T08:00:00+08:00
 draft: false
 tags: [docker, network]
 categories: [随笔]
