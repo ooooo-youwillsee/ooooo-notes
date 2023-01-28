@@ -74,9 +74,11 @@
 
 :two::zero:. [《TCP/IP详解 卷1：协议》](https://book.douban.com/subject/1088054/)
 
-:two::one:. [《自己动手写Docker》](https://book.douban.com/subject/27082348/) :o:
+:two::one:. [《自己动手写Docker》](https://book.douban.com/subject/27082348/) :white_check_mark:
 
 :two::two:. [《UNIX网络编程 卷1：套接字联网API（第3版）》](https://book.douban.com/subject/26434583/)
+
+:two::three:. [《Docker——容器与容器云（第2版）》](https://book.douban.com/subject/26894736/) :o:
 
 ### 2、文档
 
