@@ -78,7 +78,10 @@
 
 :two::two:. [《UNIX网络编程 卷1：套接字联网API（第3版）》](https://book.douban.com/subject/26434583/)
 
-:two::three:. [《Docker——容器与容器云（第2版）》](https://book.douban.com/subject/26894736/) :o:
+:two::three:. [《Docker——容器与容器云（第2版）》](https://book.douban.com/subject/26894736/) :white_check_mark:
+
+:two::four:. [《高性能MySQL（第4版）》](https://book.douban.com/subject/36096578/) :o:
+
 
 ### 2、文档
 
@@ -159,6 +162,8 @@
 :zero::two:. [《一本好书 1》](https://movie.douban.com/subject/30337114/)
 
 :zero::three:. [《一本好书 2》](https://movie.douban.com/subject/34820448/)
+
+:zero::four:. [《天气之子》](https://movie.douban.com/subject/30402296/)
 
 
 
