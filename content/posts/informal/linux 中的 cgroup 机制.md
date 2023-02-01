@@ -46,3 +46,6 @@ top
 kill 2584068
 rmdir test
 ```
+
+参考：
+> 1. [博客](https://zorrozou.github.io/docs/%E8%AF%A6%E8%A7%A3Cgroup%20V2.html)
