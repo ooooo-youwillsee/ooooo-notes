@@ -312,7 +312,7 @@ o'clock in the morning. Debbie is only eleven years old and she hopes to set up 
 swimmer and many people feel that she is sure to succeed. Debbie's father will set out with her in a small boat. Mr.
 Hart has trained his daughter for years. Tomorrow he will be watching her anxiously as she swims the long distance to
 England. Debbie intends to take short rests every two hours. She will have something to drink but she will not eat any
-solid food. Most of Debbie's school firends will be waiting for her on the English coast. Among them will be Debbie's
+solid food. Most of Debbie's school friends will be waiting for her on the English coast. Among them will be Debbie's
 mother, who swam the Channel herself when she was a girl.
 
 ## lesson 37, 2023.1.28
@@ -325,4 +325,52 @@ end of next year, they will have finished work on the new stadium. The fantastic
 by Kurt Gunter. Everyone will be watching anxiously as the new building go up. We are all very excited and are looking
 forward to the Olympic Games, because they have never been held before in this country.
 
+## lesson 38, 2023.1.30
 
+My old friend, Harrison had lived in the Mediterranean for many years before he returned to England. He had often
+dreamed of retiring in England and had planned to settle down in the country. He had no sooner returned than he bought a
+house and went to live there. Almost immediately he began to complain about the weather for even though it was still
+summer, it rained continually and it was often bitterly cold. After so many years of sunshine, Harrison got a shock.
+He acted as if he had never lived in England before. In the end, it was more than he could bear. He had hardly had
+time to settle down when he sold the house and left the country. The dream he had had for so many years ended there.
+Harrison had thought of everything except the weather.
+
+## lesson 39, 2023.1.31
+
+When John Gibert was in hospital, he asked his doctor to tell him whether his operation had been successful, but the
+doctor refused to do so. The following day, the patient asked for a bedside telephone. When he was alone, he telephoned
+the hospital exchange and asked for Doctor Millington. When the doctor answered the phone, Mr. Gibert said he was
+inquiring about a certain patient, a Mr. John Gibert. He asked if Mr. Gibert's operation had been successful and the
+doctor told him that it had been. He then asked when Mr. Gibert would be allowed to go home and the doctor told him
+that he would have to stay in hospital for another two weeks. The Dr. Millington asked the caller if he was a
+relative of the patient, "No" the patient answered. "I'm Mr. John Gibert."
+
+## lesson 40, 2023.2.2
+
+Last week at a dinner party, the hostess asked me to sit next to Mrs. Rumbold. Mrs. Rumbold is a large, unsmiling lady
+in a tight black dress. She did not even look up when I took my seat beside her. Her eyes were fixed on her plate and in
+a short time, she was busy eating. I tried to make conversation. "A new player is coming to 'The Globe' soon" I said, "
+Will you be seeing it?". "No." she answered. "Will you be spending your holidays abroad this year? " I asked.
+"No." she answered. "Will you be staying in England?" I asked. "No." she answered. In despair, I asked her whether
+she was enjoying her dinner. "Young man." she answered, "If you ate more and talked less, we would both enjoy our
+dinner."
+
+## lesson 41, 2023.2.3
+
+"Do you call that a hat?" I said to my wife. "You needn't be so rude about it." my wife answered as she looked at
+herself in the mirror. I sat down on one of those modern chairs with holes in it and waited. We had been in the hat
+shop for half an hour and my wife was still in front of the mirror. "We mustn't bug things we don't need", I remarked
+suddenly. I regretted saying it almost at once. "You needn't have said that". my wife answered. "I needn't remind
+you of that terrible hat you bought yesterday." "I find it beautiful." I said. "A man can never have too many ties.".
+"And A woman can't have too many hats." she answered. Ten minutes later we walked out of the shop together. My wife was
+wearing a hat that looked like a lighthouse.
+
+## lesson 42, 2023.2.4
+
+As we had had a long walk through one of markets of old Delhi, so we stopped at a square to have a rest. After a time, 
+we noticed a snake charmer with two large baskets at the other side of the square, so we went to have a look at him. 
+As soon as he saw us, he picked up a long pipe which was covered with coins and opened one of the baskets. When he 
+began to play a tune, we had our first glimpse of the snake. It rose out of the basket and began to follow the 
+movements of the pipe. We were very much surprised when the snake charmer suddenly began to play jazz and modern pop 
+songs. The snake, however, continued to "dance" slowly. It obviously could not tell the difference between Indian 
+music and jazz.
