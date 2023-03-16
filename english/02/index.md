@@ -367,20 +367,20 @@ wearing a hat that looked like a lighthouse.
 
 ## lesson 42, 2023.2.4
 
-As we had had a long walk through one of markets of old Delhi, so we stopped at a square to have a rest. After a time, 
-we noticed a snake charmer with two large baskets at the other side of the square, so we went to have a look at him. 
-As soon as he saw us, he picked up a long pipe which was covered with coins and opened one of the baskets. When he 
-began to play a tune, we had our first glimpse of the snake. It rose out of the basket and began to follow the 
-movements of the pipe. We were very much surprised when the snake charmer suddenly began to play jazz and modern pop 
-songs. The snake, however, continued to "dance" slowly. It obviously could not tell the difference between Indian 
+As we had had a long walk through one of markets of old Delhi, so we stopped at a square to have a rest. After a time,
+we noticed a snake charmer with two large baskets at the other side of the square, so we went to have a look at him.
+As soon as he saw us, he picked up a long pipe which was covered with coins and opened one of the baskets. When he
+began to play a tune, we had our first glimpse of the snake. It rose out of the basket and began to follow the
+movements of the pipe. We were very much surprised when the snake charmer suddenly began to play jazz and modern pop
+songs. The snake, however, continued to "dance" slowly. It obviously could not tell the difference between Indian
 music and jazz.
 
 ## lesson 43, 2023.2.14
 
-In 1929, three years after his fight over the North Pole, the American explorer, R. E. Byrd, successfully flew over 
-the South Pole for the first time. Though, at first. Byrd and his men were able to take a great many of photographs 
-of the mountains that lay below, they soon ran into serious trouble. At one point, it seemed certain that their plane 
-would crush. It could only get over the mountains if it rose 10,000 feet. Byrd at once ordered his men to throw out two 
-heavy food sacks. The plan was then able to rise and it cleared the mountains by 400 feet. Byrd now knew that he would 
-be able to reach the South Pole which was 300 miles for there were no more mountains in sight. The aircraft was able to 
+In 1929, three years after his fight over the North Pole, the American explorer, R. E. Byrd, successfully flew over the
+South Pole for the first time. Though, at first. Byrd and his men were able to take a great many of photographs
+of the mountains that lay below, they soon ran into serious trouble. At one point, it seemed certain that their plane
+would crush. It could only get over the mountains if it rose 10,000 feet. Byrd at once ordered his men to throw out two
+heavy food sacks. The plan was then able to rise and it cleared the mountains by 400 feet. Byrd now knew that he would
+be able to reach the South Pole which was 300 miles for there were no more mountains in sight. The aircraft was able to
 fly over the endless white plains without difficulty.
