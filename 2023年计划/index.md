@@ -50,9 +50,9 @@
 
 :zero::eight:. [《Vim实用技巧（第2版）》](https://book.douban.com/subject/26967597/) :o:
 
-:zero::nine:. [《RocketMQ技术内幕 第二版》](https://book.douban.com/subject/35626441/)
+:zero::nine:. [《RocketMQ技术内幕 第二版》](https://book.douban.com/subject/35626441/) :o:
 
-:one::zero:. [《云原生服务网格Istio：原理、实践、架构与源码解析》](https://book.douban.com/subject/34438220/)
+:one::zero:. [《云原生服务网格Istio：原理、实践、架构与源码解析》](https://book.douban.com/subject/34438220/) :o:
 
 :one::one:. [《MySQL技术内幕》](https://book.douban.com/subject/24708143/)
 
@@ -80,7 +80,13 @@
 
 :two::three:. [《Docker——容器与容器云（第2版）》](https://book.douban.com/subject/26894736/) :white_check_mark:
 
-:two::four:. [《高性能MySQL（第4版）》](https://book.douban.com/subject/36096578/) :o:
+:two::four:. [《高性能MySQL（第4版）》](https://book.douban.com/subject/36096578/) :white_check_mark:
+
+:two::four:. [《Kubernetes网络权威指南：基础、原理与实践）》](https://book.douban.com/subject/34855927/) :o:
+
+:two::four:. [《Kubernetes Operator开发进阶》](https://book.douban.com/subject/36209350/) 
+
+:two::four:. [《Kafka权威指南（第2版）》](https://book.douban.com/subject/36161660/)
 
 
 ### 2、文档
