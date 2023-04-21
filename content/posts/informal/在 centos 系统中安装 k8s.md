@@ -85,14 +85,13 @@ sudo sysctl --system
 
 ## 添加 k8s 镜像仓库，在前面中，设置了 yum 代理
 ## 在官方文档中多了 exclude=kubelet kubeadm kubectl ，这里去掉, 直接安装最新版本的
-cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo  
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-\$basearch
 enabled=1
 gpgcheck=1
-repo_gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 
 ## 关闭 selinux
