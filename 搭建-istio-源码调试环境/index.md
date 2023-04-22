@@ -17,7 +17,7 @@ export HUB="docker.io/youwillsee"
 export ISTIO=/root/code/istio
 
 # docker 的 tag
-export TAG=1.16.0-debug
+export TAG=1.17-debug
 ```
 
 ## 3. build istio 
@@ -53,4 +53,47 @@ dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient attach 1
 
 # 使用 IDE 远程连接
 GOland -> go remote
+```
+
+## 5. bind dlv to pilot (optional)
+
+Dockerfile.pilot
+
+```dockerfile
+# BASE_DISTRIBUTION is used to switch between the old base distribution and distroless base images
+ARG BASE_DISTRIBUTION=debug
+
+# Version is the base image version from the TLD Makefile
+ARG BASE_VERSION=latest
+ARG ISTIO_BASE_REGISTRY=gcr.io/istio-release
+
+# The following section is used as base image if BASE_DISTRIBUTION=debug
+FROM ${ISTIO_BASE_REGISTRY}/base:${BASE_VERSION} as debug
+
+# The following section is used as base image if BASE_DISTRIBUTION=distroless
+FROM ${ISTIO_BASE_REGISTRY}/distroless:${BASE_VERSION} as distroless
+
+# Add dlv
+FROM golang:1.20 AS build-dlv
+ENV GOPROXY=https://goproxy.io,direct
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+# This will build the final image based on either debug or distroless from above
+# hadolint ignore=DL3006
+FROM ${BASE_DISTRIBUTION:-debug}
+
+ARG TARGETARCH
+COPY ${TARGETARCH:-amd64}/pilot-discovery /usr/local/bin/pilot-discovery
+
+# Copy templates for bootstrap generation.
+COPY envoy_bootstrap.json /var/lib/istio/envoy/envoy_bootstrap_tmpl.json
+COPY gcp_envoy_bootstrap.json /var/lib/istio/envoy/gcp_envoy_bootstrap_tmpl.json
+COPY --from=build-dlv /go/bin/dlv /
+
+USER 1337:1337
+
+ENTRYPOINT ["/dlv", "--listen=:1234", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/usr/local/bin/pilot-discovery", "--"]
+
+#ENTRYPOINT ["/usr/local/bin/pilot-discovery"]
+
 ```
