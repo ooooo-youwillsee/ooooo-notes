@@ -99,7 +99,7 @@
 
 :zero::three:. [Go 语言项目开发实战](https://time.geekbang.org/column/intro/100079601) :o:
 
-:zero::four:. [Redis 源码剖析与实战](https://time.geekbang.org/column/intro/100084301) :o:
+:zero::four:. [Redis 源码剖析与实战](https://time.geekbang.org/column/intro/100084301) :white_check_mark:
 
 :zero::five:. [深入 C 语言和程序运行原理](https://time.geekbang.org/column/intro/100100701)
 
@@ -109,7 +109,7 @@
 
 :zero::two:. [《kubernetes 源码》](https://github.com/kubernetes/kubernetes) :o:
 
-:zero::three:. [《istio 源码》](https://github.com/istio/istio)
+:zero::three:. [《istio 源码》](https://github.com/istio/istio)  :o:
 
 :zero::four:. [《etcd 源码》](https://github.com/etcd-io/etcd)
 
