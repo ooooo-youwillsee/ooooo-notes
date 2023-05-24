@@ -1,6 +1,6 @@
 ---
 title: k8s 中的 dns 问题
-date: 2020-01-02T08:00:00+08:00
+date: 2023-05-19T08:00:00+08:00
 draft: false
 tags: [resolution, k8s, dns, cloud native]
 categories: [随笔]
