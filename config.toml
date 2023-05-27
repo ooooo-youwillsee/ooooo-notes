@@ -46,7 +46,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     # 你可以在名称 (允许 HTML 格式) 之后添加其他信息, 例如图标
     post = ""
     name = "文章"
-    url = "/posts/"
+    url = "../ooooo-notes/posts/"
     # 当你将鼠标悬停在此菜单链接上时, 将显示的标题
     title = ""
   [[menu.main]]
@@ -55,7 +55,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     pre = "<i class='fa fa-tags' aria-hidden='true'></i>"
     post = ""
     name = "标签"
-    url = "/tags/"
+    url = "../ooooo-notes/tags/"
     title = ""
   [[menu.main]]
     weight = 3
@@ -63,7 +63,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     pre = "<i class='fa fa-archive' aria-hidden='true'></i>"
     post = ""
     name = "分类"
-    url = "/categories/"
+    url = "../ooooo-notes/categories/"
     title = ""
   [[menu.main]]
     weight = 6
