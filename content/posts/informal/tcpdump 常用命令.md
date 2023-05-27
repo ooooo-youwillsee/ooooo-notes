@@ -2,7 +2,7 @@
 title: tcpdump 常用命令
 date: 2023-05-24T08:00:00+08:00
 draft: false
-tags: [ linux ]
+tags: [linux]
 categories: [ 随笔 ]
 ---
 
