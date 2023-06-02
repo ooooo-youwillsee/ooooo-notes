@@ -1,6 +1,6 @@
 ---
 title: 安装 harbor
-date: 2023-01-20T08:00:00+08:00
+date: 2023-06-02T08:00:00+08:00
 draft: false
 tags: [docker, harbor]
 categories: [随笔]
