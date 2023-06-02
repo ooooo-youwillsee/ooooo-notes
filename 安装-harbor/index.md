@@ -75,3 +75,31 @@ docker login yourdomain.com
 ```
 
 > [harbor官方文档](https://goharbor.io/docs/2.8.0/install-config/configure-https/)
+
+
+## 2. containerd 配置 harbor
+
+```shell
+# 复制证书到containerd
+mkdir /etc/containerd/yourdomain.com
+cp ca.crt  /etc/containerd/yourdomain.com/
+
+# 配置containerd
+vim /etc/containerd/config.toml
+
+#配置endpoint连接地址
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."yourdomain.com"]
+    endpoint = ["https://yourdomain.com"]
+
+#配置ca文件路径和用户名密码
+[plugins."io.containerd.grpc.v1.cri".registry.configs]
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."yourdomain.com".tls]
+    ca_file = "/etc/containerd/yourdomain.com/ca.crt"
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."yourdomain.com".auth]
+    username = "admin"
+    password = "Harbor12345"
+
+```
+
+> [博客](https://blog.csdn.net/qq_37837432/article/details/124159248)
