@@ -58,7 +58,7 @@
 
 :one::two:. [《深入解析Java虚拟机HotSpot》](https://book.douban.com/subject/35292715/)
 
-:one::three:. [《Rust权威指南》](https://book.douban.com/subject/35081743/) :o:
+:one::three:. [《Rust权威指南》](https://book.douban.com/subject/35081743/) :white_check_mark:
 
 :one::four:. [《深入剖析Kubernetes》](https://book.douban.com/subject/35424872/)
 
@@ -68,7 +68,7 @@
 
 :one::seven:. [《深入剖析Java虚拟机》](https://book.douban.com/subject/35571969/)
 
-:one::eight:. [《算法训练营：海量图解+竞赛刷题（入门篇》](https://book.douban.com/subject/35528404/)
+:one::eight:. [《算法训练营：海量图解+竞赛刷题（入门篇》](https://book.douban.com/subject/35528404/) :o:
 
 :one::nine:. [《算法训练营：海量图解+竞赛刷题（进阶篇）》](https://book.douban.com/subject/35430410/)
 
@@ -89,6 +89,10 @@
 :two::seven:. [《Kafka权威指南（第2版）》](https://book.douban.com/subject/36161660/)
 
 :two::eight:. [《操作系统导论》](https://book.douban.com/subject/33463930/) :o:
+
+:two::nine:. [《Go语言底层原理剖析》](https://book.douban.com/subject/35556889/) :o:
+
+:three::zero:. [《Kubernetes进阶实战（第2版）》](https://book.douban.com/subject/35355405/) :white_check_mark:
 
 
 ### 2、文档
