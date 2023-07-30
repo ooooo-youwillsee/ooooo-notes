@@ -10,7 +10,7 @@ categories: [随笔]
 
 `HttpObject` 的子类有 `LastHttpContent`, `HttpContent`, `HttpData`， 它需要手动调用 `release()`。
 
-![netty HttpObject类图](/images/use-netty-01.png)
+![netty HttpObject类图](/ooooo-notes/images/use-netty-01.png)
 
 
 
