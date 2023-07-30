@@ -79,4 +79,4 @@ EOF
 
 `tekton`的 `pod` `dns` 显示错误，重新设置主机的 `/etc/resolv.conf`, 重启 `kubelet`， 重启 `tekton`.
 
-![k8s-dns-show-error-in-pod](https://ooooo-notes.ooooo-youwillsee.com/static/images/k8s-dns-show-error-in-pod.png)
+![k8s-dns-show-error-in-pod](/ooooo-notes/images/k8s-dns-show-error-in-pod.png)

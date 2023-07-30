@@ -10,5 +10,5 @@ categories: [随笔]
 > 
 > you must select **idea** as run **test** and **building**
 
-![项目依赖配置](https://ooooo-notes.ooooo-youwillsee.com/static/images/idea-gradle-show-duplicated-file-tree.png "idea 
+![项目依赖配置](/ooooo-notes/images/idea-gradle-show-duplicated-file-tree.png "idea 
 gradle 项目结构显示错误")

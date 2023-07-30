@@ -29,7 +29,7 @@ categories: [微信文章]
 
 如下图：
 
-![在远端构建和运行](https://ooooo-notes.ooooo-youwillsee.com/static/images/remote-build-and-run-in-idea-01.png "在远端构建和运行")
+![在远端构建和运行](/ooooo-notes/images/remote-build-and-run-in-idea-01.png "在远端构建和运行")
 
 
 1. 新建一个**target配置**。
@@ -39,5 +39,5 @@ categories: [微信文章]
 
 如下图：
 
-![在远端构建和运行](https://ooooo-notes.ooooo-youwillsee.com/static/images/remote-build-and-run-in-idea-02.png "在远端构建和运行")
+![在远端构建和运行](/ooooo-notes/images/remote-build-and-run-in-idea-02.png "在远端构建和运行")
 

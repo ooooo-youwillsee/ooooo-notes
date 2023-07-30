@@ -12,7 +12,7 @@ categories: [随笔]
 
 设置**区域和语言**
 
-![设置区域和语言](https://ooooo-notes.ooooo-youwillsee.com/static/images/ubuntu-can't-open-terminal.png)
+![设置区域和语言](/ooooo-notes/images/ubuntu-can't-open-terminal.png)
 
 ## 2. 参考
 

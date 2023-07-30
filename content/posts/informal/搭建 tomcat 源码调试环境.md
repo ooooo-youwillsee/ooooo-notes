@@ -49,7 +49,7 @@ TOMCAT_BUILD_LIBS = ${base.path}
 * 检查你的**项目依赖**有没有问题
 
 
-![项目依赖配置](https://ooooo-notes.ooooo-youwillsee.com/static/images/tomcat-source-code-env-dependencies.png "项目依赖配置")
+![项目依赖配置](/ooooo-notes/images/tomcat-source-code-env-dependencies.png "项目依赖配置")
 
 上面的**三个依赖**，其实就是 **ServletContainerInitializer** 的实现, 比如 `res/META-INF/jasper.jar/services/jakarta.servlet.ServletContainerInitializer`.
 

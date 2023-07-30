@@ -32,7 +32,7 @@ sudo apt install build-essential
 1. open `File | Settings | Build, Execution, Deployment | Toolchains` menu.
 2. add **new toolchains** and select **wsl**.
 
-![clion toolchains](https://ooooo-notes.ooooo-youwillsee.com/static/images/debug-redis-with-windows-01.png "在 clion 中创建工具链")
+![clion toolchains](/ooooo-notes/images/debug-redis-with-windows-01.png "在 clion 中创建工具链")
 
 3. setting wsl configuration, you maybe install **cmake, gcc, g++, gdb**.
 
@@ -46,4 +46,4 @@ sudo apt install build-essential
 
 7. execute command `make`, you maybe need to execute `cd src && ls | grep .sh | xargs chmod a+x`
 
-![makefile application](https://ooooo-notes.ooooo-youwillsee.com/static/images/debug-redis-with-windows-02.png "选择可执行文件")
+![makefile application](/ooooo-notes/images/debug-redis-with-windows-02.png "选择可执行文件")
