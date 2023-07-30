@@ -39,7 +39,7 @@ mv manifests/kube-controller-manager.yaml ./
 
 点击，配置启动参数，如下图
 
-![02-配置启动参数](https://ooooo-notes.ooooo-youwillsee.com/static/images/k8s-source-code-env-config-launch-parameter.png "配置启动参数")
+![02-配置启动参数](/ooooo-notes/images/k8s-source-code-env-config-launch-parameter.png "配置启动参数")
 
 现在基本就配置好了
 
@@ -116,7 +116,7 @@ dlv --listen=:2346 --headless=true --api-version=2 --accept-multiclient exec /ro
 * 添加 **Go Remote**， 配置 **host** 和 **port**。
 * 点击 ok，然后启动服务。
 
-![02-连接dlv](https://ooooo-notes.ooooo-youwillsee.com/static/images/k8s-source-code-env-connect-dlv.png "连接dlv")
+![02-连接dlv](/ooooo-notes/images/k8s-source-code-env-connect-dlv.png "连接dlv")
 
 现在基本就配置好了
 

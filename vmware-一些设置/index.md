@@ -3,7 +3,7 @@
 
 ## 1. enable enhanced keyboard
 
-![vmware-enhanced-keyboard](https://ooooo-notes.ooooo-youwillsee.com/static/images/vmware-enhanced-keyboard.png)
+![vmware-enhanced-keyboard](/ooooo-notes/images/vmware-enhanced-keyboard.png)
 
 ## 2. enable back/forward mouse buttons in vmware
 

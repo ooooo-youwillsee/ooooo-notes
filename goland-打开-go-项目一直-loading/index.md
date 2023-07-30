@@ -7,4 +7,4 @@
 
 goland 配置代理
 
-![goland 配置代理](https://ooooo-notes.ooooo-youwillsee.com/static/images/goland-open-project-loading.png)
+![goland 配置代理](/ooooo-notes/images/goland-open-project-loading.png)
