@@ -62,6 +62,7 @@ archives:
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       {{ .ProjectName }}_
+      {{- .Version }}_
       {{- title .Os }}_
       {{- .Arch }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
@@ -96,7 +97,7 @@ name: goreleaser
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - '*.*.*'
   # Trigger the workflow by mannually
   workflow_dispatch:
 
