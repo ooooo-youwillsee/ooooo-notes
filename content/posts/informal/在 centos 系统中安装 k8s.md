@@ -1,6 +1,6 @@
 ---
 title: 在 centos 上安装 k8s
-date: 2021-12-01T18:32:22+08:00
+date: 2021-12-01T08:00:00+08:00
 draft: false
 tags: [k8s, cloud native]
 categories: [随笔]
