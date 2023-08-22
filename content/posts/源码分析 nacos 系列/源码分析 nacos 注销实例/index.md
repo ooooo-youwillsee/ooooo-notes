@@ -1,97 +1,95 @@
 ---
-title: 源码分析 nacos 注册实例
-date: 2023-08-19T08:00:00+08:00
+title: 源码分析 nacos 注销实例
+date: 2023-08-20T08:00:00+08:00
 draft: false
-tags: [nacos, source code, 源码分析 nacos]
-categories: [随笔]
+tags: [ nacos, source code, 源码分析 nacos 系列 ]
+categories: [ 源码分析 nacos 系列 ]
 ---
 
-> nacos 基于 2.2.4 版本
-
-
-## 注册实例的 curl
+## 注销实例的 curl
 
 ```shell
-curl --location 'http://localhost:8848/nacos/v2/ns/instance' \
+curl --location --request DELETE 'http://localhost:8848/nacos/v2/ns/instance' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'serviceName=test' \
 --data-urlencode 'ip=1.2.3.4' \
 --data-urlencode 'port=80'
 ```
 
-## 注册实例的主流程
+## 注销实例的主流程
 
-源码位置: `com.alibaba.nacos.naming.controllers.v2.InstanceControllerV2#register`
+源码位置: `com.alibaba.nacos.naming.controllers.v2.InstanceControllerV2#deregister`
+
 ```java
-public Result<String> register(InstanceForm instanceForm) throws NacosException {
+public Result<String> deregister(InstanceForm instanceForm) throws NacosException {
     // check param
     instanceForm.validate();
     checkWeight(instanceForm.getWeight());
     // build instance
     Instance instance = buildInstance(instanceForm);
-    // 注册实例
-    instanceServiceV2.registerInstance(instanceForm.getNamespaceId(), buildCompositeServiceName(instanceForm), instance);
-    // 发布 traceEvent
-    NotifyCenter.publishEvent(new RegisterInstanceTraceEvent(System.currentTimeMillis(), "",
-            false, instanceForm.getNamespaceId(), instanceForm.getGroupName(), instanceForm.getServiceName(),
-            instance.getIp(), instance.getPort()));
+    // 移除 instance
+    instanceServiceV2.removeInstance(instanceForm.getNamespaceId(), buildCompositeServiceName(instanceForm), instance);
+    // 发布 DeregisterInstanceTraceEvent 事件
+    NotifyCenter.publishEvent(new DeregisterInstanceTraceEvent(System.currentTimeMillis(), "",
+            false, DeregisterInstanceReason.REQUEST, instanceForm.getNamespaceId(), instanceForm.getGroupName(),
+            instanceForm.getServiceName(), instance.getIp(), instance.getPort()));
     return Result.success("ok");
 }
 ```
 
-源码位置: `com.alibaba.nacos.naming.core.InstanceOperatorClientImpl#registerInstance`
+源码位置: `com.alibaba.nacos.naming.core.InstanceOperatorClientImpl#removeInstance`
+
 ```java
-public void registerInstance(String namespaceId, String serviceName, Instance instance) throws NacosException {
-    NamingUtils.checkInstanceIsLegal(instance);
-    
+@Override
+public void removeInstance(String namespaceId, String serviceName, Instance instance) {
+    // 判断 instance 是否已经注册过, 如果没有，则不用处理
     boolean ephemeral = instance.isEphemeral();
     String clientId = IpPortBasedClient.getClientId(instance.toInetAddr(), ephemeral);
-    // 创建 client
-    createIpPortClientIfAbsent(clientId);
-    // 构建 service 对象，在 nacos2.0 中，临时属性在 service 上, instance 的临时属性已经没有了
+    if (!clientManager.contains(clientId)) {
+        Loggers.SRV_LOG.warn("remove instance from non-exist client: {}", clientId);
+        return;
+    }
     Service service = getService(namespaceId, serviceName, ephemeral);
-    // 具体实现类负责注册，如果是临时实例，EphemeralClientOperationServiceImpl，如果是持久化实例，PersistentClientOperationServiceImpl
-    clientOperationService.registerInstance(service, instance, clientId);
+    // 注销实例，如果是临时实例，EphemeralClientOperationServiceImpl，如果是持久化实例，PersistentClientOperationServiceImpl
+    clientOperationService.deregisterInstance(service, instance, clientId);
 }
 ```
 
-## 临时实例注册
+## 临时实例注销
 
-源码位置: `com.alibaba.nacos.naming.core.v2.service.impl.EphemeralClientOperationServiceImpl#registerInstance`
+源码位置: `com.alibaba.nacos.naming.core.v2.service.impl.EphemeralClientOperationServiceImpl#deregisterInstance`
+
 ```java
 @Override
-public void registerInstance(Service service, Instance instance, String clientId) throws NacosException {
-    NamingUtils.checkInstanceIsLegal(instance);
-
-    // 获得单例的 service，如果没有就会注册
-    Service singleton = ServiceManager.getInstance().getSingleton(service);
-    if (!singleton.isEphemeral()) {
-        throw new NacosRuntimeException(NacosException.INVALID_PARAM,
-                String.format("Current service %s is persistent service, can't register ephemeral instance.",
-                        singleton.getGroupedServiceName()));
+public void deregisterInstance(Service service, Instance instance, String clientId) {
+    // 判断 service 是否存在
+    if (!ServiceManager.getInstance().containSingleton(service)) {
+        Loggers.SRV_LOG.warn("remove instance from non-exist service: {}", service);
+        return;
     }
-    // 获取 client，并检查 client
+    Service singleton = ServiceManager.getInstance().getSingleton(service);
     Client client = clientManager.getClient(clientId);
     if (!clientIsLegal(client, clientId)) {
         return;
     }
-    // InstancePublishInfo 就是 nacos 内部实例
-    InstancePublishInfo instanceInfo = getPublishInfo(instance);
-    // 添加 service 和 instance，这里会发布 ClientChangedEvent 事件，非常重要
-    client.addServiceInstance(singleton, instanceInfo);
+    // 移除内存中的 instance 对象，这里会发布 ClientChangedEvent 事件，这个很重要
+    InstancePublishInfo removedInstance = client.removeServiceInstance(singleton);
     client.setLastUpdatedTime();
     client.recalculateRevision();
-    // 发布 ClientRegisterServiceEvent 事件
-    NotifyCenter.publishEvent(new ClientOperationEvent.ClientRegisterServiceEvent(singleton, clientId));
-    // 发布 InstanceMetadataEvent 事件
-    NotifyCenter
-            .publishEvent(new MetadataEvent.InstanceMetadataEvent(singleton, instanceInfo.getMetadataId(), false));
+    if (null != removedInstance) {
+        // 发布 ClientDeregisterServiceEvent 事件
+        NotifyCenter.publishEvent(new ClientOperationEvent.ClientDeregisterServiceEvent(singleton, clientId));
+        // 发布 InstanceMetadataEvent 事件
+        NotifyCenter.publishEvent(
+                new MetadataEvent.InstanceMetadataEvent(singleton, removedInstance.getMetadataId(), true));
+    }
 }
 ```
 
 源码位置: `com.alibaba.nacos.naming.consistency.ephemeral.distro.v2.DistroClientDataProcessor#syncToAllServer`
+
 ```java
-// DistroClientDataProcessor 会监听 ClientChangedEvent 事件
+// DistroClientDataProcessor 接受 ClientChangedEvent, 负责同步数据给其他节点
 private void syncToAllServer(ClientEvent event) {
     Client client = event.getClient();
     // Only ephemeral data sync by Distro, persist client should sync by raft.
@@ -103,22 +101,22 @@ private void syncToAllServer(ClientEvent event) {
         distroProtocol.sync(distroKey, DataOperation.DELETE);
     } else if (event instanceof ClientEvent.ClientChangedEvent) {
         DistroKey distroKey = new DistroKey(client.getClientId(), TYPE);
-        // 同步到其他节点
         distroProtocol.sync(distroKey, DataOperation.CHANGE);
     }
 }
 ```
 
 源码位置: `com.alibaba.nacos.naming.core.v2.index.ClientServiceIndexesManager#handleClientOperation`
+
 ```java
-// ClientServiceIndexesManager 会监听 ClientRegisterServiceEvent 事件
+// ClientServiceIndexesManager 会监听 ClientDeregisterServiceEvent 事件
 private void handleClientOperation(ClientOperationEvent event) {
     Service service = event.getService();
     String clientId = event.getClientId();
     if (event instanceof ClientOperationEvent.ClientRegisterServiceEvent) {
-        // 添加 client 的 publishIndex
         addPublisherIndexes(service, clientId);
     } else if (event instanceof ClientOperationEvent.ClientDeregisterServiceEvent) {
+        // 移除 service 的 clientId
         removePublisherIndexes(service, clientId);
     } else if (event instanceof ClientOperationEvent.ClientSubscribeServiceEvent) {
         addSubscriberIndexes(service, clientId);
@@ -126,22 +124,25 @@ private void handleClientOperation(ClientOperationEvent event) {
         removeSubscriberIndexes(service, clientId);
     }
 }
-private void addPublisherIndexes(Service service, String clientId) {
-    // service 和 clientId 是一对多的关系
-    publisherIndexes.computeIfAbsent(service, key -> new ConcurrentHashSet<>());
-    publisherIndexes.get(service).add(clientId);
-    // 发布 ServiceChangedEvent 事件
-    NotifyCenter.publishEvent(new ServiceEvent.ServiceChangedEvent(service, true));
+
+private void removePublisherIndexes(Service service, String clientId) {
+    publisherIndexes.computeIfPresent(service, (s, ids) -> {
+        ids.remove(clientId);
+        // 发布 ServiceChangedEvent 事件
+        NotifyCenter.publishEvent(new ServiceEvent.ServiceChangedEvent(service, true));
+        return ids.isEmpty() ? null : ids;
+    });
 }
 ```
 
 源码位置: `com.alibaba.nacos.naming.push.v2.NamingSubscriberServiceV2Impl#onEvent`
 ```java
-// NamingSubscriberServiceV2Impl 监听 ServiceChangedEvent
+// NamingSubscriberServiceV2Impl 会监听 ServiceChangedEvent 事件
+@Override
 public void onEvent(Event event) {
     if (event instanceof ServiceEvent.ServiceChangedEvent) {
         // If service changed, push to all subscribers.
-        // service 下的 instance 改变之后，要推送给所有的订阅者
+        // 注销 instance， 必须推送给所有的订阅者
         ServiceEvent.ServiceChangedEvent serviceChangedEvent = (ServiceEvent.ServiceChangedEvent) event;
         Service service = serviceChangedEvent.getService();
         delayTaskEngine.addTask(service, new PushDelayTask(service, PushConfig.getInstance().getPushTaskDelay()));
@@ -156,48 +157,40 @@ public void onEvent(Event event) {
 }
 ```
 
-## 持久化实例注册
+## 持久化实例注销
 
-源码位置: `com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl#registerInstance`
+源码位置: `com.alibaba.nacos.naming.core.v2.service.impl.PersistentClientOperationServiceImpl#deregisterInstance`
+
 ```java
 @Override
-public void registerInstance(Service service, Instance instance, String clientId) {
-    // 和临时实例注册一样，获取单例的  service
-    Service singleton = ServiceManager.getInstance().getSingleton(service);
-    if (singleton.isEphemeral()) {
-        throw new NacosRuntimeException(NacosException.INVALID_PARAM,
-                String.format("Current service %s is ephemeral service, can't register persistent instance.",
-                        singleton.getGroupedServiceName()));
-    }
-    // 包装为 writeRequest 对象
+public void deregisterInstance(Service service, Instance instance, String clientId) {
     final InstanceStoreRequest request = new InstanceStoreRequest();
     request.setService(service);
     request.setInstance(instance);
     request.setClientId(clientId);
-    // 这里设置了 group，在构造函数中会初始化 group 的 RequestProcessor 
+    // 注意这里的 group，在构造函数中进行注册对应的 processor
     final WriteRequest writeRequest = WriteRequest.newBuilder().setGroup(group())
-            .setData(ByteString.copyFrom(serializer.serialize(request))).setOperation(DataOperation.ADD.name())
+            .setData(ByteString.copyFrom(serializer.serialize(request))).setOperation(DataOperation.DELETE.name())
             .build();
     
     try {
-        // CPProtocol 负责写请求，同步到其他的节点，然后应用状态机
+        // 由 CPProtcol 写入请求到本地，然后同步到其他节点，最后应用状态机
         protocol.write(writeRequest);
-        Loggers.RAFT.info("Client registered. service={}, clientId={}, instance={}", service, instance, clientId);
+        Loggers.RAFT.info("Client unregistered. service={}, clientId={}, instance={}", service, instance, clientId);
     } catch (Exception e) {
         throw new NacosRuntimeException(NacosException.SERVER_ERROR, e);
     }
 }
 
-// 构造函数中，初始化话了 
+
+// 构造函数中注册 requestProcessor, 这个可以分组的
 public PersistentClientOperationServiceImpl(final PersistentIpPortClientManager clientManager) {
     this.clientManager = clientManager;
     this.protocol = ApplicationUtils.getBean(ProtocolManager.class).getCpProtocol();
-    // 自己负责来处理 apply WriteRequest
     this.protocol.addRequestProcessors(Collections.singletonList(this));
 }
 
-// 应用 raft 的状态机
-// protocol.write(writeRequest) 之后, 就会回调这个方法
+// 处理状态机
 @Override
 public Response onApply(WriteRequest request) {
     final Lock lock = readLock;
@@ -207,11 +200,11 @@ public Response onApply(WriteRequest request) {
         final DataOperation operation = DataOperation.valueOf(request.getOperation());
         switch (operation) {
             case ADD:
-                // 处理实例注册
                 onInstanceRegister(instanceRequest.service, instanceRequest.instance,
                         instanceRequest.getClientId());
                 break;
             case DELETE:
+                // 注销实例
                 onInstanceDeregister(instanceRequest.service, instanceRequest.getClientId());
                 break;
             case CHANGE:
@@ -234,23 +227,23 @@ public Response onApply(WriteRequest request) {
     }
 }
 
-// 处理实例注册, 基本和临时实例注册一样, 后面就不重复分析了
-private void onInstanceRegister(Service service, Instance instance, String clientId) {
-    // 获取 service 和 client
+// 注销实例， 这里的逻辑和临时实例注销的逻辑是一样的，所以就不继续解析了
+private void onInstanceDeregister(Service service, String clientId) {
     Service singleton = ServiceManager.getInstance().getSingleton(service);
-    if (!clientManager.contains(clientId)) {
-        clientManager.clientConnected(clientId, new ClientAttributes());
-    }
     Client client = clientManager.getClient(clientId);
-    InstancePublishInfo instancePublishInfo = getPublishInfo(instance);
-    // 添加 service 和 instance，发布 ClientChangedEvent 事件
-    client.addServiceInstance(singleton, instancePublishInfo);
+    if (client == null) {
+        Loggers.RAFT.warn("client not exist onInstanceDeregister, clientId : {} ", clientId);
+        return;
+    }
+    // 移除内存的 instance，发布 ClientChangedEvent 事件
+    client.removeServiceInstance(singleton);
     client.setLastUpdatedTime();
-    // 发布 ClientRegisterServiceEvent 事件
-    NotifyCenter.publishEvent(new ClientOperationEvent.ClientRegisterServiceEvent(singleton, clientId));
+    if (client.getAllPublishedService().isEmpty()) {
+        clientManager.clientDisconnected(clientId);
+    }
+    // 发布 ClientDeregisterServiceEvent 事件       
+    NotifyCenter.publishEvent(new ClientOperationEvent.ClientDeregisterServiceEvent(singleton, clientId));
 }
 ```
-
-
 
 

@@ -2,8 +2,8 @@
 title: 搭建 nacos 源码调试环境
 date: 2023-08-18T08:00:00+08:00
 draft: false
-tags: [ nacos, source code, 源码分析 nacos ]
-categories: [ 随笔 ]
+tags: [ nacos, source code, 源码分析 nacos 系列 ]
+categories: [ 源码分析 nacos 系列 ]
 ---
 
 ## 下载源码和编译
