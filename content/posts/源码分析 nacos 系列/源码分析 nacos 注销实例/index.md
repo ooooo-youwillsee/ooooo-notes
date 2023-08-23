@@ -6,6 +6,8 @@ tags: [ nacos, source code, 源码分析 nacos 系列 ]
 categories: [ 源码分析 nacos 系列 ]
 ---
 
+> nacos 基于 2.2.4 版本
+
 ## 注销实例的 curl
 
 ```shell

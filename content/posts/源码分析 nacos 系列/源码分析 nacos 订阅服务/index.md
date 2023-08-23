@@ -6,6 +6,8 @@ tags: [ nacos, source code, 源码分析 nacos 系列 ]
 categories: [ 源码分析 nacos 系列 ]
 ---
 
+> nacos 基于 2.2.4 版本
+
 nacos 订阅服务主要分为 `http+udp` 和 `grpc` 这两种方式，这两者的**内部调用方法**都是一样的，这里主要分析 `http+udp` 的方式。
 
 ## 订阅服务的 curl
