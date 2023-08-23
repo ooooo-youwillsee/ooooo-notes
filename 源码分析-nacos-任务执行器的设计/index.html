@@ -1,4 +1,4 @@
-<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos 任务执行器的设计 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos 任务执行器的设计"><meta property="og:description" content="任务执行器的设计 在 nacos 中，所有的任务都实现了 NacosTask 接口，所有的任务执行器都实现了 NacosTaskExecuteEngine 接口。 接下来看看这两个接口的设计 1 2 3 4 5 6 7 8 9 10 11 12 // NacosTask public interface"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-08-22T08:00:00+08:00"><meta property="article:modified_time" content="2023-08-22T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos 任务执行器的设计"><meta name=twitter:description content="任务执行器的设计 在 nacos 中，所有的任务都实现了 NacosTask 接口，所有的任务执行器都实现了 NacosTaskExecuteEngine 接口。 接下来看看这两个接口的设计 1 2 3 4 5 6 7 8 9 10 11 12 // NacosTask public interface"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E8%AE%A2%E9%98%85%E6%9C%8D%E5%8A%A1/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos 任务执行器的设计","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":508,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1\/","datePublished":"2023-08-22T08:00:00+08:00","dateModified":"2023-08-22T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos 任务执行器的设计 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos 任务执行器的设计"><meta property="og:description" content="nacos 基于 2.2.4 版本 任务执行器的设计 在 nacos 中，所有的任务都实现了 NacosTask 接口，所有的任务执行器都实现了 NacosTaskExecuteEngine 接口。 接下来看看这两个接口的设计 1 2 3 4 5 6 7 8 9 10"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-08-22T08:00:00+08:00"><meta property="article:modified_time" content="2023-08-22T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos 任务执行器的设计"><meta name=twitter:description content="nacos 基于 2.2.4 版本 任务执行器的设计 在 nacos 中，所有的任务都实现了 NacosTask 接口，所有的任务执行器都实现了 NacosTaskExecuteEngine 接口。 接下来看看这两个接口的设计 1 2 3 4 5 6 7 8 9 10"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E8%AE%A2%E9%98%85%E6%9C%8D%E5%8A%A1/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos 任务执行器的设计","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":1289,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1\/","datePublished":"2023-08-22T08:00:00+08:00","dateModified":"2023-08-22T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
 <input type=text placeholder="Search titles or contents..." id=search-input-desktop>
 <a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
 <a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
@@ -7,9 +7,9 @@
 <a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
 <a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
 <span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title><i class='fa fa-list' aria-hidden=true></i>文章</a><a class=menu-item href=/ooooo-notes/tags/ title><i class='fa fa-tags' aria-hidden=true></i>标签</a><a class=menu-item href=/ooooo-notes/categories/ title><i class='fa fa-archive' aria-hidden=true></i>分类</a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
-<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos 任务执行器的设计</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-08-22 08:00:00">2023-08-22 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;508 words&nbsp;
-<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;2 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
-<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#任务执行器的设计>任务执行器的设计</a></li></ul></nav></div></div><div class=content id=content><h2 id=任务执行器的设计>任务执行器的设计</h2><p>在 nacos 中，所有的任务都实现了 <code>NacosTask</code> 接口，所有的任务执行器都实现了 <code>NacosTaskExecuteEngine</code> 接口。</p><p>接下来看看这两个接口的设计</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos 任务执行器的设计</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-08-22 08:00:00">2023-08-22 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1289 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;3 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#任务执行器的设计>任务执行器的设计</a></li><li><a href=#具体实现类举例>具体实现类(举例)</a></li></ul></nav></div></div><div class=content id=content><blockquote><p>nacos 基于 2.2.4 版本</p></blockquote><h2 id=任务执行器的设计>任务执行器的设计</h2><p>在 nacos 中，所有的任务都实现了 <code>NacosTask</code> 接口，所有的任务执行器都实现了 <code>NacosTaskExecuteEngine</code> 接口。</p><p>接下来看看这两个接口的设计</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -33,7 +33,7 @@
 </span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=c1>// 对于延时执行的任务，判断 System.currentTimeMillis() - this.lastProcessTime &gt;= this.taskInterval.
 </span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>boolean</span> <span class=nf>shouldProcess</span><span class=o>();</span>
 </span></span><span class=line><span class=cl><span class=o>}</span>
-</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.push.v2.task.PushDelayTaskExecuteEngine#PushDelayTaskExecuteEngine</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -99,25 +99,254 @@
 </span><span class=lnt>64
 </span><span class=lnt>65
 </span><span class=lnt>66
-</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// delayTaskEngine 的初始化，在类 NamingSubscriberServiceV2Impl 中被调用
-</span></span></span><span class=line><span class=cl><span class=c1>// pushExecutor 有两种实现， 一个是 udp, 一个是 rpc
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// NacosTaskExecuteEngine
+</span></span></span><span class=line><span class=cl><span class=c1>// 从接口中可以看出
+</span></span></span><span class=line><span class=cl><span class=c1>// 1. addTask, 一个 key 对应一个 task
+</span></span></span><span class=line><span class=cl><span class=c1>// 2. addProcessor, 一个 key 对应一个 processor, 有默认的 processor
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kd>interface</span> <span class=nc>NacosTaskExecuteEngine</span><span class=o>&lt;</span><span class=n>T</span> <span class=kd>extends</span> <span class=n>NacosTask</span><span class=o>&gt;</span> <span class=kd>extends</span> <span class=n>Closeable</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Get Task size in execute engine.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @return size of task
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=nf>size</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Whether the execute engine is empty.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @return true if the execute engine has no task to do, otherwise false
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>boolean</span> <span class=nf>isEmpty</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Add task processor {@link NacosTaskProcessor} for execute engine.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param key           key of task
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param taskProcessor task processor
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=nf>addProcessor</span><span class=o>(</span><span class=n>Object</span> <span class=n>key</span><span class=o>,</span> <span class=n>NacosTaskProcessor</span> <span class=n>taskProcessor</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Remove task processor {@link NacosTaskProcessor} form execute engine for key.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param key key of task
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=nf>removeProcessor</span><span class=o>(</span><span class=n>Object</span> <span class=n>key</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Try to get {@link NacosTaskProcessor} by key, if non-exist, will return default processor.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param key key of task
+</span></span></span><span class=line><span class=cl><span class=cm>     * @return task processor for task key or default processor if task processor for task key non-exist
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=n>NacosTaskProcessor</span> <span class=nf>getProcessor</span><span class=o>(</span><span class=n>Object</span> <span class=n>key</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Get all processor key.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @return collection of processors
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=n>Collection</span><span class=o>&lt;</span><span class=n>Object</span><span class=o>&gt;</span> <span class=nf>getAllProcessorKey</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Set default task processor. If do not find task processor by task key, use this default processor to process
+</span></span></span><span class=line><span class=cl><span class=cm>     * task.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param defaultTaskProcessor default task processor
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=nf>setDefaultTaskProcessor</span><span class=o>(</span><span class=n>NacosTaskProcessor</span> <span class=n>defaultTaskProcessor</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Add task into execute pool.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param key  key of task
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param task task
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=nf>addTask</span><span class=o>(</span><span class=n>Object</span> <span class=n>key</span><span class=o>,</span> <span class=n>T</span> <span class=n>task</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Remove task.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @param key key of task
+</span></span></span><span class=line><span class=cl><span class=cm>     * @return nacos task
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=n>T</span> <span class=nf>removeTask</span><span class=o>(</span><span class=n>Object</span> <span class=n>key</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm>     * Get all task keys.
+</span></span></span><span class=line><span class=cl><span class=cm>     *
+</span></span></span><span class=line><span class=cl><span class=cm>     * @return collection of task keys.
+</span></span></span><span class=line><span class=cl><span class=cm>     */</span>
+</span></span><span class=line><span class=cl>    <span class=n>Collection</span><span class=o>&lt;</span><span class=n>Object</span><span class=o>&gt;</span> <span class=nf>getAllTaskKeys</span><span class=o>();</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=具体实现类举例>具体实现类(举例)</h2><p><code>PushDelayTask</code> 和 <code>PushDelayTaskExecuteEngine</code></p><p>源码位置: <code>com.alibaba.nacos.naming.push.v2.task.PushDelayTask</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// PushDelayTask 的构造方法
+</span></span></span><span class=line><span class=cl><span class=c1>// delay: 延时的事件
+</span></span></span><span class=line><span class=cl><span class=c1>// targetClient: 推送的 clientId
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=nf>PushDelayTask</span><span class=o>(</span><span class=n>Service</span> <span class=n>service</span><span class=o>,</span> <span class=kt>long</span> <span class=n>delay</span><span class=o>,</span> <span class=n>String</span> <span class=n>targetClient</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>service</span> <span class=o>=</span> <span class=n>service</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>pushToAll</span> <span class=o>=</span> <span class=kc>false</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>targetClients</span> <span class=o>=</span> <span class=k>new</span> <span class=n>HashSet</span><span class=o>&lt;&gt;(</span><span class=n>1</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>targetClients</span><span class=o>.</span><span class=na>add</span><span class=o>(</span><span class=n>targetClient</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>setTaskInterval</span><span class=o>(</span><span class=n>delay</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 设置上一次处理时间，用来判断是否过期
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>setLastProcessTime</span><span class=o>(</span><span class=n>System</span><span class=o>.</span><span class=na>currentTimeMillis</span><span class=o>());</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 每一个延时任务都会有 merge 方法, 用来合并相同的 task, 这样可以更高效的处理任务
+</span></span></span><span class=line><span class=cl><span class=c1>// 比如因为客户端重试，发起了两个一样的 task，经过 merge 之后，处理一个就行。 
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>void</span> <span class=nf>merge</span><span class=o>(</span><span class=n>AbstractDelayTask</span> <span class=n>task</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(!(</span><span class=n>task</span> <span class=k>instanceof</span> <span class=n>PushDelayTask</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>PushDelayTask</span> <span class=n>oldTask</span> <span class=o>=</span> <span class=o>(</span><span class=n>PushDelayTask</span><span class=o>)</span> <span class=n>task</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>isPushToAll</span><span class=o>()</span> <span class=o>||</span> <span class=n>oldTask</span><span class=o>.</span><span class=na>isPushToAll</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>pushToAll</span> <span class=o>=</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>targetClients</span> <span class=o>=</span> <span class=kc>null</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>targetClients</span><span class=o>.</span><span class=na>addAll</span><span class=o>(</span><span class=n>oldTask</span><span class=o>.</span><span class=na>getTargetClients</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>setLastProcessTime</span><span class=o>(</span><span class=n>Math</span><span class=o>.</span><span class=na>min</span><span class=o>(</span><span class=n>getLastProcessTime</span><span class=o>(),</span> <span class=n>task</span><span class=o>.</span><span class=na>getLastProcessTime</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>    <span class=n>Loggers</span><span class=o>.</span><span class=na>PUSH</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;[PUSH] Task merge for {}&#34;</span><span class=o>,</span> <span class=n>service</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=c1>// shouldProcess 方法在父类上面, 判断当前任务都是过期
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>boolean</span> <span class=nf>shouldProcess</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>(</span><span class=n>System</span><span class=o>.</span><span class=na>currentTimeMillis</span><span class=o>()</span> <span class=o>-</span> <span class=k>this</span><span class=o>.</span><span class=na>lastProcessTime</span> <span class=o>&gt;=</span> <span class=k>this</span><span class=o>.</span><span class=na>taskInterval</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.push.v2.task.PushDelayTaskExecuteEngine#PushDelayTaskExecuteEngine</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// PushDelayTaskExecuteEngine 的初始化
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=nf>PushDelayTaskExecuteEngine</span><span class=o>(</span><span class=n>ClientManager</span> <span class=n>clientManager</span><span class=o>,</span> <span class=n>ClientServiceIndexesManager</span> <span class=n>indexesManager</span><span class=o>,</span>
 </span></span><span class=line><span class=cl>                                  <span class=n>ServiceStorage</span> <span class=n>serviceStorage</span><span class=o>,</span> <span class=n>NamingMetadataManager</span> <span class=n>metadataManager</span><span class=o>,</span>
 </span></span><span class=line><span class=cl>                                  <span class=n>PushExecutor</span> <span class=n>pushExecutor</span><span class=o>,</span> <span class=n>SwitchDomain</span> <span class=n>switchDomain</span><span class=o>)</span> <span class=o>{</span>
-</span></span><span class=line><span class=cl>    <span class=kd>super</span><span class=o>(</span><span class=n>PushDelayTaskExecuteEngine</span><span class=o>.</span><span class=na>class</span><span class=o>.</span><span class=na>getSimpleName</span><span class=o>(),</span> <span class=n>Loggers</span><span class=o>.</span><span class=na>PUSH</span><span class=o>);</span>
-</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>clientManager</span> <span class=o>=</span> <span class=n>clientManager</span><span class=o>;</span>
-</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>indexesManager</span> <span class=o>=</span> <span class=n>indexesManager</span><span class=o>;</span>
-</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>serviceStorage</span> <span class=o>=</span> <span class=n>serviceStorage</span><span class=o>;</span>
-</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>metadataManager</span> <span class=o>=</span> <span class=n>metadataManager</span><span class=o>;</span>
-</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>pushExecutor</span> <span class=o>=</span> <span class=n>pushExecutor</span><span class=o>;</span>
-</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>switchDomain</span> <span class=o>=</span> <span class=n>switchDomain</span><span class=o>;</span>
-</span></span><span class=line><span class=cl>    <span class=c1>// 设置默认的processor, 用来处理 PushDelayTask
+</span></span><span class=line><span class=cl>    <span class=o>...</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 设置默认的processor, 用来处理任务, 这里没有特殊的 processor
 </span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>setDefaultTaskProcessor</span><span class=o>(</span><span class=k>new</span> <span class=n>PushDelayTaskProcessor</span><span class=o>(</span><span class=k>this</span><span class=o>));</span>
 </span></span><span class=line><span class=cl><span class=o>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 在父类 NacosDelayTaskExecuteEngine 中用单一的线程池来启动，然后处理任务
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=nf>NacosDelayTaskExecuteEngine</span><span class=o>(</span><span class=n>String</span> <span class=n>name</span><span class=o>,</span> <span class=kt>int</span> <span class=n>initCapacity</span><span class=o>,</span> <span class=n>Logger</span> <span class=n>logger</span><span class=o>,</span> <span class=kt>long</span> <span class=n>processInterval</span><span class=o>)</span> <span class=o>{</span>
-</span></span><span class=line><span class=cl>    <span class=kd>super</span><span class=o>(</span><span class=n>logger</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>...</span>
 </span></span><span class=line><span class=cl>    <span class=n>tasks</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ConcurrentHashMap</span><span class=o>&lt;&gt;(</span><span class=n>initCapacity</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>    <span class=c1>// 线程池
 </span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>processingExecutor</span> <span class=o>=</span> <span class=n>ExecutorFactory</span><span class=o>.</span><span class=na>newSingleScheduledExecutorService</span><span class=o>(</span><span class=k>new</span> <span class=n>NameThreadFactory</span><span class=o>(</span><span class=n>name</span><span class=o>));</span>
@@ -139,23 +368,26 @@
 </span></span><span class=line><span class=cl>    <span class=o>}</span>
 </span></span><span class=line><span class=cl><span class=o>}</span>
 </span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=kd>protected</span> <span class=kt>void</span> <span class=nf>processTasks</span><span class=o>()</span> <span class=o>{</span>
-</span></span><span class=line><span class=cl>    <span class=n>Collection</span><span class=o>&lt;</span><span class=n>Object</span><span class=o>&gt;</span> <span class=n>keys</span> <span class=o>=</span> <span class=n>getAllTaskKeys</span><span class=o>();</span>
+</span></span><span class=line><span class=cl><span class=c1>// 在父类 NacosDelayTaskExecuteEngine 中
+</span></span></span><span class=line><span class=cl><span class=c1>// com.alibaba.nacos.common.task.engine.NacosDelayTaskExecuteEngine#processTasks
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>protected</span> <span class=kt>void</span> <span class=nf>processTasks</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 获取所有的 key，因为 addTask 方法，所以每一个 task 都会关联到一个 key
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>Collection</span><span class=o>&lt;</span><span class=n>Object</span><span class=o>&gt;</span> <span class=n>keys</span> <span class=o>=</span> <span class=n>getAllTaskKeys</span><span class=o>();</span>
 </span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=o>(</span><span class=n>Object</span> <span class=n>taskKey</span> <span class=o>:</span> <span class=n>keys</span><span class=o>)</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>        <span class=c1>// 判断 task 是否到期，每个 task 创建时都是指定 taskInterval
 </span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>AbstractDelayTask</span> <span class=n>task</span> <span class=o>=</span> <span class=n>removeTask</span><span class=o>(</span><span class=n>taskKey</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(</span><span class=kc>null</span> <span class=o>==</span> <span class=n>task</span><span class=o>)</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>            <span class=k>continue</span><span class=o>;</span>
 </span></span><span class=line><span class=cl>        <span class=o>}</span>
-</span></span><span class=line><span class=cl>        <span class=c1>// 获取相应的 processor 来处理，一般来说就是默认的 processor, 比如 PushDelayTaskProcessor
+</span></span><span class=line><span class=cl>        <span class=c1>// 获取相应的 processor 来处理，一般来说就是默认的 processor, 比如 PushDelayTaskProcessor, 下面会说这个类
 </span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>NacosTaskProcessor</span> <span class=n>processor</span> <span class=o>=</span> <span class=n>getProcessor</span><span class=o>(</span><span class=n>taskKey</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(</span><span class=kc>null</span> <span class=o>==</span> <span class=n>processor</span><span class=o>)</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>            <span class=n>getEngineLog</span><span class=o>().</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;processor not found for task, so discarded. &#34;</span> <span class=o>+</span> <span class=n>task</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>            <span class=k>continue</span><span class=o>;</span>
 </span></span><span class=line><span class=cl>        <span class=o>}</span>
 </span></span><span class=line><span class=cl>        <span class=k>try</span> <span class=o>{</span>
-</span></span><span class=line><span class=cl>            <span class=c1>// ReAdd task if process failed
+</span></span><span class=line><span class=cl>            <span class=c1>// 处理 task，如果处理失败，重新添加 task
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=c1>// ReAdd task if process failed
 </span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(!</span><span class=n>processor</span><span class=o>.</span><span class=na>process</span><span class=o>(</span><span class=n>task</span><span class=o>))</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>                <span class=n>retryFailedTask</span><span class=o>(</span><span class=n>taskKey</span><span class=o>,</span> <span class=n>task</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>            <span class=o>}</span>
@@ -163,6 +395,48 @@
 </span></span><span class=line><span class=cl>            <span class=n>getEngineLog</span><span class=o>().</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;Nacos task execute error &#34;</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>            <span class=n>retryFailedTask</span><span class=o>(</span><span class=n>taskKey</span><span class=o>,</span> <span class=n>task</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 重新添加 task
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>private</span> <span class=kt>void</span> <span class=nf>retryFailedTask</span><span class=o>(</span><span class=n>Object</span> <span class=n>key</span><span class=o>,</span> <span class=n>AbstractDelayTask</span> <span class=n>task</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>task</span><span class=o>.</span><span class=na>setLastProcessTime</span><span class=o>(</span><span class=n>System</span><span class=o>.</span><span class=na>currentTimeMillis</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>addTask</span><span class=o>(</span><span class=n>key</span><span class=o>,</span> <span class=n>task</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.push.v2.task.PushDelayTaskExecuteEngine.PushDelayTaskProcessor</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// PushDelayTaskProcessor 处理 PushDelayTask, 重新包装为 PushExecuteTask, 然后放入线程池中运行
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>private</span> <span class=kd>static</span> <span class=kd>class</span> <span class=nc>PushDelayTaskProcessor</span> <span class=kd>implements</span> <span class=n>NacosTaskProcessor</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=kd>private</span> <span class=kd>final</span> <span class=n>PushDelayTaskExecuteEngine</span> <span class=n>executeEngine</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=nf>PushDelayTaskProcessor</span><span class=o>(</span><span class=n>PushDelayTaskExecuteEngine</span> <span class=n>executeEngine</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>this</span><span class=o>.</span><span class=na>executeEngine</span> <span class=o>=</span> <span class=n>executeEngine</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kt>boolean</span> <span class=nf>process</span><span class=o>(</span><span class=n>NacosTask</span> <span class=n>task</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>PushDelayTask</span> <span class=n>pushDelayTask</span> <span class=o>=</span> <span class=o>(</span><span class=n>PushDelayTask</span><span class=o>)</span> <span class=n>task</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>Service</span> <span class=n>service</span> <span class=o>=</span> <span class=n>pushDelayTask</span><span class=o>.</span><span class=na>getService</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=n>NamingExecuteTaskDispatcher</span><span class=o>.</span><span class=na>getInstance</span><span class=o>()</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>dispatchAndExecuteTask</span><span class=o>(</span><span class=n>service</span><span class=o>,</span> <span class=k>new</span> <span class=n>PushExecuteTask</span><span class=o>(</span><span class=n>service</span><span class=o>,</span> <span class=n>executeEngine</span><span class=o>,</span> <span class=n>pushDelayTask</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
 </span></span><span class=line><span class=cl>    <span class=o>}</span>
 </span></span><span class=line><span class=cl><span class=o>}</span>
 </span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-08-22 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/ data-title="源码分析 nacos 任务执行器的设计"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/ data-title="源码分析 nacos 任务执行器的设计"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/ data-title="源码分析 nacos 任务执行器的设计"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/nacos/>nacos</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a>,&nbsp;<a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/>源码分析 nacos 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E8%AE%A2%E9%98%85%E6%9C%8D%E5%8A%A1/ class=prev rel=prev title="源码分析 nacos 订阅服务"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>源码分析 nacos 订阅服务</a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.117.0">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
