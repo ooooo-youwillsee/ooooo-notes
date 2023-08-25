@@ -1,0 +1,717 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos grpc 服务端的设计 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos grpc 服务端的设计"><meta property="og:description" content="nacos 基于 2.2.4 版本 nacos 在 2.0 版本中引入了 grpc，用来处理http连接数过多的问题，所以有必要看看nacos 是怎么使用 grpc的，这样方便我们理清整个"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-08-23T08:00:00+08:00"><meta property="article:modified_time" content="2023-08-23T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos grpc 服务端的设计"><meta name=twitter:description content="nacos 基于 2.2.4 版本 nacos 在 2.0 版本中引入了 grpc，用来处理http连接数过多的问题，所以有必要看看nacos 是怎么使用 grpc的，这样方便我们理清整个"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos grpc 服务端的设计","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":1936,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1\/","datePublished":"2023-08-23T08:00:00+08:00","dateModified":"2023-08-23T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title><i class='fa fa-list' aria-hidden=true></i>文章</a><a class=menu-item href=/ooooo-notes/tags/ title><i class='fa fa-tags' aria-hidden=true></i>标签</a><a class=menu-item href=/ooooo-notes/categories/ title><i class='fa fa-archive' aria-hidden=true></i>分类</a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos grpc 服务端的设计</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-08-23 08:00:00">2023-08-23 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1936 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;4 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#grpc-server-的启动>grpc server 的启动</a></li><li><a href=#grpcrequestacceptor-处理单一请求>GrpcRequestAcceptor 处理单一请求</a></li><li><a href=#grpcbistreamrequestacceptor-处理流式请求>GrpcBiStreamRequestAcceptor 处理流式请求</a></li></ul></nav></div></div><div class=content id=content><blockquote><p>nacos 基于 2.2.4 版本</p></blockquote><blockquote><p><code>nacos</code> 在 <code>2.0</code> 版本中引入了 <code>grpc</code>，用来处理<strong>http连接数过多</strong>的问题，所以有必要看看<strong>nacos 是怎么使用 grpc</strong>的，这样方便我们理清整个请求流程。</p><p>在 <code>nacos</code> 中只定义了<strong>两个通用的请求模型</strong>，一个是 <code>request-response</code>, 另外一个就是<strong>基于双向流</strong>的 <code>request-response</code>.</p></blockquote><h2 id=grpc-server-的启动>grpc server 的启动</h2><p>所有的 <code>grpc</code> 服务都基于这个 <code>BaseGrpcServer</code> ，子类通过<strong>不同配置</strong>来定制服务，比如<strong>端口</strong>、<strong>超时时间</strong></p><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.BaseGrpcServer</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 在父类中调用 start 方法，来执行 startServer 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>void</span> <span class=nf>startServer</span><span class=o>()</span> <span class=kd>throws</span> <span class=n>Exception</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>MutableHandlerRegistry</span> <span class=n>handlerRegistry</span> <span class=o>=</span> <span class=k>new</span> <span class=n>MutableHandlerRegistry</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 添加 rpc 请求
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>addServices</span><span class=o>(</span><span class=n>handlerRegistry</span><span class=o>,</span> <span class=k>new</span> <span class=n>GrpcConnectionInterceptor</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>NettyServerBuilder</span> <span class=n>builder</span> <span class=o>=</span> <span class=n>NettyServerBuilder</span><span class=o>.</span><span class=na>forPort</span><span class=o>(</span><span class=n>getServicePort</span><span class=o>()).</span><span class=na>executor</span><span class=o>(</span><span class=n>getRpcExecutor</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 配置 tls
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>grpcServerConfig</span><span class=o>.</span><span class=na>getEnableTls</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(</span><span class=n>grpcServerConfig</span><span class=o>.</span><span class=na>getCompatibility</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>builder</span><span class=o>.</span><span class=na>protocolNegotiator</span><span class=o>(</span><span class=k>new</span> <span class=n>OptionalTlsProtocolNegotiator</span><span class=o>(</span><span class=n>getSslContextBuilder</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>builder</span><span class=o>.</span><span class=na>sslContext</span><span class=o>(</span><span class=n>getSslContextBuilder</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 配置 grpc server 的参数
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>server</span> <span class=o>=</span> <span class=n>builder</span><span class=o>.</span><span class=na>maxInboundMessageSize</span><span class=o>(</span><span class=n>getMaxInboundMessageSize</span><span class=o>()).</span><span class=na>fallbackHandlerRegistry</span><span class=o>(</span><span class=n>handlerRegistry</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>compressorRegistry</span><span class=o>(</span><span class=n>CompressorRegistry</span><span class=o>.</span><span class=na>getDefaultInstance</span><span class=o>())</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>decompressorRegistry</span><span class=o>(</span><span class=n>DecompressorRegistry</span><span class=o>.</span><span class=na>getDefaultInstance</span><span class=o>())</span>
+</span></span><span class=line><span class=cl>             <span class=c1>// 连接的过滤器，设置了一些属性，比如 ATTR_TRANS_KEY_CONN_ID
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=o>.</span><span class=na>addTransportFilter</span><span class=o>(</span><span class=k>new</span> <span class=n>AddressTransportFilter</span><span class=o>(</span><span class=n>connectionManager</span><span class=o>))</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>keepAliveTime</span><span class=o>(</span><span class=n>getKeepAliveTime</span><span class=o>(),</span> <span class=n>TimeUnit</span><span class=o>.</span><span class=na>MILLISECONDS</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>keepAliveTimeout</span><span class=o>(</span><span class=n>getKeepAliveTimeout</span><span class=o>(),</span> <span class=n>TimeUnit</span><span class=o>.</span><span class=na>MILLISECONDS</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>permitKeepAliveTime</span><span class=o>(</span><span class=n>getPermitKeepAliveTime</span><span class=o>(),</span> <span class=n>TimeUnit</span><span class=o>.</span><span class=na>MILLISECONDS</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>build</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 启动 grpc server
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>server</span><span class=o>.</span><span class=na>start</span><span class=o>();</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 添加 rpc 请求
+</span></span></span><span class=line><span class=cl><span class=c1>// 这里添加了两个通用的请求模型，payload -&gt; payload , stream payload &lt;-&gt; stream payload
+</span></span></span><span class=line><span class=cl><span class=c1>// 所有的请求都会由 grpcCommonRequestAcceptor 和 grpcBiStreamRequestAcceptor 来处理，接下来看看是怎么处理请求的
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>private</span> <span class=kt>void</span> <span class=nf>addServices</span><span class=o>(</span><span class=n>MutableHandlerRegistry</span> <span class=n>handlerRegistry</span><span class=o>,</span> <span class=n>ServerInterceptor</span><span class=o>...</span> <span class=n>serverInterceptor</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// unary common call register.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>final</span> <span class=n>MethodDescriptor</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>,</span> <span class=n>Payload</span><span class=o>&gt;</span> <span class=n>unaryPayloadMethod</span> <span class=o>=</span> <span class=n>MethodDescriptor</span><span class=o>.&lt;</span><span class=n>Payload</span><span class=o>,</span> <span class=n>Payload</span><span class=o>&gt;</span><span class=n>newBuilder</span><span class=o>()</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setType</span><span class=o>(</span><span class=n>MethodDescriptor</span><span class=o>.</span><span class=na>MethodType</span><span class=o>.</span><span class=na>UNARY</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setFullMethodName</span><span class=o>(</span><span class=n>MethodDescriptor</span><span class=o>.</span><span class=na>generateFullMethodName</span><span class=o>(</span><span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>REQUEST_SERVICE_NAME</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                    <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>REQUEST_METHOD_NAME</span><span class=o>))</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setRequestMarshaller</span><span class=o>(</span><span class=n>ProtoUtils</span><span class=o>.</span><span class=na>marshaller</span><span class=o>(</span><span class=n>Payload</span><span class=o>.</span><span class=na>getDefaultInstance</span><span class=o>()))</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setResponseMarshaller</span><span class=o>(</span><span class=n>ProtoUtils</span><span class=o>.</span><span class=na>marshaller</span><span class=o>(</span><span class=n>Payload</span><span class=o>.</span><span class=na>getDefaultInstance</span><span class=o>())).</span><span class=na>build</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 定义 payload -&gt; payload
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>final</span> <span class=n>ServerCallHandler</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>,</span> <span class=n>Payload</span><span class=o>&gt;</span> <span class=n>payloadHandler</span> <span class=o>=</span> <span class=n>ServerCalls</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>asyncUnaryCall</span><span class=o>((</span><span class=n>request</span><span class=o>,</span> <span class=n>responseObserver</span><span class=o>)</span> <span class=o>-&gt;</span> <span class=n>grpcCommonRequestAcceptor</span><span class=o>.</span><span class=na>request</span><span class=o>(</span><span class=n>request</span><span class=o>,</span> <span class=n>responseObserver</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>ServerServiceDefinition</span> <span class=n>serviceDefOfUnaryPayload</span> <span class=o>=</span> <span class=n>ServerServiceDefinition</span><span class=o>.</span><span class=na>builder</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>                    <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>REQUEST_SERVICE_NAME</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>addMethod</span><span class=o>(</span><span class=n>unaryPayloadMethod</span><span class=o>,</span> <span class=n>payloadHandler</span><span class=o>).</span><span class=na>build</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>handlerRegistry</span><span class=o>.</span><span class=na>addService</span><span class=o>(</span><span class=n>ServerInterceptors</span><span class=o>.</span><span class=na>intercept</span><span class=o>(</span><span class=n>serviceDefOfUnaryPayload</span><span class=o>,</span> <span class=n>serverInterceptor</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// bi stream register.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 定义 stream payload &lt;-&gt; stream payload
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>final</span> <span class=n>ServerCallHandler</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>,</span> <span class=n>Payload</span><span class=o>&gt;</span> <span class=n>biStreamHandler</span> <span class=o>=</span> <span class=n>ServerCalls</span><span class=o>.</span><span class=na>asyncBidiStreamingCall</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>            <span class=o>(</span><span class=n>responseObserver</span><span class=o>)</span> <span class=o>-&gt;</span> <span class=n>grpcBiStreamRequestAcceptor</span><span class=o>.</span><span class=na>requestBiStream</span><span class=o>(</span><span class=n>responseObserver</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>MethodDescriptor</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>,</span> <span class=n>Payload</span><span class=o>&gt;</span> <span class=n>biStreamMethod</span> <span class=o>=</span> <span class=n>MethodDescriptor</span><span class=o>.&lt;</span><span class=n>Payload</span><span class=o>,</span> <span class=n>Payload</span><span class=o>&gt;</span><span class=n>newBuilder</span><span class=o>()</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setType</span><span class=o>(</span><span class=n>MethodDescriptor</span><span class=o>.</span><span class=na>MethodType</span><span class=o>.</span><span class=na>BIDI_STREAMING</span><span class=o>).</span><span class=na>setFullMethodName</span><span class=o>(</span><span class=n>MethodDescriptor</span>
+</span></span><span class=line><span class=cl>                    <span class=o>.</span><span class=na>generateFullMethodName</span><span class=o>(</span><span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>REQUEST_BI_STREAM_SERVICE_NAME</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                            <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>REQUEST_BI_STREAM_METHOD_NAME</span><span class=o>))</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setRequestMarshaller</span><span class=o>(</span><span class=n>ProtoUtils</span><span class=o>.</span><span class=na>marshaller</span><span class=o>(</span><span class=n>Payload</span><span class=o>.</span><span class=na>newBuilder</span><span class=o>().</span><span class=na>build</span><span class=o>()))</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>setResponseMarshaller</span><span class=o>(</span><span class=n>ProtoUtils</span><span class=o>.</span><span class=na>marshaller</span><span class=o>(</span><span class=n>Payload</span><span class=o>.</span><span class=na>getDefaultInstance</span><span class=o>())).</span><span class=na>build</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>ServerServiceDefinition</span> <span class=n>serviceDefOfBiStream</span> <span class=o>=</span> <span class=n>ServerServiceDefinition</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>builder</span><span class=o>(</span><span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>REQUEST_BI_STREAM_SERVICE_NAME</span><span class=o>).</span><span class=na>addMethod</span><span class=o>(</span><span class=n>biStreamMethod</span><span class=o>,</span> <span class=n>biStreamHandler</span><span class=o>).</span><span class=na>build</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>handlerRegistry</span><span class=o>.</span><span class=na>addService</span><span class=o>(</span><span class=n>ServerInterceptors</span><span class=o>.</span><span class=na>intercept</span><span class=o>(</span><span class=n>serviceDefOfBiStream</span><span class=o>,</span> <span class=n>serverInterceptor</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=grpcrequestacceptor-处理单一请求>GrpcRequestAcceptor 处理单一请求</h2><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.GrpcRequestAcceptor</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// GrpcRequestAcceptor 处理请求
+</span></span></span><span class=line><span class=cl><span class=c1>// 请求的逻辑比较清楚，最终由 RequestHandler 来处理请求
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>void</span> <span class=nf>request</span><span class=o>(</span><span class=n>Payload</span> <span class=n>grpcRequest</span><span class=o>,</span> <span class=n>StreamObserver</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>&gt;</span> <span class=n>responseObserver</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// trace 请求
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>grpcRequest</span><span class=o>,</span> <span class=kc>true</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>type</span> <span class=o>=</span> <span class=n>grpcRequest</span><span class=o>.</span><span class=na>getMetadata</span><span class=o>().</span><span class=na>getType</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>//server is on starting.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// server 正在启动中， 返回错误
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(!</span><span class=n>ApplicationUtils</span><span class=o>.</span><span class=na>isStarted</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>convert</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>                <span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>NacosException</span><span class=o>.</span><span class=na>INVALID_SERVER_STATUS</span><span class=o>,</span> <span class=s>&#34;Server is starting,please try later.&#34;</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// server check.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 检查请求处理，在客户端启动时，会发送 ServerCheckRequest 请求
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>ServerCheckRequest</span><span class=o>.</span><span class=na>class</span><span class=o>.</span><span class=na>getSimpleName</span><span class=o>().</span><span class=na>equals</span><span class=o>(</span><span class=n>type</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>serverCheckResponseP</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=k>new</span> <span class=n>ServerCheckResponse</span><span class=o>(</span><span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_ID</span><span class=o>.</span><span class=na>get</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>serverCheckResponseP</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>serverCheckResponseP</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 根据 type 来获取 handler，这里最重要
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>RequestHandler</span> <span class=n>requestHandler</span> <span class=o>=</span> <span class=n>requestHandlerRegistry</span><span class=o>.</span><span class=na>getByRequestType</span><span class=o>(</span><span class=n>type</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//no handler found.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 没有找到对应的 handler，返回错误
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>requestHandler</span> <span class=o>==</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=n>String</span><span class=o>.</span><span class=na>format</span><span class=o>(</span><span class=s>&#34;[%s] No handler for request type : %s :&#34;</span><span class=o>,</span> <span class=s>&#34;grpc&#34;</span><span class=o>,</span> <span class=n>type</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>NacosException</span><span class=o>.</span><span class=na>NO_HANDLER</span><span class=o>,</span> <span class=s>&#34;RequestHandler Not Found&#34;</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>//check connection status.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 检查连接状态, 在客户端启动时，会发送 ConnectionSetupRequest 请求来创建 Connection
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>String</span> <span class=n>connectionId</span> <span class=o>=</span> <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_ID</span><span class=o>.</span><span class=na>get</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=kt>boolean</span> <span class=n>requestValid</span> <span class=o>=</span> <span class=n>connectionManager</span><span class=o>.</span><span class=na>checkValid</span><span class=o>(</span><span class=n>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(!</span><span class=n>requestValid</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}] Invalid connection Id ,connection [{}] is un registered ,&#34;</span><span class=o>,</span> <span class=s>&#34;grpc&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>NacosException</span><span class=o>.</span><span class=na>UN_REGISTER</span><span class=o>,</span> <span class=s>&#34;Connection is unregistered.&#34;</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>Object</span> <span class=n>parseObj</span> <span class=o>=</span> <span class=kc>null</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 根据 grpcRequest 中的 type 来进行 json 反序列化
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>parseObj</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>parse</span><span class=o>(</span><span class=n>grpcRequest</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Exception</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}] Invalid request receive from connection [{}] ,error={}&#34;</span><span class=o>,</span> <span class=s>&#34;grpc&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>NacosException</span><span class=o>.</span><span class=na>BAD_GATEWAY</span><span class=o>,</span> <span class=n>e</span><span class=o>.</span><span class=na>getMessage</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 无效的请求，返回错误
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>parseObj</span> <span class=o>==</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}] Invalid request receive  ,parse request is null&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>NacosException</span><span class=o>.</span><span class=na>BAD_GATEWAY</span><span class=o>,</span> <span class=s>&#34;Invalid request&#34;</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 只能是 request 对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(!(</span><span class=n>parseObj</span> <span class=k>instanceof</span> <span class=n>Request</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}] Invalid request receive  ,parsed payload is not a request,parseObj={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                        <span class=n>parseObj</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>NacosException</span><span class=o>.</span><span class=na>BAD_GATEWAY</span><span class=o>,</span> <span class=s>&#34;Invalid request&#34;</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>Request</span> <span class=n>request</span> <span class=o>=</span> <span class=o>(</span><span class=n>Request</span><span class=o>)</span> <span class=n>parseObj</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 获取对应的 connection，设置 requestMeta
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>Connection</span> <span class=n>connection</span> <span class=o>=</span> <span class=n>connectionManager</span><span class=o>.</span><span class=na>getConnection</span><span class=o>(</span><span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_ID</span><span class=o>.</span><span class=na>get</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>RequestMeta</span> <span class=n>requestMeta</span> <span class=o>=</span> <span class=k>new</span> <span class=n>RequestMeta</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=n>requestMeta</span><span class=o>.</span><span class=na>setClientIp</span><span class=o>(</span><span class=n>connection</span><span class=o>.</span><span class=na>getMetaInfo</span><span class=o>().</span><span class=na>getClientIp</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>requestMeta</span><span class=o>.</span><span class=na>setConnectionId</span><span class=o>(</span><span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_ID</span><span class=o>.</span><span class=na>get</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>requestMeta</span><span class=o>.</span><span class=na>setClientVersion</span><span class=o>(</span><span class=n>connection</span><span class=o>.</span><span class=na>getMetaInfo</span><span class=o>().</span><span class=na>getVersion</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>requestMeta</span><span class=o>.</span><span class=na>setLabels</span><span class=o>(</span><span class=n>connection</span><span class=o>.</span><span class=na>getMetaInfo</span><span class=o>().</span><span class=na>getLabels</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>connectionManager</span><span class=o>.</span><span class=na>refreshActiveTime</span><span class=o>(</span><span class=n>requestMeta</span><span class=o>.</span><span class=na>getConnectionId</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// requestHandler 来处理具体的请求
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>Response</span> <span class=n>response</span> <span class=o>=</span> <span class=n>requestHandler</span><span class=o>.</span><span class=na>handleRequest</span><span class=o>(</span><span class=n>request</span><span class=o>,</span> <span class=n>requestMeta</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>response</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 返回请求给客户端
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Throwable</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;[{}] Fail to handle request from connection [{}] ,error message :{}&#34;</span><span class=o>,</span> <span class=s>&#34;grpc&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                        <span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>Payload</span> <span class=n>payloadResponse</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>convert</span><span class=o>(</span><span class=n>ErrorResponse</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>e</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>traceIfNecessary</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onNext</span><span class=o>(</span><span class=n>payloadResponse</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>responseObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.RequestHandler</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// RequestHandler 处理 请求
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=n>Response</span> <span class=nf>handleRequest</span><span class=o>(</span><span class=n>T</span> <span class=n>request</span><span class=o>,</span> <span class=n>RequestMeta</span> <span class=n>meta</span><span class=o>)</span> <span class=kd>throws</span> <span class=n>NacosException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 处理过滤器，比如 TpsControlRequestFilter, RemoteRequestAuthFilter 
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=o>(</span><span class=n>AbstractRequestFilter</span> <span class=n>filter</span> <span class=o>:</span> <span class=n>requestFilters</span><span class=o>.</span><span class=na>filters</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Response</span> <span class=n>filterResult</span> <span class=o>=</span> <span class=n>filter</span><span class=o>.</span><span class=na>filter</span><span class=o>(</span><span class=n>request</span><span class=o>,</span> <span class=n>meta</span><span class=o>,</span> <span class=k>this</span><span class=o>.</span><span class=na>getClass</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>filterResult</span> <span class=o>!=</span> <span class=kc>null</span> <span class=o>&amp;&amp;</span> <span class=o>!</span><span class=n>filterResult</span><span class=o>.</span><span class=na>isSuccess</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>filterResult</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Throwable</span> <span class=n>throwable</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;filter error&#34;</span><span class=o>,</span> <span class=n>throwable</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 子类来处理具体的请求
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>return</span> <span class=n>handle</span><span class=o>(</span><span class=n>request</span><span class=o>,</span> <span class=n>meta</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=grpcbistreamrequestacceptor-处理流式请求>GrpcBiStreamRequestAcceptor 处理流式请求</h2><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.GrpcBiStreamRequestAcceptor</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// GrpcBiStreamRequestAcceptor 处理流式请求
+</span></span></span><span class=line><span class=cl><span class=c1>// 处理逻辑比较清楚，主要分为 onNext(正常请求)、onError(错误请求)、onCompleted(关闭请求)
+</span></span></span><span class=line><span class=cl><span class=c1>// 在流式处理中，没有 requestHandler 来处理请求，
+</span></span></span><span class=line><span class=cl><span class=c1>// 这是因为流式请求主要是 服务端发送数据给客户端，客户端接受后发送 ack response
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=n>StreamObserver</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>&gt;</span> <span class=nf>requestBiStream</span><span class=o>(</span><span class=n>StreamObserver</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>&gt;</span> <span class=n>responseObserver</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>StreamObserver</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>&gt;</span> <span class=n>streamObserver</span> <span class=o>=</span> <span class=k>new</span> <span class=n>StreamObserver</span><span class=o>&lt;</span><span class=n>Payload</span><span class=o>&gt;()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=kd>final</span> <span class=n>String</span> <span class=n>connectionId</span> <span class=o>=</span> <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_ID</span><span class=o>.</span><span class=na>get</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=kd>final</span> <span class=n>Integer</span> <span class=n>localPort</span> <span class=o>=</span> <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_LOCAL_PORT</span><span class=o>.</span><span class=na>get</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=kd>final</span> <span class=kt>int</span> <span class=n>remotePort</span> <span class=o>=</span> <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_REMOTE_PORT</span><span class=o>.</span><span class=na>get</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>String</span> <span class=n>remoteIp</span> <span class=o>=</span> <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CONN_REMOTE_IP</span><span class=o>.</span><span class=na>get</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>String</span> <span class=n>clientIp</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>        <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onNext</span><span class=o>(</span><span class=n>Payload</span> <span class=n>payload</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=c1>// 获取客户端的 ip
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>clientIp</span> <span class=o>=</span> <span class=n>payload</span><span class=o>.</span><span class=na>getMetadata</span><span class=o>().</span><span class=na>getClientIp</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>            <span class=n>traceDetailIfNecessary</span><span class=o>(</span><span class=n>payload</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=n>Object</span> <span class=n>parseObj</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>            <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 反序列化对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>parseObj</span> <span class=o>=</span> <span class=n>GrpcUtils</span><span class=o>.</span><span class=na>parse</span><span class=o>(</span><span class=n>payload</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Throwable</span> <span class=n>throwable</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                        <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Grpc request bi stream,payload parse error={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span> <span class=n>throwable</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=c1>// 请求对象为 null，不处理
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(</span><span class=n>parseObj</span> <span class=o>==</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                        <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Grpc request bi stream,payload parse null ,body={},meta={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                                <span class=n>payload</span><span class=o>.</span><span class=na>getBody</span><span class=o>().</span><span class=na>getValue</span><span class=o>().</span><span class=na>toStringUtf8</span><span class=o>(),</span> <span class=n>payload</span><span class=o>.</span><span class=na>getMetadata</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            <span class=c1>//  处理 ConnectionSetupRequest 请求，客户端启动时会发送这个请求
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(</span><span class=n>parseObj</span> <span class=k>instanceof</span> <span class=n>ConnectionSetupRequest</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ConnectionSetupRequest</span> <span class=n>setUpRequest</span> <span class=o>=</span> <span class=o>(</span><span class=n>ConnectionSetupRequest</span><span class=o>)</span> <span class=n>parseObj</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=n>Map</span><span class=o>&lt;</span><span class=n>String</span><span class=o>,</span> <span class=n>String</span><span class=o>&gt;</span> <span class=n>labels</span> <span class=o>=</span> <span class=n>setUpRequest</span><span class=o>.</span><span class=na>getLabels</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                <span class=n>String</span> <span class=n>appName</span> <span class=o>=</span> <span class=s>&#34;-&#34;</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=o>(</span><span class=n>labels</span> <span class=o>!=</span> <span class=kc>null</span> <span class=o>&amp;&amp;</span> <span class=n>labels</span><span class=o>.</span><span class=na>containsKey</span><span class=o>(</span><span class=n>Constants</span><span class=o>.</span><span class=na>APPNAME</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=n>appName</span> <span class=o>=</span> <span class=n>labels</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>Constants</span><span class=o>.</span><span class=na>APPNAME</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=n>ConnectionMeta</span> <span class=n>metaInfo</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ConnectionMeta</span><span class=o>(</span><span class=n>connectionId</span><span class=o>,</span> <span class=n>payload</span><span class=o>.</span><span class=na>getMetadata</span><span class=o>().</span><span class=na>getClientIp</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                        <span class=n>remoteIp</span><span class=o>,</span> <span class=n>remotePort</span><span class=o>,</span> <span class=n>localPort</span><span class=o>,</span> <span class=n>ConnectionType</span><span class=o>.</span><span class=na>GRPC</span><span class=o>.</span><span class=na>getType</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                        <span class=n>setUpRequest</span><span class=o>.</span><span class=na>getClientVersion</span><span class=o>(),</span> <span class=n>appName</span><span class=o>,</span> <span class=n>setUpRequest</span><span class=o>.</span><span class=na>getLabels</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=n>metaInfo</span><span class=o>.</span><span class=na>setTenant</span><span class=o>(</span><span class=n>setUpRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 新建 connection
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>Connection</span> <span class=n>connection</span> <span class=o>=</span> <span class=k>new</span> <span class=n>GrpcConnection</span><span class=o>(</span><span class=n>metaInfo</span><span class=o>,</span> <span class=n>responseObserver</span><span class=o>,</span> <span class=n>GrpcServerConstants</span><span class=o>.</span><span class=na>CONTEXT_KEY_CHANNEL</span><span class=o>.</span><span class=na>get</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=n>connection</span><span class=o>.</span><span class=na>setAbilities</span><span class=o>(</span><span class=n>setUpRequest</span><span class=o>.</span><span class=na>getAbilities</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=kt>boolean</span> <span class=n>rejectSdkOnStarting</span> <span class=o>=</span> <span class=n>metaInfo</span><span class=o>.</span><span class=na>isSdkSource</span><span class=o>()</span> <span class=o>&amp;&amp;</span> <span class=o>!</span><span class=n>ApplicationUtils</span><span class=o>.</span><span class=na>isStarted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=c1>// 注册 connection 对象, 如果不成功，则关闭连接
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=k>if</span> <span class=o>(</span><span class=n>rejectSdkOnStarting</span> <span class=o>||</span> <span class=o>!</span><span class=n>connectionManager</span><span class=o>.</span><span class=na>register</span><span class=o>(</span><span class=n>connectionId</span><span class=o>,</span> <span class=n>connection</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>//Not register to the connection manager if current server is over limit or server is starting.
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Connection register fail,reason:{}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                                <span class=n>rejectSdkOnStarting</span> <span class=o>?</span> <span class=s>&#34; server is not started&#34;</span> <span class=o>:</span> <span class=s>&#34; server is over limited.&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                        <span class=n>connection</span><span class=o>.</span><span class=na>request</span><span class=o>(</span><span class=k>new</span> <span class=n>ConnectResetRequest</span><span class=o>(),</span> <span class=n>3000L</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                        <span class=n>connection</span><span class=o>.</span><span class=na>close</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Exception</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>//Do nothing.
+</span></span></span><span class=line><span class=cl><span class=c1></span>                        <span class=k>if</span> <span class=o>(</span><span class=n>connectionManager</span><span class=o>.</span><span class=na>traced</span><span class=o>(</span><span class=n>clientIp</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                            <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                                    <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Send connect reset request error,error={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                        <span class=o>}</span>
+</span></span><span class=line><span class=cl>                    <span class=o>}</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>            <span class=o>}</span> <span class=k>else</span> <span class=k>if</span> <span class=o>(</span><span class=n>parseObj</span> <span class=k>instanceof</span> <span class=n>Response</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 处理 response 请求，请求可能需要 ack
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>Response</span> <span class=n>response</span> <span class=o>=</span> <span class=o>(</span><span class=n>Response</span><span class=o>)</span> <span class=n>parseObj</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=o>(</span><span class=n>connectionManager</span><span class=o>.</span><span class=na>traced</span><span class=o>(</span><span class=n>clientIp</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                            <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Receive response of server request  ,response={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span> <span class=n>response</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// ack 通知
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>RpcAckCallbackSynchronizer</span><span class=o>.</span><span class=na>ackNotify</span><span class=o>(</span><span class=n>connectionId</span><span class=o>,</span> <span class=n>response</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=n>connectionManager</span><span class=o>.</span><span class=na>refreshActiveTime</span><span class=o>(</span><span class=n>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span>
+</span></span><span class=line><span class=cl>                        <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Grpc request bi stream,unknown payload receive ,parseObj={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                                <span class=n>parseObj</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>        <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onError</span><span class=o>(</span><span class=n>Throwable</span> <span class=n>t</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>connectionManager</span><span class=o>.</span><span class=na>traced</span><span class=o>(</span><span class=n>clientIp</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Bi stream on error,error={}&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>,</span> <span class=n>t</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>responseObserver</span> <span class=k>instanceof</span> <span class=n>ServerCallStreamObserver</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ServerCallStreamObserver</span> <span class=n>serverCallStreamObserver</span> <span class=o>=</span> <span class=o>((</span><span class=n>ServerCallStreamObserver</span><span class=o>)</span> <span class=n>responseObserver</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=o>(</span><span class=n>serverCallStreamObserver</span><span class=o>.</span><span class=na>isCancelled</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>//client close the stream.
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=n>serverCallStreamObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Throwable</span> <span class=n>throwable</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>//ignore
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=o>}</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>        <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onCompleted</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>connectionManager</span><span class=o>.</span><span class=na>traced</span><span class=o>(</span><span class=n>clientIp</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_DIGEST</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[{}]Bi stream on completed&#34;</span><span class=o>,</span> <span class=n>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>responseObserver</span> <span class=k>instanceof</span> <span class=n>ServerCallStreamObserver</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ServerCallStreamObserver</span> <span class=n>serverCallStreamObserver</span> <span class=o>=</span> <span class=o>((</span><span class=n>ServerCallStreamObserver</span><span class=o>)</span> <span class=n>responseObserver</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=o>(</span><span class=n>serverCallStreamObserver</span><span class=o>.</span><span class=na>isCancelled</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>//client close the stream.
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=n>serverCallStreamObserver</span><span class=o>.</span><span class=na>onCompleted</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Throwable</span> <span class=n>throwable</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>//ignore
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=o>}</span>
+</span></span><span class=line><span class=cl>                    
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>};</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>streamObserver</span><span class=o>;</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-08-23 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1/ data-title="源码分析 nacos grpc 服务端的设计"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1/ data-title="源码分析 nacos grpc 服务端的设计"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-grpc-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1/ data-title="源码分析 nacos grpc 服务端的设计"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/nacos/>nacos</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a>,&nbsp;<a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/>源码分析 nacos 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/ class=prev rel=prev title="源码分析 nacos 任务执行器的设计"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>源码分析 nacos 任务执行器的设计</a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.117.0">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/gitalk/gitalk.min.css><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/gitalk/gitalk.min.js></script><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{gitalk:{admin:["ooooo-youwillsee"],clientID:"9fcbefe148801287b34f",clientSecret:"3833b0f8bda400fb1ea7093446f340821394e501",id:"2023-08-23T08:00:00+08:00",owner:"ooooo-youwillsee",repo:"ooooo-notes-gitalk",title:"源码分析 nacos grpc 服务端的设计"}},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>
