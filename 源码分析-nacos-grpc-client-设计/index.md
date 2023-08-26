@@ -206,6 +206,7 @@ public Connection connectToServer(ServerInfo serverInfo) {
             grpcConn.setConnectionId(((ServerCheckResponse) response).getConnectionId());
 
             //create stream request and bind connection event to this connection.
+            // client 流式处理请求
             StreamObserver<Payload> payloadStreamObserver = bindRequestStream(biRequestStreamStub, grpcConn);
 
             // stream observer to send response to server
@@ -229,5 +230,95 @@ public Connection connectToServer(ServerInfo serverInfo) {
         LOGGER.error("[{}]Fail to connect to server!,error={}", GrpcClient.this.getName(), e);
     }
     return null;
+}
+```
+
+源码位置: `com.alibaba.nacos.common.remote.client.grpc.GrpcClient#bindRequestStream`
+
+```java
+// client 流式处理请求
+// onNext: 处理请求  
+// onError 和 onCompleted 来变换 grpc server
+private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRequestStreamStub streamStub,
+                                                  final GrpcConnection grpcConn) {
+
+    return streamStub.requestBiStream(new StreamObserver<Payload>() {
+
+        @Override
+        public void onNext(Payload payload) {
+
+            LoggerUtils.printIfDebugEnabled(LOGGER, "[{}]Stream server request receive, original info: {}",
+                    grpcConn.getConnectionId(), payload.toString());
+            try {
+                Object parseBody = GrpcUtils.parse(payload);
+                final Request request = (Request) parseBody;
+                if (request != null) {
+
+                    try {
+                        // 处理服务端请求
+                        Response response = handleServerRequest(request);
+                        if (response != null) {
+                            response.setRequestId(request.getRequestId());
+                            // 响应
+                            sendResponse(response);
+                        } else {
+                            LOGGER.warn("[{}]Fail to process server request, ackId->{}", grpcConn.getConnectionId(),
+                                    request.getRequestId());
+                        }
+
+                    } catch (Exception e) {
+                        LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Handle server request exception: {}",
+                                grpcConn.getConnectionId(), payload.toString(), e.getMessage());
+                        Response errResponse = ErrorResponse.build(NacosException.CLIENT_ERROR,
+                                "Handle server request error");
+                        errResponse.setRequestId(request.getRequestId());
+                        sendResponse(errResponse);
+                    }
+
+                }
+
+            } catch (Exception e) {
+
+                LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Error to process server push response: {}",
+                        grpcConn.getConnectionId(), payload.getBody().getValue().toStringUtf8());
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            boolean isRunning = isRunning();
+            boolean isAbandon = grpcConn.isAbandon();
+            if (isRunning && !isAbandon) {
+                LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Request stream error, switch server,error={}",
+                        grpcConn.getConnectionId(), throwable);
+                if (rpcClientStatus.compareAndSet(RpcClientStatus.RUNNING, RpcClientStatus.UNHEALTHY)) {
+                    switchServerAsync();
+                }
+
+            } else {
+                LoggerUtils.printIfWarnEnabled(LOGGER, "[{}]Ignore error event,isRunning:{},isAbandon={}",
+                        grpcConn.getConnectionId(), isRunning, isAbandon);
+            }
+
+        }
+
+        @Override
+        public void onCompleted() {
+            boolean isRunning = isRunning();
+            boolean isAbandon = grpcConn.isAbandon();
+            if (isRunning && !isAbandon) {
+                LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Request stream onCompleted, switch server",
+                        grpcConn.getConnectionId());
+                if (rpcClientStatus.compareAndSet(RpcClientStatus.RUNNING, RpcClientStatus.UNHEALTHY)) {
+                    switchServerAsync();
+                }
+
+            } else {
+                LoggerUtils.printIfInfoEnabled(LOGGER, "[{}]Ignore complete event,isRunning:{},isAbandon={}",
+                        grpcConn.getConnectionId(), isRunning, isAbandon);
+            }
+
+        }
+    });
 }
 ```
