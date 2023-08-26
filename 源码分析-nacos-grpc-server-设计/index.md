@@ -1,4 +1,4 @@
-# 源码分析 nacos grpc 服务端的设计
+# 源码分析 nacos grpc server 设计
 
 
 > nacos 基于 2.2.4 版本
