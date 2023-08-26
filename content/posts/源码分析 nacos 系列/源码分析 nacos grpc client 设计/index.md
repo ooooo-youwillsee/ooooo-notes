@@ -1,5 +1,5 @@
 ---
-title: 源码分析 nacos grpc 客户端的设计
+title: 源码分析 nacos grpc client 设计
 date: 2023-08-24T08:00:00+08:00
 draft: false
 tags: [ nacos, source code, 源码分析 nacos 系列 ]
