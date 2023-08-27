@@ -268,4 +268,27 @@ class ConnectResetRequestHandler implements ServerRequestHandler {
 }
 ```
 
+## server 断开连接检查
+
+源码位置: `com.alibaba.nacos.core.remote.grpc.AddressTransportFilter#transportTerminated`
+
+```java
+// AddressTransportFilter 在 BaseGrpcServer 的 startServer 方法中注册
+@Override
+public void transportTerminated(Attributes transportAttrs) {
+    // 获取 connectionId
+    String connectionId = null;
+    try {
+        connectionId = transportAttrs.get(ATTR_TRANS_KEY_CONN_ID);
+    } catch (Exception e) {
+        // Ignore
+    }
+    if (StringUtils.isNotBlank(connectionId)) {
+        Loggers.REMOTE_DIGEST
+                .info("Connection transportTerminated,connectionId = {} ", connectionId);
+        // 注销 connectionId, 回调 clientConnectionEventListener 接口
+        connectionManager.unregister(connectionId);
+    }
+}
+```
 
