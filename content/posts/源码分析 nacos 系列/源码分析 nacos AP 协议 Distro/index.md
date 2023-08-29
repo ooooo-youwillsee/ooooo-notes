@@ -32,9 +32,9 @@ private void startDistroTask() {
         isInitialized = true;
         return;
     }
-    // 定时任务，传递当前节点的数据给其他节点, 最终会执行 DistroVerifyTimedTask 
+    // 定时任务，同步当前节点的数据给其他节点, 最终会执行 DistroVerifyTimedTask 
     startVerifyTask();
-    // 定时任务，加载节点信息，最终会执行 DistroLoadDataTask 
+    // 定时任务，从其他节点加载数据，最终会执行 DistroLoadDataTask 
     startLoadTask();
 }
 ```
@@ -46,7 +46,7 @@ private void startDistroTask() {
 源码位置: `com.alibaba.nacos.core.distributed.distro.task.verify.DistroVerifyTimedTask`
 
 ```java
-// 传递当前节点的数据给其他节点, 这个类很重要
+// 同步当前节点的数据给其他节点, 这个类很重要
 // 在 distro 协议中，每个节点只会处理部分数据, 数据的版本要通过定时任务来发送给其他节点进行续约，
 // 否则 client 下一次请求到其他节点，因为数据没有定时续约，会导致这个数据会过期删除. 
 public class DistroVerifyTimedTask implements Runnable {
@@ -281,4 +281,122 @@ private void load() throws Exception {
 
 ## DistroFilter 拦截请求
 
+源码位置: `com.alibaba.nacos.naming.web.DistroFilter#doFilter`
 
+```java
+// DistroFilter 会拦截所有的请求 
+@Override
+public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+        throws IOException, ServletException {
+    ReuseHttpServletRequest req = new ReuseHttpServletRequest((HttpServletRequest) servletRequest);
+    HttpServletResponse resp = (HttpServletResponse) servletResponse;
+    
+    String urlString = req.getRequestURI();
+    
+    if (StringUtils.isNotBlank(req.getQueryString())) {
+        urlString += "?" + req.getQueryString();
+    }
+    
+    try {
+        // 获取请求对应的方法
+        Method method = controllerMethodsCache.getMethod(req);
+        
+        String path = new URI(req.getRequestURI()).getPath();
+        if (method == null) {
+            throw new NoSuchMethodException(req.getMethod() + " " + path);
+        }
+        
+        // 方法是否有 @CanDistro 注解，没有就直接放行，不处理
+        if (!method.isAnnotationPresent(CanDistro.class)) {
+            filterChain.doFilter(req, resp);
+            return;
+        }
+        // 获取请求参数中的 ip 和 port
+        String distroTag = distroTagGenerator.getResponsibleTag(req);
+        
+        // 当前节点是否响应该请求，如果是，直接放行，这个很重要, 后面继续解析
+        if (distroMapper.responsible(distroTag)) {
+            filterChain.doFilter(req, resp);
+            return;
+        }
+        
+        // proxy request to other server if necessary:
+        String userAgent = req.getHeader(HttpHeaderConsts.USER_AGENT_HEADER);
+        
+        // 判断必须是 client 的请求，不能是 server 之间的请求
+        if (StringUtils.isNotBlank(userAgent) && userAgent.contains(UtilsAndCommons.NACOS_SERVER_HEADER)) {
+            // This request is sent from peer server, should not be redirected again:
+            Loggers.SRV_LOG.error("receive invalid redirect request from peer {}", req.getRemoteAddr());
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "receive invalid redirect request from peer " + req.getRemoteAddr());
+            return;
+        }
+        
+        // 获取转发节点, 根据 ip:port 的 hash 值对 serverList.size() 取余来计算
+        final String targetServer = distroMapper.mapSrv(distroTag);
+        
+        List<String> headerList = new ArrayList<>(16);
+        Enumeration<String> headers = req.getHeaderNames();
+        while (headers.hasMoreElements()) {
+            String headerName = headers.nextElement();
+            headerList.add(headerName);
+            headerList.add(req.getHeader(headerName));
+        }
+        
+        final String body = IoUtils.toString(req.getInputStream(), StandardCharsets.UTF_8.name());
+        final Map<String, String> paramsValue = HttpClient.translateParameterMap(req.getParameterMap());
+        
+        // 用 HttpClient 来转发请求到对应的节点上
+        RestResult<String> result = HttpClient
+                .request(HTTP_PREFIX + targetServer + req.getRequestURI(), headerList, paramsValue, body,
+                        PROXY_CONNECT_TIMEOUT, PROXY_READ_TIMEOUT, StandardCharsets.UTF_8.name(), req.getMethod());
+        String data = result.ok() ? result.getData() : result.getMessage();
+        try {
+            // 响应客户端请求
+            WebUtils.response(resp, data, result.getCode());
+        } catch (Exception ignore) {
+            Loggers.SRV_LOG.warn("[DISTRO-FILTER] request failed: " + distroMapper.mapSrv(distroTag) + urlString);
+        }
+    } catch (AccessControlException e) {
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN, "access denied: " + ExceptionUtil.getAllExceptionMsg(e));
+    } catch (NoSuchMethodException e) {
+        resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED,
+                "no such api:" + req.getMethod() + ":" + req.getRequestURI());
+    } catch (Exception e) {
+        Loggers.SRV_LOG.warn("[DISTRO-FILTER] Server failed: ", e);
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "Server failed, " + ExceptionUtil.getAllExceptionMsg(e));
+    }
+    
+}
+```
+
+源码位置: `com.alibaba.nacos.naming.core.DistroMapper#responsible`
+
+```java
+// 当前节点是否响应该请求
+public boolean responsible(String responsibleTag) {
+    final List<String> servers = healthyList;
+    
+    if (!switchDomain.isDistroEnabled() || EnvUtil.getStandaloneMode()) {
+        return true;
+    }
+    
+    if (CollectionUtils.isEmpty(servers)) {
+        // means distro config is not ready yet
+        return false;
+    }
+    
+    // 当前节点地址找不到，不转发请求 
+    String localAddress = EnvUtil.getLocalAddress();
+    int index = servers.indexOf(localAddress);
+    int lastIndex = servers.lastIndexOf(localAddress);
+    if (lastIndex < 0 || index < 0) {
+        return true;
+    }
+    
+    // 获取 hash 值，然后取余
+    int target = distroHash(responsibleTag) % servers.size();
+    return target >= index && target <= lastIndex;
+}
+```
