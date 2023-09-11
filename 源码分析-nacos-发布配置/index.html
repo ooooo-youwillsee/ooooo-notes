@@ -1,4 +1,4 @@
-<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos 发布配置 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos 发布配置"><meta property="og:description" content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-09-11T08:00:00+08:00"><meta property="article:modified_time" content="2023-09-11T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos 发布配置"><meta name=twitter:description content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos 发布配置","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":21,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/","datePublished":"2023-09-11T08:00:00+08:00","dateModified":"2023-09-11T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos 发布配置 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos 发布配置"><meta property="og:description" content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为 ConfigControllerV2#publishConfig 和 ConfigPublishRequestHandler。这两个方法的处理逻辑都是一样的，所以我"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-09-11T08:00:00+08:00"><meta property="article:modified_time" content="2023-09-11T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos 发布配置"><meta name=twitter:description content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为 ConfigControllerV2#publishConfig 和 ConfigPublishRequestHandler。这两个方法的处理逻辑都是一样的，所以我"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos 发布配置","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":2258,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/","datePublished":"2023-09-11T08:00:00+08:00","dateModified":"2023-09-11T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
 <input type=text placeholder="Search titles or contents..." id=search-input-desktop>
 <a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
 <a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
@@ -7,7 +7,873 @@
 <a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
 <a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
 <span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title><i class='fa fa-list' aria-hidden=true></i>文章</a><a class=menu-item href=/ooooo-notes/tags/ title><i class='fa fa-tags' aria-hidden=true></i>标签</a><a class=menu-item href=/ooooo-notes/categories/ title><i class='fa fa-archive' aria-hidden=true></i>分类</a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
-<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos 发布配置</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-09-11 08:00:00">2023-09-11 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;21 words&nbsp;
-<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;One minute&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
-<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents></nav></div></div><div class=content id=content><p>在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为</p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-09-11 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/nacos/>nacos</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a>,&nbsp;<a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/>源码分析 nacos 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/ class=prev rel=prev title="源码分析 nacos 同步服务和实例元数据信息"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>源码分析 nacos 同步服务和实例元数据信息</a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.118.2">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
-</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/gitalk/gitalk.min.css><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/gitalk/gitalk.min.js></script><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{gitalk:{admin:["ooooo-youwillsee"],clientID:"9fcbefe148801287b34f",clientSecret:"3833b0f8bda400fb1ea7093446f340821394e501",id:"2023-09-11T08:00:00+08:00",owner:"ooooo-youwillsee",repo:"ooooo-notes-gitalk",title:"源码分析 nacos 发布配置"}},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos 发布配置</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-09-11 08:00:00">2023-09-11 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;2258 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;5 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#发布配置>发布配置</a></li><li><a href=#处理-configdatachangeevent-事件>处理 ConfigDataChangeEvent 事件</a></li><li><a href=#dumpservicedump-方法>dumpService#dump 方法</a></li></ul></nav></div></div><div class=content id=content><p>在 <code>nacos</code> 中，发布配置分为 <code>http</code> 和 <code>grpc</code> 两种方式，分别为 <code>ConfigControllerV2#publishConfig</code> 和 <code>ConfigPublishRequestHandler</code>。这两个方法的处理逻辑都是<strong>一样的</strong>，所以我就选择 <code>http</code> 的方式来分析代码。</p><h2 id=发布配置>发布配置</h2><p>源码位置: <code>com.alibaba.nacos.config.server.controller.v2.ConfigControllerV2#publishConfig</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 接受 http 请求，发布配置
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=n>Result</span><span class=o>&lt;</span><span class=n>Boolean</span><span class=o>&gt;</span> <span class=nf>publishConfig</span><span class=o>(</span><span class=n>ConfigForm</span> <span class=n>configForm</span><span class=o>,</span> <span class=n>HttpServletRequest</span> <span class=n>request</span><span class=o>)</span> <span class=kd>throws</span> <span class=n>NacosException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// check required field
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>configForm</span><span class=o>.</span><span class=na>validate</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// encrypted
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>Pair</span><span class=o>&lt;</span><span class=n>String</span><span class=o>,</span> <span class=n>String</span><span class=o>&gt;</span> <span class=n>pair</span> <span class=o>=</span> <span class=n>EncryptionHandler</span><span class=o>.</span><span class=na>encryptHandler</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>configForm</span><span class=o>.</span><span class=na>setContent</span><span class=o>(</span><span class=n>pair</span><span class=o>.</span><span class=na>getSecond</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//fix issue #9783
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>configForm</span><span class=o>.</span><span class=na>setNamespaceId</span><span class=o>(</span><span class=n>NamespaceUtil</span><span class=o>.</span><span class=na>processNamespaceParameter</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// check param
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>ParamUtils</span><span class=o>.</span><span class=na>checkTenantV2</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>ParamUtils</span><span class=o>.</span><span class=na>checkParam</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=s>&#34;datumId&#34;</span><span class=o>,</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>ParamUtils</span><span class=o>.</span><span class=na>checkParamV2</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getTag</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>StringUtils</span><span class=o>.</span><span class=na>isBlank</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getSrcUser</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>configForm</span><span class=o>.</span><span class=na>setSrcUser</span><span class=o>(</span><span class=n>RequestUtil</span><span class=o>.</span><span class=na>getSrcUserName</span><span class=o>(</span><span class=n>request</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(!</span><span class=n>ConfigType</span><span class=o>.</span><span class=na>isValidType</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getType</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>configForm</span><span class=o>.</span><span class=na>setType</span><span class=o>(</span><span class=n>ConfigType</span><span class=o>.</span><span class=na>getDefaultType</span><span class=o>().</span><span class=na>getType</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>ConfigRequestInfo</span> <span class=n>configRequestInfo</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ConfigRequestInfo</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>setSrcIp</span><span class=o>(</span><span class=n>RequestUtil</span><span class=o>.</span><span class=na>getRemoteIp</span><span class=o>(</span><span class=n>request</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>    <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>setRequestIpApp</span><span class=o>(</span><span class=n>RequestUtil</span><span class=o>.</span><span class=na>getAppName</span><span class=o>(</span><span class=n>request</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>    <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>setBetaIps</span><span class=o>(</span><span class=n>request</span><span class=o>.</span><span class=na>getHeader</span><span class=o>(</span><span class=s>&#34;betaIps&#34;</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>encryptedDataKey</span> <span class=o>=</span> <span class=n>pair</span><span class=o>.</span><span class=na>getFirst</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// configOperationService 发布配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>return</span> <span class=n>Result</span><span class=o>.</span><span class=na>success</span><span class=o>(</span><span class=n>configOperationService</span><span class=o>.</span><span class=na>publishConfig</span><span class=o>(</span><span class=n>configForm</span><span class=o>,</span> <span class=n>configRequestInfo</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>));</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.ConfigOperationService#publishConfig</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// configOperationService 发布配置
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=n>Boolean</span> <span class=nf>publishConfig</span><span class=o>(</span><span class=n>ConfigForm</span> <span class=n>configForm</span><span class=o>,</span> <span class=n>ConfigRequestInfo</span> <span class=n>configRequestInfo</span><span class=o>,</span> <span class=n>String</span> <span class=n>encryptedDataKey</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>        <span class=kd>throws</span> <span class=n>NacosException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 组装参数
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>Map</span><span class=o>&lt;</span><span class=n>String</span><span class=o>,</span> <span class=n>Object</span><span class=o>&gt;</span> <span class=n>configAdvanceInfo</span> <span class=o>=</span> <span class=n>getConfigAdvanceInfo</span><span class=o>(</span><span class=n>configForm</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 检查参数
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>ParamUtils</span><span class=o>.</span><span class=na>checkParam</span><span class=o>(</span><span class=n>configAdvanceInfo</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// dataId 黑名单校验
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>AggrWhitelist</span><span class=o>.</span><span class=na>isAggrDataId</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>LOGGER</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[aggr-conflict] {} attempt to publish single data, {}, {}&#34;</span><span class=o>,</span> <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getSrcIp</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                <span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=k>throw</span> <span class=k>new</span> <span class=n>NacosApiException</span><span class=o>(</span><span class=n>HttpStatus</span><span class=o>.</span><span class=na>FORBIDDEN</span><span class=o>.</span><span class=na>value</span><span class=o>(),</span> <span class=n>ErrorCode</span><span class=o>.</span><span class=na>INVALID_DATA_ID</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                <span class=s>&#34;dataId:&#34;</span> <span class=o>+</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>()</span> <span class=o>+</span> <span class=s>&#34; is aggr&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>Timestamp</span> <span class=n>time</span> <span class=o>=</span> <span class=n>TimeUtils</span><span class=o>.</span><span class=na>getCurrentTime</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 封装为 configInfo 对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>ConfigInfo</span> <span class=n>configInfo</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ConfigInfo</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>            <span class=n>configForm</span><span class=o>.</span><span class=na>getAppName</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>configInfo</span><span class=o>.</span><span class=na>setType</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getType</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>configInfo</span><span class=o>.</span><span class=na>setEncryptedDataKey</span><span class=o>(</span><span class=n>encryptedDataKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>StringUtils</span><span class=o>.</span><span class=na>isBlank</span><span class=o>(</span><span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getBetaIps</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(</span><span class=n>StringUtils</span><span class=o>.</span><span class=na>isBlank</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getTag</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 没有 beta 和 tag，插入或者更新 config_info 表，这个也是最常用的
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>configInfoPersistService</span><span class=o>.</span><span class=na>insertOrUpdate</span><span class=o>(</span><span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getSrcIp</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getSrcUser</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                    <span class=n>configInfo</span><span class=o>,</span> <span class=n>time</span><span class=o>,</span> <span class=n>configAdvanceInfo</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 发布 ConfigDataChangeEvent 事件
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>ConfigChangePublisher</span><span class=o>.</span><span class=na>notifyConfigChange</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>                    <span class=k>new</span> <span class=n>ConfigDataChangeEvent</span><span class=o>(</span><span class=kc>false</span><span class=o>,</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                            <span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>(),</span> <span class=n>time</span><span class=o>.</span><span class=na>getTime</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 有 tag，插入或者更新 config_info_tag 表，注意控制台没有用到这个
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>configInfoTagPersistService</span><span class=o>.</span><span class=na>insertOrUpdateTag</span><span class=o>(</span><span class=n>configInfo</span><span class=o>,</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getTag</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                    <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getSrcIp</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getSrcUser</span><span class=o>(),</span> <span class=n>time</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 发布 ConfigDataChangeEvent 事件
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>ConfigChangePublisher</span><span class=o>.</span><span class=na>notifyConfigChange</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>                    <span class=k>new</span> <span class=n>ConfigDataChangeEvent</span><span class=o>(</span><span class=kc>false</span><span class=o>,</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                            <span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getTag</span><span class=o>(),</span> <span class=n>time</span><span class=o>.</span><span class=na>getTime</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// beta publish
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=c1>// 有 beta, 插入或者更新 config_info_beta 表
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>configInfoBetaPersistService</span><span class=o>.</span><span class=na>insertOrUpdateBeta</span><span class=o>(</span><span class=n>configInfo</span><span class=o>,</span> <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getBetaIps</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getSrcIp</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getSrcUser</span><span class=o>(),</span> <span class=n>time</span><span class=o>,</span> <span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 发布 ConfigDataChangeEvent 事件
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>ConfigChangePublisher</span><span class=o>.</span><span class=na>notifyConfigChange</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>                <span class=k>new</span> <span class=n>ConfigDataChangeEvent</span><span class=o>(</span><span class=kc>true</span><span class=o>,</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                        <span class=n>time</span><span class=o>.</span><span class=na>getTime</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 记录日志
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>logPersistenceEvent</span><span class=o>(</span><span class=n>configForm</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getNamespaceId</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>            <span class=n>configRequestInfo</span><span class=o>.</span><span class=na>getRequestIpApp</span><span class=o>(),</span> <span class=n>time</span><span class=o>.</span><span class=na>getTime</span><span class=o>(),</span> <span class=n>InetUtils</span><span class=o>.</span><span class=na>getSelfIP</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>            <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>PERSISTENCE_EVENT_PUB</span><span class=o>,</span> <span class=n>configForm</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=处理-configdatachangeevent-事件>处理 ConfigDataChangeEvent 事件</h2><p>源码位置: <code>com.alibaba.nacos.config.server.service.notify.AsyncNotifyService#AsyncNotifyService</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 处理 ConfigDataChangeEvent 事件
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Autowired</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=nf>AsyncNotifyService</span><span class=o>(</span><span class=n>ServerMemberManager</span> <span class=n>memberManager</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>memberManager</span> <span class=o>=</span> <span class=n>memberManager</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// Register ConfigDataChangeEvent to NotifyCenter.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 分配事件的缓冲大小
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>NotifyCenter</span><span class=o>.</span><span class=na>registerToPublisher</span><span class=o>(</span><span class=n>ConfigDataChangeEvent</span><span class=o>.</span><span class=na>class</span><span class=o>,</span> <span class=n>NotifyCenter</span><span class=o>.</span><span class=na>ringBufferSize</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// Register A Subscriber to subscribe ConfigDataChangeEvent.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 注册 ConfigDataChangeEvent 的订阅者
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>NotifyCenter</span><span class=o>.</span><span class=na>registerSubscriber</span><span class=o>(</span><span class=k>new</span> <span class=n>Subscriber</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>        <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onEvent</span><span class=o>(</span><span class=n>Event</span> <span class=n>event</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// Generate ConfigDataChangeEvent concurrently
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(</span><span class=n>event</span> <span class=k>instanceof</span> <span class=n>ConfigDataChangeEvent</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>ConfigDataChangeEvent</span> <span class=n>evt</span> <span class=o>=</span> <span class=o>(</span><span class=n>ConfigDataChangeEvent</span><span class=o>)</span> <span class=n>event</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=kt>long</span> <span class=n>dumpTs</span> <span class=o>=</span> <span class=n>evt</span><span class=o>.</span><span class=na>lastModifiedTs</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=n>String</span> <span class=n>dataId</span> <span class=o>=</span> <span class=n>evt</span><span class=o>.</span><span class=na>dataId</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=n>String</span> <span class=n>group</span> <span class=o>=</span> <span class=n>evt</span><span class=o>.</span><span class=na>group</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=n>String</span> <span class=n>tenant</span> <span class=o>=</span> <span class=n>evt</span><span class=o>.</span><span class=na>tenant</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                <span class=n>String</span> <span class=n>tag</span> <span class=o>=</span> <span class=n>evt</span><span class=o>.</span><span class=na>tag</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=n>MetricsMonitor</span><span class=o>.</span><span class=na>incrementConfigChangeCount</span><span class=o>(</span><span class=n>tenant</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>dataId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=n>Collection</span><span class=o>&lt;</span><span class=n>Member</span><span class=o>&gt;</span> <span class=n>ipList</span> <span class=o>=</span> <span class=n>memberManager</span><span class=o>.</span><span class=na>allMembers</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=c1>// In fact, any type of queue here can be
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>Queue</span><span class=o>&lt;</span><span class=n>NotifySingleRpcTask</span><span class=o>&gt;</span> <span class=n>rpcQueue</span> <span class=o>=</span> <span class=k>new</span> <span class=n>LinkedList</span><span class=o>&lt;&gt;();</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=c1>// 遍历集群成员列表, 添加到队列中
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=c1>// A 服务配置发生改变之后，必须推送给 B 服务，因为 B 服务可能有订阅者来监听这个配置。
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=k>for</span> <span class=o>(</span><span class=n>Member</span> <span class=n>member</span> <span class=o>:</span> <span class=n>ipList</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// grpc report data change only
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=n>rpcQueue</span><span class=o>.</span><span class=na>add</span><span class=o>(</span>
+</span></span><span class=line><span class=cl>                            <span class=k>new</span> <span class=n>NotifySingleRpcTask</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>tag</span><span class=o>,</span> <span class=n>dumpTs</span><span class=o>,</span> <span class=n>evt</span><span class=o>.</span><span class=na>isBeta</span><span class=o>,</span> <span class=n>member</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=o>(!</span><span class=n>rpcQueue</span><span class=o>.</span><span class=na>isEmpty</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// 线程池调度 AsyncRpcTask 
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=n>ConfigExecutor</span><span class=o>.</span><span class=na>executeAsyncNotify</span><span class=o>(</span><span class=k>new</span> <span class=n>AsyncRpcTask</span><span class=o>(</span><span class=n>rpcQueue</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>        <span class=kd>public</span> <span class=n>Class</span><span class=o>&lt;?</span> <span class=kd>extends</span> <span class=n>Event</span><span class=o>&gt;</span> <span class=nf>subscribeType</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>ConfigDataChangeEvent</span><span class=o>.</span><span class=na>class</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>});</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.notify.AsyncNotifyService.AsyncRpcTask</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 线程池调度 AsyncRpcTask 
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>class</span> <span class=nc>AsyncRpcTask</span> <span class=kd>implements</span> <span class=n>Runnable</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=o>...</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>    <span class=kd>public</span> <span class=kt>void</span> <span class=nf>run</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=o>(!</span><span class=n>queue</span><span class=o>.</span><span class=na>isEmpty</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 从队列中取出 task
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>NotifySingleRpcTask</span> <span class=n>task</span> <span class=o>=</span> <span class=n>queue</span><span class=o>.</span><span class=na>poll</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=n>ConfigChangeClusterSyncRequest</span> <span class=n>syncRequest</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ConfigChangeClusterSyncRequest</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>            <span class=n>syncRequest</span><span class=o>.</span><span class=na>setDataId</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>getDataId</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=n>syncRequest</span><span class=o>.</span><span class=na>setGroup</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>getGroup</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=n>syncRequest</span><span class=o>.</span><span class=na>setBeta</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>isBeta</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=n>syncRequest</span><span class=o>.</span><span class=na>setLastModified</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=n>syncRequest</span><span class=o>.</span><span class=na>setTag</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>tag</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=n>syncRequest</span><span class=o>.</span><span class=na>setTenant</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>getTenant</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=n>Member</span> <span class=n>member</span> <span class=o>=</span> <span class=n>task</span><span class=o>.</span><span class=na>member</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 是当前服务
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(</span><span class=n>memberManager</span><span class=o>.</span><span class=na>getSelf</span><span class=o>().</span><span class=na>equals</span><span class=o>(</span><span class=n>member</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 处理逻辑分为是不是 beta，但调用的方法都是一样的, dumpService#dump
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=k>if</span> <span class=o>(</span><span class=n>syncRequest</span><span class=o>.</span><span class=na>isBeta</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=n>dumpService</span><span class=o>.</span><span class=na>dump</span><span class=o>(</span><span class=n>syncRequest</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                            <span class=n>syncRequest</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>(),</span> <span class=n>NetUtils</span><span class=o>.</span><span class=na>localIP</span><span class=o>(),</span> <span class=kc>true</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=n>dumpService</span><span class=o>.</span><span class=na>dump</span><span class=o>(</span><span class=n>syncRequest</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                            <span class=n>syncRequest</span><span class=o>.</span><span class=na>getTag</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>(),</span> <span class=n>NetUtils</span><span class=o>.</span><span class=na>localIP</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>                <span class=k>continue</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=c1>// 地址是有效的
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(</span><span class=n>memberManager</span><span class=o>.</span><span class=na>hasMember</span><span class=o>(</span><span class=n>member</span><span class=o>.</span><span class=na>getAddress</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// start the health check and there are ips that are not monitored, put them directly in the notification queue, otherwise notify
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=kt>boolean</span> <span class=n>unHealthNeedDelay</span> <span class=o>=</span> <span class=n>memberManager</span><span class=o>.</span><span class=na>isUnHealth</span><span class=o>(</span><span class=n>member</span><span class=o>.</span><span class=na>getAddress</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=o>(</span><span class=n>unHealthNeedDelay</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// target ip is unhealthy, then put it in the notification list
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>logNotifyEvent</span><span class=o>(</span><span class=n>task</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>task</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>task</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span> <span class=kc>null</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                            <span class=n>task</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>(),</span> <span class=n>InetUtils</span><span class=o>.</span><span class=na>getSelfIP</span><span class=o>(),</span> <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>NOTIFY_EVENT_UNHEALTH</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                            <span class=n>0</span><span class=o>,</span> <span class=n>member</span><span class=o>.</span><span class=na>getAddress</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// get delay time and set fail count to the task
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=c1>// 如果地址是不健康的，延时来执行 task
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=n>asyncTaskExecute</span><span class=o>(</span><span class=n>task</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                    <span class=c1>// grpc report data change only
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>// 地址是健康的，用 grpc 来发送 ConfigChangeClusterSyncRequest 请求，
+</span></span></span><span class=line><span class=cl><span class=c1></span>                        <span class=c1>// 会被 ConfigChangeClusterSyncRequestHandler 来处理
+</span></span></span><span class=line><span class=cl><span class=c1></span>                        <span class=n>configClusterRpcClientProxy</span>
+</span></span><span class=line><span class=cl>                                <span class=o>.</span><span class=na>syncConfigChange</span><span class=o>(</span><span class=n>member</span><span class=o>,</span> <span class=n>syncRequest</span><span class=o>,</span> <span class=k>new</span> <span class=n>AsyncRpcNotifyCallBack</span><span class=o>(</span><span class=n>task</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>                    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>Exception</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                        <span class=n>MetricsMonitor</span><span class=o>.</span><span class=na>getConfigNotifyException</span><span class=o>().</span><span class=na>increment</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                        <span class=c1>// 发送异常，延时来重试
+</span></span></span><span class=line><span class=cl><span class=c1></span>                        <span class=n>asyncTaskExecute</span><span class=o>(</span><span class=n>task</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                    <span class=o>}</span>
+</span></span><span class=line><span class=cl>                  
+</span></span><span class=line><span class=cl>                <span class=o>}</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>//No nothig if  member has offline.
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.remote.ConfigChangeClusterSyncRequestHandler#handle</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 处理 ConfigChangeClusterSyncRequest 请求
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=n>ConfigChangeClusterSyncResponse</span> <span class=nf>handle</span><span class=o>(</span><span class=n>ConfigChangeClusterSyncRequest</span> <span class=n>configChangeSyncRequest</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>RequestMeta</span> <span class=n>meta</span><span class=o>)</span> <span class=kd>throws</span> <span class=n>NacosException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 调用 dumpService#dump 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>isBeta</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>dumpService</span><span class=o>.</span><span class=na>dump</span><span class=o>(</span><span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                <span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span> <span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>(),</span> <span class=n>meta</span><span class=o>.</span><span class=na>getClientIp</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                <span class=kc>true</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>dumpService</span><span class=o>.</span><span class=na>dump</span><span class=o>(</span><span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                <span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span> <span class=n>configChangeSyncRequest</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>(),</span> <span class=n>meta</span><span class=o>.</span><span class=na>getClientIp</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=k>new</span> <span class=n>ConfigChangeClusterSyncResponse</span><span class=o>();</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=dumpservicedump-方法>dumpService#dump 方法</h2><p>源码位置: <code>com.alibaba.nacos.config.server.service.dump.DumpService#dump</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// dumpService#dump 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kt>void</span> <span class=nf>dump</span><span class=o>(</span><span class=n>String</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>String</span> <span class=n>group</span><span class=o>,</span> <span class=n>String</span> <span class=n>tenant</span><span class=o>,</span> <span class=kt>long</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>String</span> <span class=n>handleIp</span><span class=o>,</span> <span class=kt>boolean</span> <span class=n>isBeta</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>groupKey</span> <span class=o>=</span> <span class=n>GroupKey2</span><span class=o>.</span><span class=na>getKey</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>taskKey</span> <span class=o>=</span> <span class=n>String</span><span class=o>.</span><span class=na>join</span><span class=o>(</span><span class=s>&#34;+&#34;</span><span class=o>,</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>String</span><span class=o>.</span><span class=na>valueOf</span><span class=o>(</span><span class=n>isBeta</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 添加了 DumpTask，会被 DumpProcessor 来处理
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>dumpTaskMgr</span><span class=o>.</span><span class=na>addTask</span><span class=o>(</span><span class=n>taskKey</span><span class=o>,</span> <span class=k>new</span> <span class=n>DumpTask</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>handleIp</span><span class=o>,</span> <span class=n>isBeta</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>    <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;[dump-task] add task. groupKey={}, taskKey={}&#34;</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>,</span> <span class=n>taskKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.dump.processor.DumpProcessor#process</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 处理 DumpTask
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>boolean</span> <span class=nf>process</span><span class=o>(</span><span class=n>NacosTask</span> <span class=n>task</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>DumpTask</span> <span class=n>dumpTask</span> <span class=o>=</span> <span class=o>(</span><span class=n>DumpTask</span><span class=o>)</span> <span class=n>task</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span><span class=o>[]</span> <span class=n>pair</span> <span class=o>=</span> <span class=n>GroupKey2</span><span class=o>.</span><span class=na>parseKey</span><span class=o>(</span><span class=n>dumpTask</span><span class=o>.</span><span class=na>getGroupKey</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>dataId</span> <span class=o>=</span> <span class=n>pair</span><span class=o>[</span><span class=n>0</span><span class=o>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>group</span> <span class=o>=</span> <span class=n>pair</span><span class=o>[</span><span class=n>1</span><span class=o>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>tenant</span> <span class=o>=</span> <span class=n>pair</span><span class=o>[</span><span class=n>2</span><span class=o>];</span>
+</span></span><span class=line><span class=cl>    <span class=kt>long</span> <span class=n>lastModified</span> <span class=o>=</span> <span class=n>dumpTask</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>handleIp</span> <span class=o>=</span> <span class=n>dumpTask</span><span class=o>.</span><span class=na>getHandleIp</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=kt>boolean</span> <span class=n>isBeta</span> <span class=o>=</span> <span class=n>dumpTask</span><span class=o>.</span><span class=na>isBeta</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>tag</span> <span class=o>=</span> <span class=n>dumpTask</span><span class=o>.</span><span class=na>getTag</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>ConfigDumpEvent</span><span class=o>.</span><span class=na>ConfigDumpEventBuilder</span> <span class=n>build</span> <span class=o>=</span> <span class=n>ConfigDumpEvent</span><span class=o>.</span><span class=na>builder</span><span class=o>().</span><span class=na>namespaceId</span><span class=o>(</span><span class=n>tenant</span><span class=o>).</span><span class=na>dataId</span><span class=o>(</span><span class=n>dataId</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>            <span class=o>.</span><span class=na>group</span><span class=o>(</span><span class=n>group</span><span class=o>).</span><span class=na>isBeta</span><span class=o>(</span><span class=n>isBeta</span><span class=o>).</span><span class=na>tag</span><span class=o>(</span><span class=n>tag</span><span class=o>).</span><span class=na>lastModifiedTs</span><span class=o>(</span><span class=n>lastModified</span><span class=o>).</span><span class=na>handleIp</span><span class=o>(</span><span class=n>handleIp</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 下面的逻辑又分为 beta, tag 
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>isBeta</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// if publish beta, then dump config, update beta cache
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>ConfigInfo4Beta</span> <span class=n>cf</span> <span class=o>=</span> <span class=n>configInfoBetaPersistService</span><span class=o>.</span><span class=na>findConfigInfo4Beta</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// cf 为 null，说明之前删除了
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>build</span><span class=o>.</span><span class=na>remove</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>betaIps</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getBetaIps</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>content</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>encryptedDataKey</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getEncryptedDataKey</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>DumpConfigHandler</span><span class=o>.</span><span class=na>configDump</span><span class=o>(</span><span class=n>build</span><span class=o>.</span><span class=na>build</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>StringUtils</span><span class=o>.</span><span class=na>isBlank</span><span class=o>(</span><span class=n>tag</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>ConfigInfo</span> <span class=n>cf</span> <span class=o>=</span> <span class=n>configInfoPersistService</span><span class=o>.</span><span class=na>findConfigInfo</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>remove</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>content</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>type</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getType</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>encryptedDataKey</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getEncryptedDataKey</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>ConfigInfo4Tag</span> <span class=n>cf</span> <span class=o>=</span> <span class=n>configInfoTagPersistService</span><span class=o>.</span><span class=na>findConfigInfo4Tag</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>tag</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>remove</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>build</span><span class=o>.</span><span class=na>content</span><span class=o>(</span><span class=n>Objects</span><span class=o>.</span><span class=na>isNull</span><span class=o>(</span><span class=n>cf</span><span class=o>)</span> <span class=o>?</span> <span class=kc>null</span> <span class=o>:</span> <span class=n>cf</span><span class=o>.</span><span class=na>getContent</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 调用 DumpConfigHandler#configDump 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>return</span> <span class=n>DumpConfigHandler</span><span class=o>.</span><span class=na>configDump</span><span class=o>(</span><span class=n>build</span><span class=o>.</span><span class=na>build</span><span class=o>());</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.dump.DumpConfigHandler#configDump</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// DumpConfigHandler#configDump 方法
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kd>static</span> <span class=kt>boolean</span> <span class=nf>configDump</span><span class=o>(</span><span class=n>ConfigDumpEvent</span> <span class=n>event</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=o>...</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 处理逻辑又分为 beat， tag
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>event</span><span class=o>.</span><span class=na>isBeta</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>boolean</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(</span><span class=n>event</span><span class=o>.</span><span class=na>isRemove</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 删除配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>result</span> <span class=o>=</span> <span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>removeBeta</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>result</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 记录日志
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>logDumpEvent</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>,</span> <span class=kc>null</span><span class=o>,</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>event</span><span class=o>.</span><span class=na>getHandleIp</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                        <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>DUMP_EVENT_REMOVE_OK</span><span class=o>,</span> <span class=n>System</span><span class=o>.</span><span class=na>currentTimeMillis</span><span class=o>()</span> <span class=o>-</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>0</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 更新配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>result</span> <span class=o>=</span> <span class=n>ConfigCacheService</span>
+</span></span><span class=line><span class=cl>                    <span class=o>.</span><span class=na>dumpBeta</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>,</span> <span class=n>content</span><span class=o>,</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>event</span><span class=o>.</span><span class=na>getBetaIps</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                            <span class=n>encryptedDataKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=o>(</span><span class=n>result</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 记录日志
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>logDumpEvent</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>,</span> <span class=kc>null</span><span class=o>,</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>event</span><span class=o>.</span><span class=na>getHandleIp</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                        <span class=n>ConfigTraceService</span><span class=o>.</span><span class=na>DUMP_EVENT_OK</span><span class=o>,</span> <span class=n>System</span><span class=o>.</span><span class=na>currentTimeMillis</span><span class=o>()</span> <span class=o>-</span> <span class=n>lastModified</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                        <span class=n>content</span><span class=o>.</span><span class=na>length</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>StringUtils</span><span class=o>.</span><span class=na>isBlank</span><span class=o>(</span><span class=n>event</span><span class=o>.</span><span class=na>getTag</span><span class=o>()))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// dataId 黑名单加载
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>dataId</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>AggrWhitelist</span><span class=o>.</span><span class=na>AGGRIDS_METADATA</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>AggrWhitelist</span><span class=o>.</span><span class=na>load</span><span class=o>(</span><span class=n>content</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// clientIp 白名单
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>dataId</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>ClientIpWhiteList</span><span class=o>.</span><span class=na>CLIENT_IP_WHITELIST_METADATA</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>ClientIpWhiteList</span><span class=o>.</span><span class=na>load</span><span class=o>(</span><span class=n>content</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// switchMeta 元数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>dataId</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>SwitchService</span><span class=o>.</span><span class=na>SWITCH_META_DATAID</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>SwitchService</span><span class=o>.</span><span class=na>load</span><span class=o>(</span><span class=n>content</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=kt>boolean</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(!</span><span class=n>event</span><span class=o>.</span><span class=na>isRemove</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 更新配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>result</span> <span class=o>=</span> <span class=n>ConfigCacheService</span>
+</span></span><span class=line><span class=cl>                    <span class=o>.</span><span class=na>dump</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>,</span> <span class=n>content</span><span class=o>,</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>type</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>...</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 删除配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>result</span> <span class=o>=</span> <span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>remove</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>...</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>//
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kt>boolean</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(!</span><span class=n>event</span><span class=o>.</span><span class=na>isRemove</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 更新配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>result</span> <span class=o>=</span> <span class=n>ConfigCacheService</span>
+</span></span><span class=line><span class=cl>                    <span class=o>.</span><span class=na>dumpTag</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>,</span> <span class=n>event</span><span class=o>.</span><span class=na>getTag</span><span class=o>(),</span> <span class=n>content</span><span class=o>,</span> <span class=n>lastModified</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>...</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 删除配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>result</span> <span class=o>=</span> <span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>removeTag</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>namespaceId</span><span class=o>,</span> <span class=n>event</span><span class=o>.</span><span class=na>getTag</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>            <span class=o>...</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>result</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.ConfigCacheService#removeBeta</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 删除配置 ConfigCacheService#removeBeta
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kd>static</span> <span class=kt>boolean</span> <span class=nf>removeBeta</span><span class=o>(</span><span class=n>String</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>String</span> <span class=n>group</span><span class=o>,</span> <span class=n>String</span> <span class=n>tenant</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>String</span> <span class=n>groupKey</span> <span class=o>=</span> <span class=n>GroupKey2</span><span class=o>.</span><span class=na>getKey</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 获取锁
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>final</span> <span class=kt>int</span> <span class=n>lockResult</span> <span class=o>=</span> <span class=n>tryWriteLock</span><span class=o>(</span><span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// If data is non-existent.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 数据不存在, 直接返回 true
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>0</span> <span class=o>==</span> <span class=n>lockResult</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;[remove-ok] {} not exist.&#34;</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// try to lock failed
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 获取失败
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>lockResult</span> <span class=o>&lt;</span> <span class=n>0</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[remove-error] write lock failed. {}&#34;</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>false</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(!</span><span class=n>PropertyUtil</span><span class=o>.</span><span class=na>isDirectRead</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 移除本地文件，子啊
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>DiskUtil</span><span class=o>.</span><span class=na>removeConfigInfo4Beta</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和  LongPollingService 处理
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>NotifyCenter</span><span class=o>.</span><span class=na>publishEvent</span><span class=o>(</span><span class=k>new</span> <span class=n>LocalDataChangeEvent</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=kc>true</span><span class=o>,</span> <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>getIps4Beta</span><span class=o>()));</span>
+</span></span><span class=line><span class=cl>        <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>setBeta</span><span class=o>(</span><span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>setIps4Beta</span><span class=o>(</span><span class=kc>null</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>setMd54Beta</span><span class=o>(</span><span class=n>Constants</span><span class=o>.</span><span class=na>NULL</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>finally</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>releaseWriteLock</span><span class=o>(</span><span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.ConfigCacheService#dumpBeta</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 更新配置 ConfigCacheService#dumpBeta
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kd>static</span> <span class=kt>boolean</span> <span class=nf>dumpBeta</span><span class=o>(</span><span class=n>String</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>String</span> <span class=n>group</span><span class=o>,</span> <span class=n>String</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>String</span> <span class=n>content</span><span class=o>,</span> <span class=kt>long</span> <span class=n>lastModifiedTs</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>String</span> <span class=n>betaIps</span><span class=o>,</span> <span class=n>String</span> <span class=n>encryptedDataKey</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>final</span> <span class=n>String</span> <span class=n>groupKey</span> <span class=o>=</span> <span class=n>GroupKey2</span><span class=o>.</span><span class=na>getKey</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>makeSure</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>,</span> <span class=kc>true</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 获取锁
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kd>final</span> <span class=kt>int</span> <span class=n>lockResult</span> <span class=o>=</span> <span class=n>tryWriteLock</span><span class=o>(</span><span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=o>(</span><span class=n>lockResult</span> <span class=o>!=</span> <span class=n>0</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 获取锁失败
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(</span><span class=n>lockResult</span> <span class=o>&lt;</span> <span class=n>0</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[dump-beta-error] write lock failed. {}&#34;</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>false</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 计算新配置的 md5 值
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kd>final</span> <span class=n>String</span> <span class=n>md5</span> <span class=o>=</span> <span class=n>MD5Utils</span><span class=o>.</span><span class=na>md5Hex</span><span class=o>(</span><span class=n>content</span><span class=o>,</span> <span class=n>Constants</span><span class=o>.</span><span class=na>ENCODE</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 修改时间小，说明事件处理已经过期
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>lastModifiedTs</span> <span class=o>&lt;</span> <span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>getLastModifiedTs4Beta</span><span class=o>(</span><span class=n>groupKey</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[dump-beta-ignore] the content is old. groupKey={}, md5={}, lastModifiedOld={}, &#34;</span>
+</span></span><span class=line><span class=cl>                            <span class=o>+</span> <span class=s>&#34;lastModifiedNew={}&#34;</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>,</span> <span class=n>md5</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                    <span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>getLastModifiedTs4Beta</span><span class=o>(</span><span class=n>groupKey</span><span class=o>),</span> <span class=n>lastModifiedTs</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// md5 值是一样的，并且缓存文件是存在，说明不需要更新
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>md5</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>getContentBetaMd5</span><span class=o>(</span><span class=n>groupKey</span><span class=o>))</span> <span class=o>&amp;&amp;</span> <span class=n>DiskUtil</span><span class=o>.</span><span class=na>targetBetaFile</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>).</span><span class=na>exists</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;[dump-beta-ignore] ignore to save cache file. groupKey={}, md5={}, lastModifiedOld={}, &#34;</span>
+</span></span><span class=line><span class=cl>                            <span class=o>+</span> <span class=s>&#34;lastModifiedNew={}&#34;</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>,</span> <span class=n>md5</span><span class=o>,</span> <span class=n>ConfigCacheService</span><span class=o>.</span><span class=na>getLastModifiedTs</span><span class=o>(</span><span class=n>groupKey</span><span class=o>),</span>
+</span></span><span class=line><span class=cl>                    <span class=n>lastModifiedTs</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span> <span class=k>else</span> <span class=k>if</span> <span class=o>(!</span><span class=n>PropertyUtil</span><span class=o>.</span><span class=na>isDirectRead</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 更新缓存文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>DiskUtil</span><span class=o>.</span><span class=na>saveBetaToDisk</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>content</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>String</span><span class=o>[]</span> <span class=n>betaIpsArr</span> <span class=o>=</span> <span class=n>betaIps</span><span class=o>.</span><span class=na>split</span><span class=o>(</span><span class=s>&#34;,&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>updateBetaMd5</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>md5</span><span class=o>,</span> <span class=n>Arrays</span><span class=o>.</span><span class=na>asList</span><span class=o>(</span><span class=n>betaIpsArr</span><span class=o>),</span> <span class=n>lastModifiedTs</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>IOException</span> <span class=n>ioe</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;[dump-beta-exception] save disk error. &#34;</span> <span class=o>+</span> <span class=n>groupKey</span> <span class=o>+</span> <span class=s>&#34;, &#34;</span> <span class=o>+</span> <span class=n>ioe</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>false</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>finally</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>releaseWriteLock</span><span class=o>(</span><span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-09-11 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/nacos/>nacos</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a>,&nbsp;<a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/>源码分析 nacos 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/ class=prev rel=prev title="源码分析 nacos 同步服务和实例元数据信息"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>源码分析 nacos 同步服务和实例元数据信息</a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.118.2">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/gitalk/gitalk.min.css><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/gitalk/gitalk.min.js></script><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:100},comment:{gitalk:{admin:["ooooo-youwillsee"],clientID:"9fcbefe148801287b34f",clientSecret:"3833b0f8bda400fb1ea7093446f340821394e501",id:"2023-09-11T08:00:00+08:00",owner:"ooooo-youwillsee",repo:"ooooo-notes-gitalk",title:"源码分析 nacos 发布配置"}},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>
