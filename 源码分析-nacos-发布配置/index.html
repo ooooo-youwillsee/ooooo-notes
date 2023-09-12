@@ -1,4 +1,4 @@
-<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos 发布配置 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos 发布配置"><meta property="og:description" content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为 ConfigControllerV2#publishConfig 和 ConfigPublishRequestHandler。这两个方法的处理逻辑都是一样的，所以我"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-09-11T08:00:00+08:00"><meta property="article:modified_time" content="2023-09-11T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos 发布配置"><meta name=twitter:description content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为 ConfigControllerV2#publishConfig 和 ConfigPublishRequestHandler。这两个方法的处理逻辑都是一样的，所以我"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos 发布配置","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":2258,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/","datePublished":"2023-09-11T08:00:00+08:00","dateModified":"2023-09-11T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>源码分析 nacos 发布配置 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="源码分析 nacos 发布配置"><meta property="og:description" content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为 ConfigControllerV2#publishConfig 和 ConfigPublishRequestHandler。这两个方法的处理逻辑都是一样的，所以我"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-09-11T08:00:00+08:00"><meta property="article:modified_time" content="2023-09-11T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="源码分析 nacos 发布配置"><meta name=twitter:description content="在 nacos 中，发布配置分为 http 和 grpc 两种方式，分别为 ConfigControllerV2#publishConfig 和 ConfigPublishRequestHandler。这两个方法的处理逻辑都是一样的，所以我"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"源码分析 nacos 发布配置","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/"},"genre":"posts","keywords":"nacos, source code, 源码分析 nacos 系列","wordcount":2840,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE\/","datePublished":"2023-09-11T08:00:00+08:00","dateModified":"2023-09-11T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
 <input type=text placeholder="Search titles or contents..." id=search-input-desktop>
 <a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
 <a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
@@ -7,9 +7,9 @@
 <a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
 <a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
 <span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title><i class='fa fa-list' aria-hidden=true></i>文章</a><a class=menu-item href=/ooooo-notes/tags/ title><i class='fa fa-tags' aria-hidden=true></i>标签</a><a class=menu-item href=/ooooo-notes/categories/ title><i class='fa fa-archive' aria-hidden=true></i>分类</a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
-<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos 发布配置</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-09-11 08:00:00">2023-09-11 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;2258 words&nbsp;
-<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;5 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
-<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#发布配置>发布配置</a></li><li><a href=#处理-configdatachangeevent-事件>处理 ConfigDataChangeEvent 事件</a></li><li><a href=#dumpservicedump-方法>dumpService#dump 方法</a></li></ul></nav></div></div><div class=content id=content><p>在 <code>nacos</code> 中，发布配置分为 <code>http</code> 和 <code>grpc</code> 两种方式，分别为 <code>ConfigControllerV2#publishConfig</code> 和 <code>ConfigPublishRequestHandler</code>。这两个方法的处理逻辑都是<strong>一样的</strong>，所以我就选择 <code>http</code> 的方式来分析代码。</p><h2 id=发布配置>发布配置</h2><p>源码位置: <code>com.alibaba.nacos.config.server.controller.v2.ConfigControllerV2#publishConfig</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">源码分析 nacos 发布配置</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 nacos 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-09-11 08:00:00">2023-09-11 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;2840 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;6 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#发布配置>发布配置</a></li><li><a href=#处理-configdatachangeevent-事件>处理 ConfigDataChangeEvent 事件</a></li><li><a href=#dumpservicedump-方法>dumpService#dump 方法</a></li><li><a href=#处理-localdatachangeevent-事件>处理 LocalDataChangeEvent 事件</a></li></ul></nav></div></div><div class=content id=content><p>在 <code>nacos</code> 中，发布配置分为 <code>http</code> 和 <code>grpc</code> 两种方式，分别为 <code>ConfigControllerV2#publishConfig</code> 和 <code>ConfigPublishRequestHandler</code>。这两个方法的处理逻辑都是<strong>一样的</strong>，所以我就选择 <code>http</code> 的方式来分析代码。</p><h2 id=发布配置>发布配置</h2><p>源码位置: <code>com.alibaba.nacos.config.server.controller.v2.ConfigControllerV2#publishConfig</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -382,7 +382,7 @@
 </span></span><span class=line><span class=cl>            <span class=n>Member</span> <span class=n>member</span> <span class=o>=</span> <span class=n>task</span><span class=o>.</span><span class=na>member</span><span class=o>;</span>
 </span></span><span class=line><span class=cl>            <span class=c1>// 是当前服务
 </span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=o>(</span><span class=n>memberManager</span><span class=o>.</span><span class=na>getSelf</span><span class=o>().</span><span class=na>equals</span><span class=o>(</span><span class=n>member</span><span class=o>))</span> <span class=o>{</span>
-</span></span><span class=line><span class=cl>                <span class=c1>// 处理逻辑分为是不是 beta，但调用的方法都是一样的, dumpService#dump
+</span></span><span class=line><span class=cl>                <span class=c1>// 处理逻辑分为是不是 beta，调用的方法都是 dumpService#dump
 </span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=k>if</span> <span class=o>(</span><span class=n>syncRequest</span><span class=o>.</span><span class=na>isBeta</span><span class=o>())</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>                    <span class=n>dumpService</span><span class=o>.</span><span class=na>dump</span><span class=o>(</span><span class=n>syncRequest</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>syncRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span>
 </span></span><span class=line><span class=cl>                            <span class=n>syncRequest</span><span class=o>.</span><span class=na>getLastModified</span><span class=o>(),</span> <span class=n>NetUtils</span><span class=o>.</span><span class=na>localIP</span><span class=o>(),</span> <span class=kc>true</span><span class=o>);</span>
@@ -770,10 +770,10 @@
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(!</span><span class=n>PropertyUtil</span><span class=o>.</span><span class=na>isDirectRead</span><span class=o>())</span> <span class=o>{</span>
-</span></span><span class=line><span class=cl>            <span class=c1>// 移除本地文件，子啊
+</span></span><span class=line><span class=cl>            <span class=c1>// 移除本地文件
 </span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>DiskUtil</span><span class=o>.</span><span class=na>removeConfigInfo4Beta</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=o>}</span>
-</span></span><span class=line><span class=cl>        <span class=c1>// 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和  LongPollingService 处理
+</span></span><span class=line><span class=cl>        <span class=c1>// 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和 LongPollingService 处理
 </span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>NotifyCenter</span><span class=o>.</span><span class=na>publishEvent</span><span class=o>(</span><span class=k>new</span> <span class=n>LocalDataChangeEvent</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=kc>true</span><span class=o>,</span> <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>getIps4Beta</span><span class=o>()));</span>
 </span></span><span class=line><span class=cl>        <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>setBeta</span><span class=o>(</span><span class=kc>false</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=n>CACHE</span><span class=o>.</span><span class=na>get</span><span class=o>(</span><span class=n>groupKey</span><span class=o>).</span><span class=na>setIps4Beta</span><span class=o>(</span><span class=kc>null</span><span class=o>);</span>
@@ -829,6 +829,7 @@
 </span><span class=lnt>44
 </span><span class=lnt>45
 </span><span class=lnt>46
+</span><span class=lnt>47
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 更新配置 ConfigCacheService#dumpBeta
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kd>static</span> <span class=kt>boolean</span> <span class=nf>dumpBeta</span><span class=o>(</span><span class=n>String</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>String</span> <span class=n>group</span><span class=o>,</span> <span class=n>String</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>String</span> <span class=n>content</span><span class=o>,</span> <span class=kt>long</span> <span class=n>lastModifiedTs</span><span class=o>,</span>
 </span></span><span class=line><span class=cl>        <span class=n>String</span> <span class=n>betaIps</span><span class=o>,</span> <span class=n>String</span> <span class=n>encryptedDataKey</span><span class=o>)</span> <span class=o>{</span>
@@ -866,13 +867,246 @@
 </span></span><span class=line><span class=cl>        <span class=o>}</span>
 </span></span><span class=line><span class=cl>        <span class=n>String</span><span class=o>[]</span> <span class=n>betaIpsArr</span> <span class=o>=</span> <span class=n>betaIps</span><span class=o>.</span><span class=na>split</span><span class=o>(</span><span class=s>&#34;,&#34;</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        
-</span></span><span class=line><span class=cl>        <span class=n>updateBetaMd5</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>md5</span><span class=o>,</span> <span class=n>Arrays</span><span class=o>.</span><span class=na>asList</span><span class=o>(</span><span class=n>betaIpsArr</span><span class=o>),</span> <span class=n>lastModifiedTs</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 更新 md5 值
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>updateBetaMd5</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>md5</span><span class=o>,</span> <span class=n>Arrays</span><span class=o>.</span><span class=na>asList</span><span class=o>(</span><span class=n>betaIpsArr</span><span class=o>),</span> <span class=n>lastModifiedTs</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>true</span><span class=o>;</span>
 </span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>IOException</span> <span class=n>ioe</span><span class=o>)</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>DUMP_LOG</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;[dump-beta-exception] save disk error. &#34;</span> <span class=o>+</span> <span class=n>groupKey</span> <span class=o>+</span> <span class=s>&#34;, &#34;</span> <span class=o>+</span> <span class=n>ioe</span><span class=o>);</span>
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>false</span><span class=o>;</span>
 </span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>finally</span> <span class=o>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>releaseWriteLock</span><span class=o>(</span><span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.service.ConfigCacheService#updateBetaMd5</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 更新 md5 值
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kd>static</span> <span class=kt>void</span> <span class=nf>updateBetaMd5</span><span class=o>(</span><span class=n>String</span> <span class=n>groupKey</span><span class=o>,</span> <span class=n>String</span> <span class=n>md5</span><span class=o>,</span> <span class=n>List</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span> <span class=n>ips4Beta</span><span class=o>,</span> <span class=kt>long</span> <span class=n>lastModifiedTs</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>String</span> <span class=n>encryptedDataKey</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>CacheItem</span> <span class=n>cache</span> <span class=o>=</span> <span class=n>makeSure</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>encryptedDataKey</span><span class=o>,</span> <span class=kc>true</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>cache</span><span class=o>.</span><span class=na>md54Beta</span> <span class=o>==</span> <span class=kc>null</span> <span class=o>||</span> <span class=o>!</span><span class=n>cache</span><span class=o>.</span><span class=na>md54Beta</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>md5</span><span class=o>)</span> <span class=o>||</span> <span class=o>!</span><span class=n>ips4Beta</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>cache</span><span class=o>.</span><span class=na>ips4Beta</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>cache</span><span class=o>.</span><span class=na>isBeta</span> <span class=o>=</span> <span class=kc>true</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>cache</span><span class=o>.</span><span class=na>md54Beta</span> <span class=o>=</span> <span class=n>md5</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>cache</span><span class=o>.</span><span class=na>lastModifiedTs4Beta</span> <span class=o>=</span> <span class=n>lastModifiedTs</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>cache</span><span class=o>.</span><span class=na>ips4Beta</span> <span class=o>=</span> <span class=n>ips4Beta</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和 LongPollingService 处理
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>NotifyCenter</span><span class=o>.</span><span class=na>publishEvent</span><span class=o>(</span><span class=k>new</span> <span class=n>LocalDataChangeEvent</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=kc>true</span><span class=o>,</span> <span class=n>ips4Beta</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=处理-localdatachangeevent-事件>处理 LocalDataChangeEvent 事件</h2><p>源码位置: ``</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 处理 LocalDataChangeEvent 事件 
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>void</span> <span class=nf>onEvent</span><span class=o>(</span><span class=n>LocalDataChangeEvent</span> <span class=n>event</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=o>...</span>   
+</span></span><span class=line><span class=cl>    <span class=c1>// 处理事件
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>configDataChanged</span><span class=o>(</span><span class=n>groupKey</span><span class=o>,</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>,</span> <span class=n>isBeta</span><span class=o>,</span> <span class=n>betaIps</span><span class=o>,</span> <span class=n>tag</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 处理事件
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>public</span> <span class=kt>void</span> <span class=nf>configDataChanged</span><span class=o>(</span><span class=n>String</span> <span class=n>groupKey</span><span class=o>,</span> <span class=n>String</span> <span class=n>dataId</span><span class=o>,</span> <span class=n>String</span> <span class=n>group</span><span class=o>,</span> <span class=n>String</span> <span class=n>tenant</span><span class=o>,</span> <span class=kt>boolean</span> <span class=n>isBeta</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>        <span class=n>List</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span> <span class=n>betaIps</span><span class=o>,</span> <span class=n>String</span> <span class=n>tag</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Set</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span> <span class=n>listeners</span> <span class=o>=</span> <span class=n>configChangeListenContext</span><span class=o>.</span><span class=na>getListeners</span><span class=o>(</span><span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>CollectionUtils</span><span class=o>.</span><span class=na>isEmpty</span><span class=o>(</span><span class=n>listeners</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>notifyClientCount</span> <span class=o>=</span> <span class=n>0</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 遍历所有订阅者
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=o>(</span><span class=kd>final</span> <span class=n>String</span> <span class=n>client</span> <span class=o>:</span> <span class=n>listeners</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 获取 Connection
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>Connection</span> <span class=n>connection</span> <span class=o>=</span> <span class=n>connectionManager</span><span class=o>.</span><span class=na>getConnection</span><span class=o>(</span><span class=n>client</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=o>(</span><span class=n>connection</span> <span class=o>==</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>continue</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>ConnectionMeta</span> <span class=n>metaInfo</span> <span class=o>=</span> <span class=n>connection</span><span class=o>.</span><span class=na>getMetaInfo</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=c1>//beta ips check.
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>String</span> <span class=n>clientIp</span> <span class=o>=</span> <span class=n>metaInfo</span><span class=o>.</span><span class=na>getClientIp</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=n>String</span> <span class=n>clientTag</span> <span class=o>=</span> <span class=n>metaInfo</span><span class=o>.</span><span class=na>getTag</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 判断是否要 beta 推送
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>isBeta</span> <span class=o>&amp;&amp;</span> <span class=n>betaIps</span> <span class=o>!=</span> <span class=kc>null</span> <span class=o>&amp;&amp;</span> <span class=o>!</span><span class=n>betaIps</span><span class=o>.</span><span class=na>contains</span><span class=o>(</span><span class=n>clientIp</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>continue</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        <span class=c1>//tag check
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=c1>// 判断是否要 tag 推送
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=o>(</span><span class=n>StringUtils</span><span class=o>.</span><span class=na>isNotBlank</span><span class=o>(</span><span class=n>tag</span><span class=o>)</span> <span class=o>&amp;&amp;</span> <span class=o>!</span><span class=n>tag</span><span class=o>.</span><span class=na>equals</span><span class=o>(</span><span class=n>clientTag</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>continue</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=o>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=n>ConfigChangeNotifyRequest</span> <span class=n>notifyRequest</span> <span class=o>=</span> <span class=n>ConfigChangeNotifyRequest</span><span class=o>.</span><span class=na>build</span><span class=o>(</span><span class=n>dataId</span><span class=o>,</span> <span class=n>group</span><span class=o>,</span> <span class=n>tenant</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// 封装为 RpcPushTask，错误次数为 50 
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>RpcPushTask</span> <span class=n>rpcPushRetryTask</span> <span class=o>=</span> <span class=k>new</span> <span class=n>RpcPushTask</span><span class=o>(</span><span class=n>notifyRequest</span><span class=o>,</span> <span class=n>50</span><span class=o>,</span> <span class=n>client</span><span class=o>,</span> <span class=n>clientIp</span><span class=o>,</span> <span class=n>metaInfo</span><span class=o>.</span><span class=na>getAppName</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 异步推送配置数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>push</span><span class=o>(</span><span class=n>rpcPushRetryTask</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>notifyClientCount</span><span class=o>++;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_PUSH</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;push [{}] clients ,groupKey=[{}]&#34;</span><span class=o>,</span> <span class=n>notifyClientCount</span><span class=o>,</span> <span class=n>groupKey</span><span class=o>);</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 异步推送配置数据
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>private</span> <span class=kt>void</span> <span class=nf>push</span><span class=o>(</span><span class=n>RpcPushTask</span> <span class=n>retryTask</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ConfigChangeNotifyRequest</span> <span class=n>notifyRequest</span> <span class=o>=</span> <span class=n>retryTask</span><span class=o>.</span><span class=na>notifyRequest</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>retryTask</span><span class=o>.</span><span class=na>isOverTimes</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 错误次数达到上限
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_PUSH</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;push callback retry fail over times .dataId={},group={},tenant={},clientId={},will unregister client.&#34;</span><span class=o>,</span>
+</span></span><span class=line><span class=cl>                        <span class=n>notifyRequest</span><span class=o>.</span><span class=na>getDataId</span><span class=o>(),</span> <span class=n>notifyRequest</span><span class=o>.</span><span class=na>getGroup</span><span class=o>(),</span> <span class=n>notifyRequest</span><span class=o>.</span><span class=na>getTenant</span><span class=o>(),</span>
+</span></span><span class=line><span class=cl>                        <span class=n>retryTask</span><span class=o>.</span><span class=na>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 注销连接
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>connectionManager</span><span class=o>.</span><span class=na>unregister</span><span class=o>(</span><span class=n>retryTask</span><span class=o>.</span><span class=na>connectionId</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=k>if</span> <span class=o>(</span><span class=n>connectionManager</span><span class=o>.</span><span class=na>getConnection</span><span class=o>(</span><span class=n>retryTask</span><span class=o>.</span><span class=na>connectionId</span><span class=o>)</span> <span class=o>!=</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// first time:delay 0s; second time:delay 2s; third time:delay 4s
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=c1>// 线程池延迟调度
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>ConfigExecutor</span><span class=o>.</span><span class=na>getClientConfigNotifierServiceExecutor</span><span class=o>()</span>
+</span></span><span class=line><span class=cl>                <span class=o>.</span><span class=na>schedule</span><span class=o>(</span><span class=n>retryTask</span><span class=o>,</span> <span class=n>retryTask</span><span class=o>.</span><span class=na>tryTimes</span> <span class=o>*</span> <span class=n>2</span><span class=o>,</span> <span class=n>TimeUnit</span><span class=o>.</span><span class=na>SECONDS</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// client is already offline, ignore task.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.config.server.remote.RpcConfigChangeNotifier.RpcPushTask#run</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// RpcPushTask 执行
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nd>@Override</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kt>void</span> <span class=nf>run</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>tryTimes</span><span class=o>++;</span>
+</span></span><span class=line><span class=cl>    <span class=n>TpsCheckRequest</span> <span class=n>tpsCheckRequest</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TpsCheckRequest</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>   
+</span></span><span class=line><span class=cl>    <span class=n>tpsCheckRequest</span><span class=o>.</span><span class=na>setPointName</span><span class=o>(</span><span class=n>POINT_CONFIG_PUSH</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 检查 tps，默认没有实现
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=o>(!</span><span class=n>tpsControlManager</span><span class=o>.</span><span class=na>check</span><span class=o>(</span><span class=n>tpsCheckRequest</span><span class=o>).</span><span class=na>isSuccess</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>push</span><span class=o>(</span><span class=k>this</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 发送 notifyRequest 请求给客户端
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>rpcPushService</span><span class=o>.</span><span class=na>pushWithCallback</span><span class=o>(</span><span class=n>connectionId</span><span class=o>,</span> <span class=n>notifyRequest</span><span class=o>,</span> <span class=k>new</span> <span class=n>AbstractPushCallBack</span><span class=o>(</span><span class=n>3000L</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>            <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>            <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onSuccess</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>TpsCheckRequest</span> <span class=n>tpsCheckRequest</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TpsCheckRequest</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=n>tpsCheckRequest</span><span class=o>.</span><span class=na>setPointName</span><span class=o>(</span><span class=n>POINT_CONFIG_PUSH_SUCCESS</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=n>tpsControlManager</span><span class=o>.</span><span class=na>check</span><span class=o>(</span><span class=n>tpsCheckRequest</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>            <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>            <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onFail</span><span class=o>(</span><span class=n>Throwable</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>TpsCheckRequest</span> <span class=n>tpsCheckRequest</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TpsCheckRequest</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>                <span class=n>tpsCheckRequest</span><span class=o>.</span><span class=na>setPointName</span><span class=o>(</span><span class=n>POINT_CONFIG_PUSH_FAIL</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=n>tpsControlManager</span><span class=o>.</span><span class=na>check</span><span class=o>(</span><span class=n>tpsCheckRequest</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=n>Loggers</span><span class=o>.</span><span class=na>REMOTE_PUSH</span><span class=o>.</span><span class=na>warn</span><span class=o>(</span><span class=s>&#34;Push fail&#34;</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>                <span class=n>push</span><span class=o>(</span><span class=n>RpcPushTask</span><span class=o>.</span><span class=na>this</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>            <span class=o>}</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>        <span class=o>},</span> <span class=n>ConfigExecutor</span><span class=o>.</span><span class=na>getClientConfigNotifierServiceExecutor</span><span class=o>());</span>
 </span></span><span class=line><span class=cl>    <span class=o>}</span>
 </span></span><span class=line><span class=cl><span class=o>}</span>
 </span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-09-11 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%8F%91%E5%B8%83%E9%85%8D%E7%BD%AE/ data-title="源码分析 nacos 发布配置"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/nacos/>nacos</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a>,&nbsp;<a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E7%B3%BB%E5%88%97/>源码分析 nacos 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/ class=prev rel=prev title="源码分析 nacos 同步服务和实例元数据信息"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>源码分析 nacos 同步服务和实例元数据信息</a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.118.2">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
