@@ -194,7 +194,7 @@ class AsyncRpcTask implements Runnable {
             Member member = task.member;
             // 是当前服务
             if (memberManager.getSelf().equals(member)) {
-                // 处理逻辑分为是不是 beta，但调用的方法都是一样的, dumpService#dump
+                // 处理逻辑分为是不是 beta，调用的方法都是 dumpService#dump
                 if (syncRequest.isBeta()) {
                     dumpService.dump(syncRequest.getDataId(), syncRequest.getGroup(), syncRequest.getTenant(),
                             syncRequest.getLastModified(), NetUtils.localIP(), true);
@@ -431,10 +431,10 @@ public static boolean removeBeta(String dataId, String group, String tenant) {
     
     try {
         if (!PropertyUtil.isDirectRead()) {
-            // 移除本地文件，子啊
+            // 移除本地文件
             DiskUtil.removeConfigInfo4Beta(dataId, group, tenant);
         }
-        // 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和  LongPollingService 处理
+        // 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和 LongPollingService 处理
         NotifyCenter.publishEvent(new LocalDataChangeEvent(groupKey, true, CACHE.get(groupKey).getIps4Beta()));
         CACHE.get(groupKey).setBeta(false);
         CACHE.get(groupKey).setIps4Beta(null);
@@ -486,6 +486,7 @@ public static boolean dumpBeta(String dataId, String group, String tenant, Strin
         }
         String[] betaIpsArr = betaIps.split(",");
         
+        // 更新 md5 值
         updateBetaMd5(groupKey, md5, Arrays.asList(betaIpsArr), lastModifiedTs, encryptedDataKey);
         return true;
     } catch (IOException ioe) {
@@ -493,6 +494,139 @@ public static boolean dumpBeta(String dataId, String group, String tenant, Strin
         return false;
     } finally {
         releaseWriteLock(groupKey);
+    }
+}
+```
+
+源码位置: `com.alibaba.nacos.config.server.service.ConfigCacheService#updateBetaMd5`
+
+```java
+// 更新 md5 值
+public static void updateBetaMd5(String groupKey, String md5, List<String> ips4Beta, long lastModifiedTs,
+        String encryptedDataKey) {
+    CacheItem cache = makeSure(groupKey, encryptedDataKey, true);
+    if (cache.md54Beta == null || !cache.md54Beta.equals(md5) || !ips4Beta.equals(cache.ips4Beta)) {
+        cache.isBeta = true;
+        cache.md54Beta = md5;
+        cache.lastModifiedTs4Beta = lastModifiedTs;
+        cache.ips4Beta = ips4Beta;
+        // 发布 LocalDataChangeEvent 事件，会被 RpcConfigChangeNotifier 和 LongPollingService 处理
+        NotifyCenter.publishEvent(new LocalDataChangeEvent(groupKey, true, ips4Beta));
+    }
+}
+```
+
+## 处理 LocalDataChangeEvent 事件 
+
+源码位置: ``
+
+```java
+// 处理 LocalDataChangeEvent 事件 
+@Override
+public void onEvent(LocalDataChangeEvent event) {
+    ...   
+    // 处理事件
+    configDataChanged(groupKey, dataId, group, tenant, isBeta, betaIps, tag);
+}
+
+// 处理事件
+public void configDataChanged(String groupKey, String dataId, String group, String tenant, boolean isBeta,
+        List<String> betaIps, String tag) {
+    Set<String> listeners = configChangeListenContext.getListeners(groupKey);
+    if (CollectionUtils.isEmpty(listeners)) {
+        return;
+    }
+    int notifyClientCount = 0;
+    // 遍历所有订阅者
+    for (final String client : listeners) {
+        // 获取 Connection
+        Connection connection = connectionManager.getConnection(client);
+        if (connection == null) {
+            continue;
+        }
+        
+        ConnectionMeta metaInfo = connection.getMetaInfo();
+        //beta ips check.
+        String clientIp = metaInfo.getClientIp();
+        String clientTag = metaInfo.getTag();
+        // 判断是否要 beta 推送
+        if (isBeta && betaIps != null && !betaIps.contains(clientIp)) {
+            continue;
+        }
+        //tag check
+        // 判断是否要 tag 推送
+        if (StringUtils.isNotBlank(tag) && !tag.equals(clientTag)) {
+            continue;
+        }
+        
+        ConfigChangeNotifyRequest notifyRequest = ConfigChangeNotifyRequest.build(dataId, group, tenant);
+        
+        // 封装为 RpcPushTask，错误次数为 50 
+        RpcPushTask rpcPushRetryTask = new RpcPushTask(notifyRequest, 50, client, clientIp, metaInfo.getAppName());
+        // 异步推送配置数据
+        push(rpcPushRetryTask);
+        notifyClientCount++;
+    }
+    Loggers.REMOTE_PUSH.info("push [{}] clients ,groupKey=[{}]", notifyClientCount, groupKey);
+}
+
+// 异步推送配置数据
+private void push(RpcPushTask retryTask) {
+    ConfigChangeNotifyRequest notifyRequest = retryTask.notifyRequest;
+    if (retryTask.isOverTimes()) {
+        // 错误次数达到上限
+        Loggers.REMOTE_PUSH
+                .warn("push callback retry fail over times .dataId={},group={},tenant={},clientId={},will unregister client.",
+                        notifyRequest.getDataId(), notifyRequest.getGroup(), notifyRequest.getTenant(),
+                        retryTask.connectionId);
+        // 注销连接
+        connectionManager.unregister(retryTask.connectionId);
+    } else if (connectionManager.getConnection(retryTask.connectionId) != null) {
+        // first time:delay 0s; second time:delay 2s; third time:delay 4s
+        // 线程池延迟调度
+        ConfigExecutor.getClientConfigNotifierServiceExecutor()
+                .schedule(retryTask, retryTask.tryTimes * 2, TimeUnit.SECONDS);
+    } else {
+        // client is already offline, ignore task.
+    }
+}
+```
+
+源码位置: `com.alibaba.nacos.config.server.remote.RpcConfigChangeNotifier.RpcPushTask#run`
+
+```java
+// RpcPushTask 执行
+@Override
+public void run() {
+    tryTimes++;
+    TpsCheckRequest tpsCheckRequest = new TpsCheckRequest();
+   
+    tpsCheckRequest.setPointName(POINT_CONFIG_PUSH);
+    // 检查 tps，默认没有实现
+    if (!tpsControlManager.check(tpsCheckRequest).isSuccess()) {
+        push(this);
+    } else {
+        // 发送 notifyRequest 请求给客户端
+        rpcPushService.pushWithCallback(connectionId, notifyRequest, new AbstractPushCallBack(3000L) {
+            @Override
+            public void onSuccess() {
+                TpsCheckRequest tpsCheckRequest = new TpsCheckRequest();
+                
+                tpsCheckRequest.setPointName(POINT_CONFIG_PUSH_SUCCESS);
+                tpsControlManager.check(tpsCheckRequest);
+            }
+            
+            @Override
+            public void onFail(Throwable e) {
+                TpsCheckRequest tpsCheckRequest = new TpsCheckRequest();
+                
+                tpsCheckRequest.setPointName(POINT_CONFIG_PUSH_FAIL);
+                tpsControlManager.check(tpsCheckRequest);
+                Loggers.REMOTE_PUSH.warn("Push fail", e);
+                push(RpcPushTask.this);
+            }
+            
+        }, ConfigExecutor.getClientConfigNotifierServiceExecutor());
     }
 }
 ```
