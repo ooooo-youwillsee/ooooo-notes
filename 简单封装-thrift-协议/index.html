@@ -1,0 +1,540 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>简单封装 thrift 协议 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="简单封装 thrift 协议"><meta property="og:description" content="build.gradle 文件 1 2 3 4 5 6 7 8 9 10 11 plugins { id(&#34;com.linecorp.thrift-gradle-plugin&#34;) version &#34;0.5.0&#34; } dependencies { api('org.apache.thrift:libthrift:0.19.0') api('org.springframework.boot:spring-boot-starter-logging') api('cn.hutool:hutool-all') testImplementation('org.springframework.boot:spring-boot-starter-test') } example.thrift 文件 文件放在路径: src/main/thrift, 运行 gradle 命令 compileThrift 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-09-13T08:00:00+08:00"><meta property="article:modified_time" content="2023-09-13T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="简单封装 thrift 协议"><meta name=twitter:description content="build.gradle 文件 1 2 3 4 5 6 7 8 9 10 11 plugins { id(&#34;com.linecorp.thrift-gradle-plugin&#34;) version &#34;0.5.0&#34; } dependencies { api('org.apache.thrift:libthrift:0.19.0') api('org.springframework.boot:spring-boot-starter-logging') api('cn.hutool:hutool-all') testImplementation('org.springframework.boot:spring-boot-starter-test') } example.thrift 文件 文件放在路径: src/main/thrift, 运行 gradle 命令 compileThrift 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E8%8E%B7%E5%8F%96%E9%85%8D%E7%BD%AE/><link rel=next href=https://ooooo-youwillsee.github.io/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%88%A0%E9%99%A4%E9%85%8D%E7%BD%AE/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"简单封装 thrift 协议","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE\/"},"genre":"posts","keywords":"thrift","wordcount":1057,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE\/","datePublished":"2023-09-13T08:00:00+08:00","dateModified":"2023-09-13T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title><i class='fa fa-list' aria-hidden=true></i>文章</a><a class=menu-item href=/ooooo-notes/tags/ title><i class='fa fa-tags' aria-hidden=true></i>标签</a><a class=menu-item href=/ooooo-notes/categories/ title><i class='fa fa-archive' aria-hidden=true></i>分类</a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">简单封装 thrift 协议</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E9%9A%8F%E7%AC%94/><i class="far fa-folder fa-fw" aria-hidden=true></i>随笔</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-09-13 08:00:00">2023-09-13 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1057 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;3 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#buildgradle-文件>build.gradle 文件</a></li><li><a href=#examplethrift-文件>example.thrift 文件</a></li><li><a href=#thrift-server-代码>thrift server 代码</a></li><li><a href=#thrift-client-代码>thrift client 代码</a></li><li><a href=#测试类相关代码>测试类相关代码</a></li></ul></nav></div></div><div class=content id=content><h2 id=buildgradle-文件>build.gradle 文件</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>plugins <span class=o>{</span>
+</span></span><span class=line><span class=cl>    id<span class=o>(</span><span class=s2>&#34;com.linecorp.thrift-gradle-plugin&#34;</span><span class=o>)</span> version <span class=s2>&#34;0.5.0&#34;</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>dependencies <span class=o>{</span>
+</span></span><span class=line><span class=cl>    api<span class=o>(</span><span class=s1>&#39;org.apache.thrift:libthrift:0.19.0&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>    api<span class=o>(</span><span class=s1>&#39;org.springframework.boot:spring-boot-starter-logging&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>    api<span class=o>(</span><span class=s1>&#39;cn.hutool:hutool-all&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    testImplementation<span class=o>(</span><span class=s1>&#39;org.springframework.boot:spring-boot-starter-test&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=examplethrift-文件>example.thrift 文件</h2><p>文件放在路径: <code>src/main/thrift</code>, 运行 <code>gradle</code> 命令 <code>compileThrift</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-thrift data-lang=thrift><span class=line><span class=cl><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm> * The first thing to know about are types. The available types in Thrift are:
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> *  bool        Boolean, one byte
+</span></span></span><span class=line><span class=cl><span class=cm> *  i8 (byte)   Signed 8-bit integer
+</span></span></span><span class=line><span class=cl><span class=cm> *  i16         Signed 16-bit integer
+</span></span></span><span class=line><span class=cl><span class=cm> *  i32         Signed 32-bit integer
+</span></span></span><span class=line><span class=cl><span class=cm> *  i64         Signed 64-bit integer
+</span></span></span><span class=line><span class=cl><span class=cm> *  double      64-bit floating point value
+</span></span></span><span class=line><span class=cl><span class=cm> *  string      String
+</span></span></span><span class=line><span class=cl><span class=cm> *  binary      Blob (byte array)
+</span></span></span><span class=line><span class=cl><span class=cm> *  map&lt;t1,t2&gt;  Map from one type to another
+</span></span></span><span class=line><span class=cl><span class=cm> *  list&lt;t1&gt;    Ordered list of one type
+</span></span></span><span class=line><span class=cl><span class=cm> *  set&lt;t1&gt;     Set of unique elements of one type
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> * Did you also notice that Thrift supports C style comments?
+</span></span></span><span class=line><span class=cl><span class=cm> */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm> * Thrift files can namespace, package, or prefix their output in various
+</span></span></span><span class=line><span class=cl><span class=cm> * target languages.
+</span></span></span><span class=line><span class=cl><span class=cm> */</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>cl</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>cpp</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>d</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>dart</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>java</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>php</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>perl</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>haxe</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kn>namespace</span><span class=w> </span><span class=nn>netstd</span><span class=w> </span><span class=n>example</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>service</span><span class=w> </span><span class=nc>Calculator</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>   </span><span class=kt>i32</span><span class=w> </span><span class=nf>add</span><span class=o>(</span><span class=mi>1</span><span class=p>:</span><span class=kt>i32</span><span class=w> </span><span class=n>num1</span><span class=p>,</span><span class=w> </span><span class=mi>2</span><span class=p>:</span><span class=kt>i32</span><span class=w> </span><span class=n>num2</span><span class=p>),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=thrift-server-代码>thrift server 代码</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span><span class=lnt>90
+</span><span class=lnt>91
+</span><span class=lnt>92
+</span><span class=lnt>93
+</span><span class=lnt>94
+</span><span class=lnt>95
+</span><span class=lnt>96
+</span><span class=lnt>97
+</span><span class=lnt>98
+</span><span class=lnt>99
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=nd>@Slf4j</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kd>class</span> <span class=nc>ThriftServer</span> <span class=kd>implements</span> <span class=n>Closeable</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kd>static</span> <span class=kd>final</span> <span class=n>String</span> <span class=n>CLASS_NAME_SUFFIX_IFACE</span> <span class=o>=</span> <span class=s>&#34;$Iface&#34;</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kd>static</span> <span class=kd>final</span> <span class=n>String</span> <span class=n>CLASS_NAME_SUFFIX_PROCESSOR</span> <span class=o>=</span> <span class=s>&#34;$Processor&#34;</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kd>final</span> <span class=n>TMultiplexedProcessor</span> <span class=n>multiplexedProcessor</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TMultiplexedProcessor</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kd>final</span> <span class=n>AtomicBoolean</span> <span class=n>started</span> <span class=o>=</span> <span class=k>new</span> <span class=n>AtomicBoolean</span><span class=o>(</span><span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nd>@Getter</span>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kt>int</span> <span class=n>port</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nd>@Setter</span>
+</span></span><span class=line><span class=cl>  <span class=nd>@Getter</span>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kt>int</span> <span class=n>workerThreads</span> <span class=o>=</span> <span class=n>5</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=n>TNonblockingServerSocket</span> <span class=n>serverSocket</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=nf>ThriftServer</span><span class=o>(</span><span class=kt>int</span> <span class=n>port</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>port</span> <span class=o>=</span> <span class=n>port</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>start</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(!</span><span class=n>started</span><span class=o>.</span><span class=na>compareAndSet</span><span class=o>(</span><span class=kc>false</span><span class=o>,</span> <span class=kc>true</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>serverSocket</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TNonblockingServerSocket</span><span class=o>(</span><span class=n>port</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>TTransportException</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>log</span><span class=o>.</span><span class=na>error</span><span class=o>(</span><span class=s>&#34;start thrift server&#34;</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=k>throw</span> <span class=k>new</span> <span class=n>RuntimeException</span><span class=o>(</span><span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>TThreadedSelectorServer</span><span class=o>.</span><span class=na>Args</span> <span class=n>args</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TThreadedSelectorServer</span><span class=o>.</span><span class=na>Args</span><span class=o>(</span><span class=n>serverSocket</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>args</span><span class=o>.</span><span class=na>processor</span><span class=o>(</span><span class=n>multiplexedProcessor</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>args</span><span class=o>.</span><span class=na>workerThreads</span><span class=o>(</span><span class=n>workerThreads</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>TServer</span> <span class=n>server</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TThreadedSelectorServer</span><span class=o>(</span><span class=n>args</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>log</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;start thrift server on port {}&#34;</span><span class=o>,</span> <span class=n>port</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>server</span><span class=o>.</span><span class=na>serve</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>asyncStart</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Thread</span> <span class=n>thread</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Thread</span><span class=o>(</span><span class=k>this</span><span class=o>::</span><span class=n>start</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>thread</span><span class=o>.</span><span class=na>setDaemon</span><span class=o>(</span><span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>thread</span><span class=o>.</span><span class=na>setName</span><span class=o>(</span><span class=s>&#34;thrift-server&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>thread</span><span class=o>.</span><span class=na>start</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>addService</span><span class=o>(</span><span class=n>Object</span> <span class=n>service</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>processorClass</span> <span class=o>=</span> <span class=n>findProcessorClass</span><span class=o>(</span><span class=n>service</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>Object</span> <span class=n>processor</span> <span class=o>=</span> <span class=n>ReflectUtil</span><span class=o>.</span><span class=na>newInstance</span><span class=o>(</span><span class=n>processorClass</span><span class=o>,</span> <span class=n>service</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>addProcessor</span><span class=o>((</span><span class=n>TProcessor</span><span class=o>)</span> <span class=n>processor</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kd>synchronized</span> <span class=kt>void</span> <span class=nf>addProcessor</span><span class=o>(</span><span class=n>TProcessor</span> <span class=n>processor</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>processClassName</span> <span class=o>=</span> <span class=n>processor</span><span class=o>.</span><span class=na>getClass</span><span class=o>().</span><span class=na>getName</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>serviceName</span> <span class=o>=</span> <span class=n>processClassName</span><span class=o>.</span><span class=na>replace</span><span class=o>(</span><span class=n>CLASS_NAME_SUFFIX_PROCESSOR</span><span class=o>,</span> <span class=s>&#34;&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>log</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;add thrift processor {}&#34;</span><span class=o>,</span> <span class=n>serviceName</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>multiplexedProcessor</span><span class=o>.</span><span class=na>registerProcessor</span><span class=o>(</span><span class=n>serviceName</span><span class=o>,</span> <span class=n>processor</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>findProcessorClass</span><span class=o>(</span><span class=n>Object</span> <span class=n>service</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>interfaceClass</span> <span class=o>=</span> <span class=n>findInterfaceClass</span><span class=o>(</span><span class=n>service</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>interfaceName</span> <span class=o>=</span> <span class=n>interfaceClass</span><span class=o>.</span><span class=na>getName</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>processorClassName</span> <span class=o>=</span> <span class=n>interfaceName</span><span class=o>.</span><span class=na>replace</span><span class=o>(</span><span class=n>CLASS_NAME_SUFFIX_IFACE</span><span class=o>,</span> <span class=n>CLASS_NAME_SUFFIX_PROCESSOR</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>processorClazz</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>processorClazz</span> <span class=o>=</span> <span class=n>Class</span><span class=o>.</span><span class=na>forName</span><span class=o>(</span><span class=n>processorClassName</span><span class=o>,</span> <span class=kc>true</span><span class=o>,</span> <span class=n>interfaceClass</span><span class=o>.</span><span class=na>getClassLoader</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>ClassNotFoundException</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>throw</span> <span class=k>new</span> <span class=n>RuntimeException</span><span class=o>(</span><span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>processorClazz</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kd>static</span> <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>findInterfaceClass</span><span class=o>(</span><span class=n>Object</span> <span class=n>service</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>Assert</span><span class=o>.</span><span class=na>notNull</span><span class=o>(</span><span class=n>service</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>clazz</span> <span class=o>=</span> <span class=n>service</span><span class=o>.</span><span class=na>getClass</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>interfaceClazz</span> <span class=o>=</span> <span class=kc>null</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=o>(</span><span class=n>Class</span><span class=o>&lt;?&gt;</span> <span class=n>c</span> <span class=o>:</span> <span class=n>clazz</span><span class=o>.</span><span class=na>getInterfaces</span><span class=o>())</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=o>(</span><span class=n>c</span><span class=o>.</span><span class=na>getName</span><span class=o>().</span><span class=na>contains</span><span class=o>(</span><span class=n>CLASS_NAME_SUFFIX_IFACE</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>interfaceClazz</span> <span class=o>=</span> <span class=n>c</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>      <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>interfaceClazz</span> <span class=o>==</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>throw</span> <span class=k>new</span> <span class=n>IllegalArgumentException</span><span class=o>(</span><span class=s>&#34;service is not thrift implement object&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>interfaceClazz</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>close</span><span class=o>()</span> <span class=kd>throws</span> <span class=n>IOException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>serverSocket</span> <span class=o>!=</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>serverSocket</span><span class=o>.</span><span class=na>close</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=thrift-client-代码>thrift client 代码</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=nd>@Slf4j</span>
+</span></span><span class=line><span class=cl><span class=kd>public</span> <span class=kd>class</span> <span class=nc>ThriftClient</span> <span class=kd>implements</span> <span class=n>Closeable</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kd>static</span> <span class=kd>final</span> <span class=n>String</span> <span class=n>CLASS_NAME_SUFFIX_CLIENT</span> <span class=o>=</span> <span class=s>&#34;$Client&#34;</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=n>TTransport</span> <span class=n>transport</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=n>TProtocol</span> <span class=n>protocol</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kd>final</span> <span class=n>AtomicBoolean</span> <span class=n>started</span> <span class=o>=</span> <span class=k>new</span> <span class=n>AtomicBoolean</span><span class=o>(</span><span class=kc>false</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=n>String</span> <span class=n>host</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kt>int</span> <span class=n>port</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=nf>ThriftClient</span><span class=o>(</span><span class=n>String</span> <span class=n>host</span><span class=o>,</span> <span class=kt>int</span> <span class=n>port</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>host</span> <span class=o>=</span> <span class=n>host</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=o>.</span><span class=na>port</span> <span class=o>=</span> <span class=n>port</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>start</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(!</span><span class=n>started</span><span class=o>.</span><span class=na>compareAndSet</span><span class=o>(</span><span class=kc>false</span><span class=o>,</span> <span class=kc>true</span><span class=o>))</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>return</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>transport</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TSocket</span><span class=o>(</span><span class=n>host</span><span class=o>,</span> <span class=n>port</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>transport</span><span class=o>.</span><span class=na>open</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>      <span class=n>TTransport</span> <span class=n>framedTransport</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TFramedTransport</span><span class=o>(</span><span class=n>transport</span><span class=o>,</span> <span class=n>Integer</span><span class=o>.</span><span class=na>MAX_VALUE</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>protocol</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TBinaryProtocol</span><span class=o>(</span><span class=n>framedTransport</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>TTransportException</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>log</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;connect thrift error&#34;</span><span class=o>,</span> <span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=k>throw</span> <span class=k>new</span> <span class=n>RuntimeException</span><span class=o>(</span><span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=o>&lt;</span><span class=n>T</span> <span class=kd>extends</span> <span class=n>TServiceClient</span><span class=o>&gt;</span> <span class=n>T</span> <span class=nf>getClient</span><span class=o>(</span><span class=n>Class</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=n>clazz</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>start</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>className</span> <span class=o>=</span> <span class=n>clazz</span><span class=o>.</span><span class=na>getName</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>String</span> <span class=n>serviceName</span> <span class=o>=</span> <span class=n>className</span><span class=o>.</span><span class=na>replace</span><span class=o>(</span><span class=n>CLASS_NAME_SUFFIX_CLIENT</span><span class=o>,</span> <span class=s>&#34;&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>log</span><span class=o>.</span><span class=na>info</span><span class=o>(</span><span class=s>&#34;add thrift client {}&#34;</span><span class=o>,</span> <span class=n>serviceName</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>TMultiplexedProtocol</span> <span class=n>multiplexedProtocol</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TMultiplexedProtocol</span><span class=o>(</span><span class=n>protocol</span><span class=o>,</span> <span class=n>serviceName</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>ReflectUtil</span><span class=o>.</span><span class=na>newInstance</span><span class=o>(</span><span class=n>clazz</span><span class=o>,</span> <span class=n>multiplexedProtocol</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>close</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>(</span><span class=n>transport</span> <span class=o>!=</span> <span class=kc>null</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>transport</span><span class=o>.</span><span class=na>close</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=测试类相关代码>测试类相关代码</h2><p>实现类: <code>CalculatorHandler</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span> <span class=kd>class</span> <span class=nc>CalculatorHandler</span> <span class=kd>implements</span> <span class=n>Calculator</span><span class=o>.</span><span class=na>Iface</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>  <span class=nd>@Override</span>
+</span></span><span class=line><span class=cl>  <span class=kd>public</span> <span class=kt>int</span> <span class=nf>add</span><span class=o>(</span><span class=kt>int</span> <span class=n>num1</span><span class=o>,</span> <span class=kt>int</span> <span class=n>num2</span><span class=o>)</span> <span class=kd>throws</span> <span class=n>TException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>System</span><span class=o>.</span><span class=na>out</span><span class=o>.</span><span class=na>println</span><span class=o>(</span><span class=s>&#34;num1: &#34;</span> <span class=o>+</span> <span class=n>num1</span> <span class=o>+</span> <span class=s>&#34;, num2: &#34;</span> <span class=o>+</span> <span class=n>num2</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>num1</span> <span class=o>+</span> <span class=n>num2</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>测试类: <code>MultiThriftExampleTest</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span> <span class=kd>class</span> <span class=nc>MultiThriftExampleTest</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nd>@Test</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=nf>test1</span><span class=o>()</span> <span class=kd>throws</span> <span class=n>Exception</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=nd>@Cleanup</span> <span class=n>ThriftServer</span> <span class=n>thriftServer</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ThriftServer</span><span class=o>(</span><span class=n>9090</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>thriftServer</span><span class=o>.</span><span class=na>addService</span><span class=o>(</span><span class=k>new</span> <span class=n>CalculatorHandler</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>thriftServer</span><span class=o>.</span><span class=na>asyncStart</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@Cleanup</span> <span class=n>ThriftClient</span> <span class=n>thriftClient</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ThriftClient</span><span class=o>(</span><span class=s>&#34;localhost&#34;</span><span class=o>,</span> <span class=n>9090</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>Calculator</span><span class=o>.</span><span class=na>Client</span> <span class=n>client</span> <span class=o>=</span> <span class=n>thriftClient</span><span class=o>.</span><span class=na>getClient</span><span class=o>(</span><span class=n>Calculator</span><span class=o>.</span><span class=na>Client</span><span class=o>.</span><span class=na>class</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>sum</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=na>add</span><span class=o>(</span><span class=n>1</span><span class=o>,</span> <span class=n>2</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>assertEquals</span><span class=o>(</span><span class=n>3</span><span class=o>,</span> <span class=n>sum</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nd>@Test</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=nf>test2</span><span class=o>()</span> <span class=kd>throws</span> <span class=n>TException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>startServer</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>startClient</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kt>void</span> <span class=nf>startClient</span><span class=o>()</span> <span class=kd>throws</span> <span class=n>TException</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>TimeUnit</span><span class=o>.</span><span class=na>SECONDS</span><span class=o>.</span><span class=na>sleep</span><span class=o>(</span><span class=n>3</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>InterruptedException</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>throw</span> <span class=k>new</span> <span class=n>RuntimeException</span><span class=o>(</span><span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>TTransport</span> <span class=n>transport</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TSocket</span><span class=o>(</span><span class=s>&#34;localhost&#34;</span><span class=o>,</span> <span class=n>9090</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>transport</span><span class=o>.</span><span class=na>open</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>TTransport</span> <span class=n>framedTransport</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TFramedTransport</span><span class=o>(</span><span class=n>transport</span><span class=o>,</span> <span class=n>Integer</span><span class=o>.</span><span class=na>MAX_VALUE</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>TProtocol</span> <span class=n>protocol</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TBinaryProtocol</span><span class=o>(</span><span class=n>framedTransport</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>TMultiplexedProtocol</span> <span class=n>multiplexedProtocol</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TMultiplexedProtocol</span><span class=o>(</span><span class=n>protocol</span><span class=o>,</span> <span class=n>CalculatorHandler</span><span class=o>.</span><span class=na>class</span><span class=o>.</span><span class=na>getName</span><span class=o>());</span>
+</span></span><span class=line><span class=cl>    <span class=n>Calculator</span><span class=o>.</span><span class=na>Client</span> <span class=n>client</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Calculator</span><span class=o>.</span><span class=na>Client</span><span class=o>(</span><span class=n>multiplexedProtocol</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>add</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=na>add</span><span class=o>(</span><span class=n>1</span><span class=o>,</span> <span class=n>2</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>System</span><span class=o>.</span><span class=na>out</span><span class=o>.</span><span class=na>println</span><span class=o>(</span><span class=s>&#34;add: &#34;</span> <span class=o>+</span> <span class=n>add</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>transport</span><span class=o>.</span><span class=na>close</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kd>private</span> <span class=kt>void</span> <span class=nf>startServer</span><span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>new</span> <span class=n>Thread</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>CalculatorHandler</span> <span class=n>handler</span> <span class=o>=</span> <span class=k>new</span> <span class=n>CalculatorHandler</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>      <span class=n>Calculator</span><span class=o>.</span><span class=na>Processor</span><span class=o>&lt;</span><span class=n>CalculatorHandler</span><span class=o>&gt;</span> <span class=n>processor</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Calculator</span><span class=o>.</span><span class=na>Processor</span><span class=o>&lt;&gt;(</span><span class=n>handler</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>TNonblockingServerSocket</span> <span class=n>serverSocket</span><span class=o>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>try</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>serverSocket</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TNonblockingServerSocket</span><span class=o>(</span><span class=n>9090</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=o>}</span> <span class=k>catch</span> <span class=o>(</span><span class=n>TTransportException</span> <span class=n>e</span><span class=o>)</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>throw</span> <span class=k>new</span> <span class=n>RuntimeException</span><span class=o>(</span><span class=n>e</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=o>}</span>
+</span></span><span class=line><span class=cl>      <span class=n>TMultiplexedProcessor</span> <span class=n>multiplexedProcessor</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TMultiplexedProcessor</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>      <span class=n>multiplexedProcessor</span><span class=o>.</span><span class=na>registerProcessor</span><span class=o>(</span><span class=n>handler</span><span class=o>.</span><span class=na>getClass</span><span class=o>().</span><span class=na>getName</span><span class=o>(),</span> <span class=n>processor</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>TServer</span> <span class=n>server</span> <span class=o>=</span> <span class=k>new</span> <span class=n>TThreadedSelectorServer</span><span class=o>(</span><span class=k>new</span> <span class=n>TThreadedSelectorServer</span><span class=o>.</span><span class=na>Args</span><span class=o>(</span><span class=n>serverSocket</span><span class=o>).</span><span class=na>processor</span><span class=o>(</span><span class=n>multiplexedProcessor</span><span class=o>));</span>
+</span></span><span class=line><span class=cl>      <span class=n>System</span><span class=o>.</span><span class=na>out</span><span class=o>.</span><span class=na>println</span><span class=o>(</span><span class=s>&#34;Starting the simple server...&#34;</span><span class=o>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>server</span><span class=o>.</span><span class=na>serve</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>    <span class=o>}).</span><span class=na>start</span><span class=o>();</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-09-13 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE/ data-title="简单封装 thrift 协议"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE/ data-title="简单封装 thrift 协议"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/%E7%AE%80%E5%8D%95%E5%B0%81%E8%A3%85-thrift-%E5%8D%8F%E8%AE%AE/ data-title="简单封装 thrift 协议"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/thrift/>thrift</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E8%8E%B7%E5%8F%96%E9%85%8D%E7%BD%AE/ class=prev rel=prev title="源码分析 nacos 获取配置"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>源码分析 nacos 获取配置</a>
+<a href=/ooooo-notes/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-nacos-%E5%88%A0%E9%99%A4%E9%85%8D%E7%BD%AE/ class=next rel=next title="源码分析 nacos 删除配置">源码分析 nacos 删除配置<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.118.2">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/gitalk/gitalk.min.css><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/gitalk/gitalk.min.js></script><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:100},comment:{gitalk:{admin:["ooooo-youwillsee"],clientID:"9fcbefe148801287b34f",clientSecret:"3833b0f8bda400fb1ea7093446f340821394e501",id:"2023-09-13T08:00:00+08:00",owner:"ooooo-youwillsee",repo:"ooooo-notes-gitalk",title:"简单封装 thrift 协议"}},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>
