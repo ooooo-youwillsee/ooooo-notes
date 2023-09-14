@@ -1,6 +1,8 @@
 # 源码分析 nacos 同步服务和实例元数据信息
 
 
+> nacos 基于 2.2.4 版本
+
 在 `nacos` 中，手动创建 `service`，更新 `service`，删除 `service`，更新 `instance`，都是通过 `raft` 协议来实现的，所以来简单介绍下。
 
 ## service 元数据同步
@@ -214,5 +216,6 @@ public Response onApply(WriteRequest request) {
 }
 ```
 
+## 测试类
 
-
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#createService`

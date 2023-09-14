@@ -287,4 +287,7 @@ public void transportTerminated(Attributes transportAttrs) {
 }
 ```
 
+## 测试类
+
+`com.alibaba.nacos.core.remote.ConnectionManagerTest#testLoadSingle`
 

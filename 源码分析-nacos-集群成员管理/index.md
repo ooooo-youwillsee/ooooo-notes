@@ -1,6 +1,8 @@
 # 源码分析 nacos 集群成员管理
 
 
+> nacos 基于 2.2.4 版本
+
 在 nacos 中，集群成员分为**静态加载**和**动态加载**，**静态加载**就是读取 `cluster.conf` 文件，**动态加载**就是从`一个接口`中获取。
 
 ## 集群成员加载的入口
@@ -205,5 +207,10 @@ private void run() throws NacosException {
 }
 ```
 
+## 测试类
+
+`com.alibaba.nacos.test.core.cluster.MemberLookup_ITCase#test_a_lookup_file_config`
+
+`com.alibaba.nacos.test.core.cluster.MemberLookup_ITCase#test_c_lookup_address_server`
 
 

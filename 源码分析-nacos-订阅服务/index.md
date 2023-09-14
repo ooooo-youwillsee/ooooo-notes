@@ -217,3 +217,7 @@ private PushExecutor getPushExecuteService(String clientId, Subscriber subscribe
 // udpPushExecuteService 的逻辑比较简单，就是发送一个 udp 的数据包，这里不继续分析了。
 // rpcPushExecuteService 的逻辑就是发送一个 rpc 的数据包，后面的文章详说
 ```
+
+## 测试类
+
+`com.alibaba.nacos.test.naming.SubscribeCluster_ITCase#subscribeAdd`

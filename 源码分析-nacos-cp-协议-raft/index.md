@@ -1,6 +1,8 @@
 # 源码分析 nacos CP 协议 Raft
 
 
+> nacos 基于 2.2.4 版本
+
 ## raft 协议的初始化
 
 源码位置: `com.alibaba.nacos.core.distributed.raft.JRaftProtocol#init`
@@ -771,3 +773,6 @@ public CompletableFuture<Response> commit(final String group, final Message data
 3. `com.alibaba.nacos.config.server.service.repository.embedded.DistributedDatabaseOperateImpl`: 内嵌数据库
 
 
+## 测试类
+
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_false`
