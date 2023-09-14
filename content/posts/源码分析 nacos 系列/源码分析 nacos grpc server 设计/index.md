@@ -391,3 +391,8 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
     return streamObserver;
 }
 ```
+
+## 测试类
+
+`com.alibaba.nacos.core.remote.grpc.GrpcServerTest#testGrpcSdkServer`
+`com.alibaba.nacos.core.remote.grpc.GrpcServerTest#testGrpcClusterServer`

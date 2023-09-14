@@ -6,6 +6,8 @@ tags: [ nacos, source code, 源码分析 nacos 系列 ]
 categories: [ 源码分析 nacos 系列 ]
 ---
 
+> nacos 基于 2.2.4 版本
+
 在 `nacos` 中，**发布配置**分为 `http` 和 `grpc` 两种方式，分别为 `ConfigControllerV2#publishConfig` 和 `ConfigPublishRequestHandler`。这两个方法的处理逻辑都是**一样的**，所以我就选择 `http` 的方式来分析代码。
 
 ## 发布配置
@@ -631,3 +633,6 @@ public void run() {
 }
 ```
 
+## 测试类
+
+`com.alibaba.nacos.test.config.ConfigAPI_V2_CITCase#test`

@@ -251,6 +251,9 @@ private void onInstanceRegister(Service service, Instance instance, String clien
 }
 ```
 
+## 测试类
+
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`
 
 
 

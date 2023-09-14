@@ -240,5 +240,6 @@ public void run() {
 }
 ```
 
+## 测试类
 
-
+`com.alibaba.nacos.test.naming.SubscribeCluster_ITCase#subscribeAdd`

@@ -248,4 +248,6 @@ private void onInstanceDeregister(Service service, String clientId) {
 }
 ```
 
+## 测试类
 
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`

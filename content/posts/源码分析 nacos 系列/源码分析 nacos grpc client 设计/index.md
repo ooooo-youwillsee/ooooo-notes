@@ -327,3 +327,7 @@ private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRe
     });
 }
 ```
+
+## 测试类
+
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`

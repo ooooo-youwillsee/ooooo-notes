@@ -400,3 +400,7 @@ public boolean responsible(String responsibleTag) {
     return target >= index && target <= lastIndex;
 }
 ```
+
+## 测试类
+
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`

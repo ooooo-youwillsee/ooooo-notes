@@ -133,3 +133,7 @@ public void deregisterService(String serviceName, String groupName, Instance ins
     reqApi(UtilAndComs.nacosUrlInstance, params, HttpMethod.DELETE);
 }
 ```
+
+## 测试类
+
+`com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`
