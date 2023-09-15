@@ -74,20 +74,15 @@ service Calculator {
 @Slf4j
 public class ThriftServer implements Closeable {
 
-  public static final String CLASS_NAME_SUFFIX_IFACE = "$Iface";
+  private static final String CLASS_NAME_SUFFIX_IFACE = "$Iface";
 
-  public static final String CLASS_NAME_SUFFIX_PROCESSOR = "$Processor";
+  private static final String CLASS_NAME_SUFFIX_PROCESSOR = "$Processor";
 
   private final TMultiplexedProcessor multiplexedProcessor = new TMultiplexedProcessor();
 
   private final AtomicBoolean started = new AtomicBoolean(false);
 
-  @Getter
   private int port;
-
-  @Setter
-  @Getter
-  private int workerThreads = 5;
 
   private TNonblockingServerSocket serverSocket;
 
@@ -95,7 +90,7 @@ public class ThriftServer implements Closeable {
     this.port = port;
   }
 
-  public void start() {
+  public void startServer() {
     if (!started.compareAndSet(false, true)) {
       return;
     }
@@ -105,46 +100,33 @@ public class ThriftServer implements Closeable {
       log.error("start thrift server", e);
       throw new RuntimeException(e);
     }
-    TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverSocket);
-    args.processor(multiplexedProcessor);
-    args.workerThreads(workerThreads);
-
+    TThreadedSelectorServer.Args args = new TThreadedSelectorServer.Args(serverSocket).processor(multiplexedProcessor);
     TServer server = new TThreadedSelectorServer(args);
-    log.info("start thrift server on port {}", port);
-    server.serve();
+
+    new Thread(() -> {
+      log.info("start thrift server on port {}",port);
+      server.serve();
+      log.info("stop thrift server on port {}", port);
+    }, "thrift-server").start();
   }
 
-  public void asyncStart() {
-    Thread thread = new Thread(this::start);
-    thread.setDaemon(false);
-    thread.setName("thrift-server");
-    thread.start();
-  }
 
   public void addService(Object service) {
-    Class<?> processorClass = findProcessorClass(service);
-    Object processor = ReflectUtil.newInstance(processorClass, service);
-    addProcessor((TProcessor) processor);
-  }
-
-  private synchronized void addProcessor(TProcessor processor) {
-    String processClassName = processor.getClass().getName();
-    String serviceName = processClassName.replace(CLASS_NAME_SUFFIX_PROCESSOR, "");
-    log.info("add thrift processor {}", serviceName);
-    multiplexedProcessor.registerProcessor(serviceName, processor);
-  }
-
-  private Class<?> findProcessorClass(Object service) {
     Class<?> interfaceClass = findInterfaceClass(service);
-    String interfaceName = interfaceClass.getName();
-    String processorClassName = interfaceName.replace(CLASS_NAME_SUFFIX_IFACE, CLASS_NAME_SUFFIX_PROCESSOR);
-    Class<?> processorClazz;
+    addProcessor(interfaceClass, service);
+  }
+
+  private synchronized void addProcessor(Class<?> interfaceClass, Object service) {
+    String processorClassName = interfaceClass.getName().replace(CLASS_NAME_SUFFIX_IFACE, CLASS_NAME_SUFFIX_PROCESSOR);
+    Class<?> processorClass;
     try {
-      processorClazz = Class.forName(processorClassName, true, interfaceClass.getClassLoader());
+      processorClass = Class.forName(processorClassName, true, interfaceClass.getClassLoader());
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
-    return processorClazz;
+    TProcessor processor = (TProcessor) ReflectUtil.newInstance(processorClass, service);
+    log.info("add thrift interface {}", interfaceClass);
+    multiplexedProcessor.registerProcessor(interfaceClass.getName(), processor);
   }
 
   private static Class<?> findInterfaceClass(Object service) {
@@ -178,7 +160,9 @@ public class ThriftServer implements Closeable {
 @Slf4j
 public class ThriftClient implements Closeable {
 
-  public static final String CLASS_NAME_SUFFIX_CLIENT = "$Client";
+  private static final String CLASS_NAME_SUFFIX_IFACE = "$Iface";
+
+  private static final String CLASS_NAME_SUFFIX_CLIENT = "$Client";
 
   private TTransport transport;
 
@@ -195,7 +179,7 @@ public class ThriftClient implements Closeable {
     this.port = port;
   }
 
-  public void start() {
+  public void startClient() {
     if (!started.compareAndSet(false, true)) {
       return;
     }
@@ -210,13 +194,12 @@ public class ThriftClient implements Closeable {
     }
   }
 
-  public <T extends TServiceClient> T getClient(Class<T> clazz) {
-    start();
-    String className = clazz.getName();
-    String serviceName = className.replace(CLASS_NAME_SUFFIX_CLIENT, "");
-    log.info("add thrift client {}", serviceName);
-    TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, serviceName);
-    return ReflectUtil.newInstance(clazz, multiplexedProtocol);
+  public <T extends TServiceClient> T getClient(String interfaceClassName) {
+    log.info("add thrift interface {}", interfaceClassName);
+    String clientClassName = interfaceClassName.replace(CLASS_NAME_SUFFIX_IFACE, CLASS_NAME_SUFFIX_CLIENT);
+    Class<T> clientClass = ClassUtil.loadClass(clientClassName);
+    TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, interfaceClassName);
+    return ReflectUtil.newInstance(clientClass, multiplexedProtocol);
   }
 
   public void close() {
@@ -250,10 +233,11 @@ public class MultiThriftExampleTest {
   void test1() throws Exception {
     @Cleanup ThriftServer thriftServer = new ThriftServer(9090);
     thriftServer.addService(new CalculatorHandler());
-    thriftServer.asyncStart();
+    thriftServer.startServer();
 
     @Cleanup ThriftClient thriftClient = new ThriftClient("localhost", 9090);
-    Calculator.Client client = thriftClient.getClient(Calculator.Client.class);
+    thriftClient.startClient();
+    Calculator.Client client = thriftClient.getClient(Calculator.Iface.class.getName());
     int sum = client.add(1, 2);
     assertEquals(3, sum);
   }
@@ -274,7 +258,7 @@ public class MultiThriftExampleTest {
     transport.open();
     TTransport framedTransport = new TFramedTransport(transport, Integer.MAX_VALUE);
     TProtocol protocol = new TBinaryProtocol(framedTransport);
-    TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, CalculatorHandler.class.getName());
+    TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, Calculator.Iface.class.getName());
     Calculator.Client client = new Calculator.Client(multiplexedProtocol);
 
     int add = client.add(1, 2);
@@ -284,18 +268,18 @@ public class MultiThriftExampleTest {
   }
 
   private void startServer() {
+    CalculatorHandler handler = new CalculatorHandler();
+    Calculator.Processor<CalculatorHandler> processor = new Calculator.Processor<>(handler);
+    TNonblockingServerSocket serverSocket;
+    try {
+      serverSocket = new TNonblockingServerSocket(9090);
+    } catch (TTransportException e) {
+      throw new RuntimeException(e);
+    }
+    TMultiplexedProcessor multiplexedProcessor = new TMultiplexedProcessor();
+    multiplexedProcessor.registerProcessor(Calculator.Iface.class.getName(), processor);
+    TServer server = new TThreadedSelectorServer(new TThreadedSelectorServer.Args(serverSocket).processor(multiplexedProcessor));
     new Thread(() -> {
-      CalculatorHandler handler = new CalculatorHandler();
-      Calculator.Processor<CalculatorHandler> processor = new Calculator.Processor<>(handler);
-      TNonblockingServerSocket serverSocket;
-      try {
-        serverSocket = new TNonblockingServerSocket(9090);
-      } catch (TTransportException e) {
-        throw new RuntimeException(e);
-      }
-      TMultiplexedProcessor multiplexedProcessor = new TMultiplexedProcessor();
-      multiplexedProcessor.registerProcessor(handler.getClass().getName(), processor);
-      TServer server = new TThreadedSelectorServer(new TThreadedSelectorServer.Args(serverSocket).processor(multiplexedProcessor));
       System.out.println("Starting the simple server...");
       server.serve();
     }).start();
