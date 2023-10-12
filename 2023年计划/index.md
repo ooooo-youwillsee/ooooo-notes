@@ -54,7 +54,7 @@
 
 :one::zero:. [《云原生服务网格Istio：原理、实践、架构与源码解析》](https://book.douban.com/subject/34438220/) :white_check_mark:
 
-:one::one:. [《MySQL技术内幕》](https://book.douban.com/subject/24708143/)
+:one::one:. [《MySQL技术内幕》](https://book.douban.com/subject/24708143/) :o:
 
 :one::two:. [《深入解析Java虚拟机HotSpot》](https://book.douban.com/subject/35292715/)
 
@@ -72,7 +72,7 @@
 
 :one::nine:. [《算法训练营：海量图解+竞赛刷题（进阶篇）》](https://book.douban.com/subject/35430410/)
 
-:two::zero:. [《TCP/IP详解 卷1：协议》](https://book.douban.com/subject/1088054/) :o:
+:two::zero:. [《TCP/IP详解 卷1：协议》](https://book.douban.com/subject/1088054/) :white_check_mark:
 
 :two::one:. [《自己动手写Docker》](https://book.douban.com/subject/27082348/) :white_check_mark:
 
@@ -94,6 +94,7 @@
 
 :three::zero:. [《Kubernetes进阶实战（第2版）》](https://book.douban.com/subject/35355405/) :white_check_mark:
 
+:three::one:. [《数据密集型应用系统设计》](https://book.douban.com/subject/30329536/) :white_check_mark:
 
 ### 2、文档
 
@@ -119,7 +120,7 @@
 
 :zero::five:. [《dubbo 源码》](https://github.com/apache/dubbo) :o:
 
-:zero::six:. [《arthas》](https://github.com/alibaba/arthas)
+:zero::six:. [《arthas 源码》](https://github.com/alibaba/arthas)
 
 :zero::seven:. [《nsq 源码》](https://github.com/nsqio/nsq)
 
@@ -128,6 +129,8 @@
 :zero::nine:. [《serving 源码》](https://github.com/knative/serving)
 
 :one::zero:. [《grpc-go 源码》](https://github.com/grpc/grpc-go) :o:
+
+:one::one:. [《nacos 源码》](https://github.com/alibaba/nacos) :white_check_mark:
 
 ### 4、视频
 
