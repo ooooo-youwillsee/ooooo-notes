@@ -232,6 +232,10 @@ protected void executeOperations(final CommandContext commandContext) {
 }
 ```
 
+## 测试类
+
+`org.activiti.examples.bpmn.receivetask.ReceiveTaskTest#testWaitStateBehavior`
+
 
 
 
