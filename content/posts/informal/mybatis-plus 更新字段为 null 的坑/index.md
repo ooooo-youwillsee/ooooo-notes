@@ -32,7 +32,7 @@ JobEntityMapper.updateById(jobEntity);
 
 ```java
 // 添加 jdbcType
-@TableField(value = "LOCK_EXP_TIME_", updateStrategy = FieldStrategy.IGNORED, jdbcType = JdbcType.DATE)
+@TableField(value = "LOCK_EXP_TIME_", updateStrategy = FieldStrategy.IGNORED, jdbcType = JdbcType.TIMESTAMP)
 private Date lockExpirationTime;
 ```
 
