@@ -41,7 +41,7 @@ categories: [计划]
 
 :zero::one:. [《深入理解 Kafka：核心设计与实践原理》](https://book.douban.com/subject/30437872/)
 
-:zero::two:. [《分布式一致性算法开发实战》](https://book.douban.com/subject/35051108/)
+:zero::two:. [《分布式一致性算法开发实战》](https://book.douban.com/subject/35051108/) :x:
 
 :zero::three:. [《Go Web 编程》](https://book.douban.com/subject/27204133/) :white_check_mark:
 
@@ -61,7 +61,7 @@ categories: [计划]
 
 :one::one:. [《MySQL技术内幕》](https://book.douban.com/subject/24708143/) :o:
 
-:one::two:. [《深入解析Java虚拟机HotSpot》](https://book.douban.com/subject/35292715/)
+:one::two:. [《深入解析Java虚拟机HotSpot》](https://book.douban.com/subject/35292715/) 
 
 :one::three:. [《Rust权威指南》](https://book.douban.com/subject/35081743/) :white_check_mark:
 
@@ -89,13 +89,13 @@ categories: [计划]
 
 :two::five:. [《Kubernetes网络权威指南：基础、原理与实践）》](https://book.douban.com/subject/34855927/) :white_check_mark:
 
-:two::six:. [《Kubernetes Operator开发进阶》](https://book.douban.com/subject/36209350/) 
+:two::six:. [《Kubernetes Operator开发进阶》](https://book.douban.com/subject/36209350/) :x:
 
 :two::seven:. [《Kafka权威指南（第2版）》](https://book.douban.com/subject/36161660/)
 
 :two::eight:. [《操作系统导论》](https://book.douban.com/subject/33463930/) :o:
 
-:two::nine:. [《Go语言底层原理剖析》](https://book.douban.com/subject/35556889/) :o:
+:two::nine:. [《Go语言底层原理剖析》](https://book.douban.com/subject/35556889/) :x:
 
 :three::zero:. [《Kubernetes进阶实战（第2版）》](https://book.douban.com/subject/35355405/) :white_check_mark:
 
@@ -105,9 +105,9 @@ categories: [计划]
 
 :zero::one:. [《深入拆解 Java 虚拟机》](https://time.geekbang.org/column/intro/100010301)
 
-:zero::two:. [从 0 开始带你成为JVM实战高手]() :o:
+:zero::two:. [从 0 开始带你成为JVM实战高手]() :x:
 
-:zero::three:. [Go 语言项目开发实战](https://time.geekbang.org/column/intro/100079601) :o:
+:zero::three:. [Go 语言项目开发实战](https://time.geekbang.org/column/intro/100079601) :x:
 
 :zero::four:. [Redis 源码剖析与实战](https://time.geekbang.org/column/intro/100084301) :white_check_mark:
 
@@ -129,9 +129,9 @@ categories: [计划]
 
 :zero::seven:. [《nsq 源码》](https://github.com/nsqio/nsq)
 
-:zero::eight:. [《eventing 源码》](https://github.com/knative/eventing)
+:zero::eight:. [《eventing 源码》](https://github.com/knative/eventing) :x:
 
-:zero::nine:. [《serving 源码》](https://github.com/knative/serving)
+:zero::nine:. [《serving 源码》](https://github.com/knative/serving) :x:
 
 :one::zero:. [《grpc-go 源码》](https://github.com/grpc/grpc-go) :o:
 
@@ -163,9 +163,7 @@ categories: [计划]
 
 :zero::eight:. [《人性的弱点》](https://book.douban.com/subject/25985683/)
 
-:zero::nine:. [《数据密集型应用系统设计》](https://book.douban.com/subject/30329536/)
-
-:one::zero:. [《当我谈跑步时，我谈些什么》](https://book.douban.com/subject/4872222/)
+:zero::nine:. [《当我谈跑步时，我谈些什么》](https://book.douban.com/subject/4872222/)
 
 ### 2、尝试 :tada:
 
@@ -183,6 +181,6 @@ categories: [计划]
 
 :zero::three:. [《一本好书 2》](https://movie.douban.com/subject/34820448/)
 
-:zero::four:. [《天气之子》](https://movie.douban.com/subject/30402296/)
+:zero::four:. [《天气之子》](https://movie.douban.com/subject/30402296/) :white_check_mark:
 
 
