@@ -134,7 +134,7 @@
 
 ### 4、视频
 
-:zero::one:. [《玩转算法系列--图论精讲》](https://coding.imooc.com/class/370.html)
+:zero::one:. [《玩转算法系列--图论精讲》](https://coding.imooc.com/class/370.html) :x:
 
 :zero::two:. [《玩转算法面试》](https://coding.imooc.com/class/82.html) :o:
 
@@ -162,7 +162,7 @@
 
 ### 2、尝试 :tada:
 
-:zero::one:. 学会使用**尤克里里**弹奏
+:zero::one:. 学会使用**尤克里里**弹奏 :x:
 
 ### 3、了解 :tada:
 
