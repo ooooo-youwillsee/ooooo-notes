@@ -15,13 +15,13 @@ categories: [ 源码分析 activiti 系列 ]
 ```java
 // 部署流程
 public Deployment deploy() {
-  return repositoryService.deploy(this);
+    return repositoryService.deploy(this);
 }
 
 // org.activiti.engine.impl.RepositoryServiceImpl#deploy
 public Deployment deploy(DeploymentBuilderImpl deploymentBuilder) {
-  // 执行 DeployCmd, 最终会执行 DeployCmd#execute 方法
-  return commandExecutor.execute(new DeployCmd<Deployment>(deploymentBuilder));
+    // 执行 DeployCmd, 最终会执行 DeployCmd#execute 方法
+    return commandExecutor.execute(new DeployCmd<Deployment>(deploymentBuilder));
 }
 ```
 
@@ -32,41 +32,41 @@ public Deployment deploy(DeploymentBuilderImpl deploymentBuilder) {
 public Deployment execute(CommandContext commandContext) {
       // 执行部署
       return executeDeploy(commandContext);
-  }
+}
 
-  protected Deployment executeDeploy(CommandContext commandContext) {
-      // DeploymentEntity 表示部署, 里面包含了流程文件
-      DeploymentEntity newDeployment = setUpNewDeploymentFromContext(commandContext);
+protected Deployment executeDeploy(CommandContext commandContext) {
+    // DeploymentEntity 表示部署, 里面包含了流程文件
+    DeploymentEntity newDeployment = setUpNewDeploymentFromContext(commandContext);
 
-      // 判断是否过滤重复的
-      // 每次部署流程，可能只有一部分的流程发生了改变，所以不需要部署所有的流程
-      if (deploymentBuilder.isDuplicateFilterEnabled()) {
-          ...
-          if (!existingDeployments.isEmpty()) {
-              DeploymentEntity existingDeployment = (DeploymentEntity) existingDeployments.get(0);
+    // 判断是否过滤重复的
+    // 每次部署流程，可能只有一部分的流程发生了改变，所以不需要部署所有的流程
+    if (deploymentBuilder.isDuplicateFilterEnabled()) {
+        ...
+        if (!existingDeployments.isEmpty()) {
+            DeploymentEntity existingDeployment = (DeploymentEntity) existingDeployments.get(0);
 
-              // 对比流程文件是否发生改动
-              if (deploymentsDiffer(newDeployment, existingDeployment)) {
-                  applyUpgradeLogic(newDeployment, existingDeployment);
-              } else {
-                  LOGGER.info("An existing deployment of version {} matching the current one was found, no need to deploy again.",
-                      existingDeployment.getVersion());
-                  return existingDeployment;
-              }
-          }
-      }
+            // 对比流程文件是否发生改动
+            if (deploymentsDiffer(newDeployment, existingDeployment)) {
+                applyUpgradeLogic(newDeployment, existingDeployment);
+            } else {
+                LOGGER.info("An existing deployment of version {} matching the current one was found, no need to deploy again.",
+                    existingDeployment.getVersion());
+                return existingDeployment;
+            }
+        }
+    }
 
-      // 持久化部署，会把流程文件插入到数据库中，也会返回 deploymentId 和 version
-      persistDeploymentInDatabase(commandContext, newDeployment);
+    // 持久化部署，会把流程文件插入到数据库中，也会返回 deploymentId 和 version
+    persistDeploymentInDatabase(commandContext, newDeployment);
 
-      ...
-      LOGGER.info("Launching new deployment with version: " + newDeployment.getVersion());
-      // 部署流程
-      commandContext.getProcessEngineConfiguration().getDeploymentManager().deploy(newDeployment, deploymentSettings);
+    ...
+    LOGGER.info("Launching new deployment with version: " + newDeployment.getVersion());
+    // 部署流程
+    commandContext.getProcessEngineConfiguration().getDeploymentManager().deploy(newDeployment, deploymentSettings);
 
-      ...
-      return newDeployment;
-  }
+    ...
+    return newDeployment;
+}
 ```
 
 源码位置: `org.activiti.engine.impl.persistence.deploy.DeploymentManager#deploy`
@@ -74,10 +74,10 @@ public Deployment execute(CommandContext commandContext) {
 ```java
 // 部署流程
 public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-  // deployers 默认只有一个实现 BpmnDeployer
-  for (Deployer deployer : deployers) {
-    deployer.deploy(deployment, deploymentSettings);
-  }
+    // deployers 默认只有一个实现 BpmnDeployer
+    for (Deployer deployer : deployers) {
+        deployer.deploy(deployment, deploymentSettings);
+    }
 }
 ```
 
