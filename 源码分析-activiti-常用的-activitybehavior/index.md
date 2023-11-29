@@ -14,8 +14,8 @@
 ```java
 // 没有实现 execute，直接使用父类的方法
 public void execute(DelegateExecution execution) {
-  // 离开节点
-  leave(execution);
+    // 离开节点
+    leave(execution);
 }
 ```
 
@@ -28,12 +28,12 @@ public void execute(DelegateExecution execution) {
 ```java
 // 空实现，表示停在当前节点
 public void execute(DelegateExecution execution) {
-  // Do nothing: waitstate behavior
+    // Do nothing: waitstate behavior
 }
 
 // 调用 org.activiti.engine.RuntimeService#trigger 方法来流转到下个节点
 public void trigger(DelegateExecution execution, String signalName, Object data) {
-  leave(execution);
+    leave(execution);
 }
 ```
 
@@ -46,14 +46,14 @@ public void trigger(DelegateExecution execution, String signalName, Object data)
 ```java
 @Override
 public void execute(DelegateExecution execution) {
-  // 获取 connector
-  Connector connector = getConnector(getImplementation(execution));
-  // 执行
-  IntegrationContext integrationContext = connector.apply(integrationContextBuilder.from(execution));
-
-  variablesPropagator.propagate(execution, integrationContext.getOutBoundVariables());
-  // 离开节点
-  leave(execution);
+    // 获取 connector
+    Connector connector = getConnector(getImplementation(execution));
+    // 执行
+    IntegrationContext integrationContext = connector.apply(integrationContextBuilder.from(execution));
+  
+    variablesPropagator.propagate(execution, integrationContext.getOutBoundVariables());
+    // 离开节点
+    leave(execution);
 }
 ```
 
@@ -66,27 +66,27 @@ public void execute(DelegateExecution execution) {
 ```java
 // 这个方法的代码比较多，但是代码结构很清晰
 public void execute(DelegateExecution execution) {
-  CommandContext commandContext = Context.getCommandContext();
-  TaskEntityManager taskEntityManager = commandContext.getTaskEntityManager();
-
-  // 创建 TaskEntity，然后填充参数
-  TaskEntity task = taskEntityManager.create();
-  ExecutionEntity executionEntity = (ExecutionEntity) execution;
-  task.setExecution(executionEntity);
-  task.setTaskDefinitionKey(userTask.getId());
-  task.setBusinessKey(executionEntity.getProcessInstanceBusinessKey());
-
-  ...
-  // 新增 ACT_RU_TASK 表数据
-  taskEntityManager.insert(task, executionEntity);
-
-  ...
-  if (skipUserTask) {
-    // 删除 ACT_RU_TASK 表数据
-    taskEntityManager.deleteTask(task, null, false, false);
-    // 离开节点
-    leave(execution);
-  }
+    CommandContext commandContext = Context.getCommandContext();
+    TaskEntityManager taskEntityManager = commandContext.getTaskEntityManager();
+  
+    // 创建 TaskEntity，然后填充参数
+    TaskEntity task = taskEntityManager.create();
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    task.setExecution(executionEntity);
+    task.setTaskDefinitionKey(userTask.getId());
+    task.setBusinessKey(executionEntity.getProcessInstanceBusinessKey());
+  
+    ...
+    // 新增 ACT_RU_TASK 表数据
+    taskEntityManager.insert(task, executionEntity);
+  
+    ...
+    if (skipUserTask) {
+        // 删除 ACT_RU_TASK 表数据
+        taskEntityManager.deleteTask(task, null, false, false);
+        // 离开节点
+        leave(execution);
+    }
 }
 ```
 
@@ -101,20 +101,20 @@ public void execute(DelegateExecution execution) {
 ```java
 @Override
 public void execute(DelegateExecution execution) {
-  ExecutionEntity executionEntity = (ExecutionEntity) execution;
-  // 判断是否为边界事件
-  if (!(execution.getCurrentFlowElement() instanceof BoundaryEvent)) {
-    throw new ActivitiException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event");
-  }
-
-  JobManager jobManager = Context.getCommandContext().getJobManager();
-  // 创建定时任务
-  TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE,
-      TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-  if (timerJob != null) {
-    // 调度定时任务, 插入到 ACT_RU_TIMER_JOB 表
-    jobManager.scheduleTimerJob(timerJob);
-  }
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    // 判断是否为边界事件
+    if (!(execution.getCurrentFlowElement() instanceof BoundaryEvent)) {
+        throw new ActivitiException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event");
+    }
+  
+    JobManager jobManager = Context.getCommandContext().getJobManager();
+    // 创建定时任务
+    TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, interrupting, executionEntity, TriggerTimerEventJobHandler.TYPE,
+        TimerEventHandler.createConfiguration(execution.getCurrentActivityId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+    if (timerJob != null) {
+        // 调度定时任务, 插入到 ACT_RU_TIMER_JOB 表
+        jobManager.scheduleTimerJob(timerJob);
+    }
 }
 ```
 
@@ -126,7 +126,7 @@ public void execute(DelegateExecution execution) {
 
 ```java
 public void execute(DelegateExecution execution) {
-  // EndEvent 没有连线了，所以会结束流程, 会执行 Agenda#planEndExecutionOperation 
-  Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
+    // EndEvent 没有连线了，所以会结束流程, 会执行 Agenda#planEndExecutionOperation 
+    Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
 }
 ```

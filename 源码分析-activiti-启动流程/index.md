@@ -63,19 +63,19 @@ public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(Proce
                                                                          String businessKey, String processInstanceName, FlowElement initialFlowElement,
                                                                          Process process, Map<String, Object> variables, Map<String, Object> transientVariables, boolean startProcessInstance) {
 
-  // 创建流程实例
-  ExecutionEntity processInstance = createProcessInstanceWithInitialFlowElement(processDefinition,
-      businessKey,
-      processInstanceName,
-      initialFlowElement,
-      process);
-  if (startProcessInstance) {
-      CommandContext commandContext = Context.getCommandContext();
-      // 启动流程实例
-      startProcessInstance(processInstance, commandContext, variables, initialFlowElement, transientVariables);
-  }
-  // 返回
-  return processInstance;
+    // 创建流程实例
+    ExecutionEntity processInstance = createProcessInstanceWithInitialFlowElement(processDefinition,
+        businessKey,
+        processInstanceName,
+        initialFlowElement,
+        process);
+    if (startProcessInstance) {
+        CommandContext commandContext = Context.getCommandContext();
+        // 启动流程实例
+        startProcessInstance(processInstance, commandContext, variables, initialFlowElement, transientVariables);
+    }
+    // 返回
+    return processInstance;
 }
 ```
 
@@ -125,19 +125,19 @@ public ExecutionEntity createProcessInstanceWithInitialFlowElement(ProcessDefini
 ```java
 // 启动流程实例
 public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables, FlowElement initialFlowElement, Map<String, Object> transientVariables) {
-  Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
-  createProcessVariables(processInstance, variables, transientVariables, process);
-  recordStartProcessInstance(commandContext, initialFlowElement, processInstance);
-
-  ...省略了事件子流程的代码
-  // 在创建流程时，会将子节点加入到父节点的节点列表中, 这样就可以从流程实例中获取子节点
-  // There will always be one child execution created
-  ExecutionEntity execution = processInstance.getExecutions().get(0); 
-
-  execution.setAppVersion(processInstance.getAppVersion());
-
-  // 流转节点，这个非常重要, 会在下一节继续分析
-  commandContext.getAgenda().planContinueProcessOperation(execution);
+    Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
+    createProcessVariables(processInstance, variables, transientVariables, process);
+    recordStartProcessInstance(commandContext, initialFlowElement, processInstance);
+  
+    ...省略了事件子流程的代码
+    // 在创建流程时，会将子节点加入到父节点的节点列表中, 这样就可以从流程实例中获取子节点
+    // There will always be one child execution created
+    ExecutionEntity execution = processInstance.getExecutions().get(0); 
+  
+    execution.setAppVersion(processInstance.getAppVersion());
+  
+    // 流转节点，这个非常重要, 会在下一节继续分析
+    commandContext.getAgenda().planContinueProcessOperation(execution);
 }
 ```
 

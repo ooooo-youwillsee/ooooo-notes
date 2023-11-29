@@ -13,8 +13,8 @@
 // 流转 startEvent 节点，在启动流程之后，就会调用这个方法
 @Override
 public void planContinueProcessOperation(ExecutionEntity execution) {
-  // 最终会执行 ContinueProcessOperation#run 方法
-  planOperation(new ContinueProcessOperation(commandContext, execution));
+    // 最终会执行 ContinueProcessOperation#run 方法
+    planOperation(new ContinueProcessOperation(commandContext, execution));
 }
 ```
 
@@ -24,17 +24,17 @@ public void planContinueProcessOperation(ExecutionEntity execution) {
 // 执行 ContinueProcessOperation#run 方法
 @Override
 public void run() {
-  // 获取当前节点
-  FlowElement currentFlowElement = getCurrentFlowElement(execution);
-  if (currentFlowElement instanceof FlowNode) {
-      // 处理节点
-      continueThroughFlowNode((FlowNode) currentFlowElement);
-  } else if (currentFlowElement instanceof SequenceFlow) {
-      // 处理连线
-      continueThroughSequenceFlow((SequenceFlow) currentFlowElement);
-  } else {
-      throw new ActivitiException("Programmatic error: no current flow element found or invalid type: " + currentFlowElement + ". Halting.");
-  }
+    // 获取当前节点
+    FlowElement currentFlowElement = getCurrentFlowElement(execution);
+    if (currentFlowElement instanceof FlowNode) {
+        // 处理节点
+        continueThroughFlowNode((FlowNode) currentFlowElement);
+    } else if (currentFlowElement instanceof SequenceFlow) {
+        // 处理连线
+        continueThroughSequenceFlow((SequenceFlow) currentFlowElement);
+    } else {
+        throw new ActivitiException("Programmatic error: no current flow element found or invalid type: " + currentFlowElement + ". Halting.");
+    }
 }
 ```
 
@@ -44,25 +44,25 @@ public void run() {
 // 处理节点
 protected void continueThroughFlowNode(FlowNode flowNode) {
 
-  // Check if it's the initial flow element. If so, we must fire the execution listeners for the process too
-  if (flowNode.getIncomingFlows() != null
-          && flowNode.getIncomingFlows().size() == 0
-          && flowNode.getSubProcess() == null) {
-      // 发布 StartExecution 事件
-      executeProcessStartExecutionListeners();
-  }
-
-  ...
-  if (isMultiInstance(flowNode)) {
-      // the multi instance execution will look at async
-      executeMultiInstanceSynchronous(flowNode);
-  } else if (forceSynchronousOperation || !flowNode.isAsynchronous()) {
-      // 同步执行，这里会等待流转节点完成, 重点分析这个，默认都是同步执行
-      executeSynchronous(flowNode);
-  } else {
-      // 异步执行, 不会等待
-      executeAsynchronous(flowNode);
-  }
+    // Check if it's the initial flow element. If so, we must fire the execution listeners for the process too
+    if (flowNode.getIncomingFlows() != null
+            && flowNode.getIncomingFlows().size() == 0
+            && flowNode.getSubProcess() == null) {
+        // 发布 StartExecution 事件
+        executeProcessStartExecutionListeners();
+    }
+  
+    ...
+    if (isMultiInstance(flowNode)) {
+        // the multi instance execution will look at async
+        executeMultiInstanceSynchronous(flowNode);
+    } else if (forceSynchronousOperation || !flowNode.isAsynchronous()) {
+        // 同步执行，这里会等待流转节点完成, 重点分析这个，默认都是同步执行
+        executeSynchronous(flowNode);
+    } else {
+        // 异步执行, 不会等待
+        executeAsynchronous(flowNode);
+    }
 }
 ```
 
@@ -71,42 +71,42 @@ protected void continueThroughFlowNode(FlowNode flowNode) {
 ```java
 // 同步执行，这里会等待流转节点完成
 protected void executeSynchronous(FlowNode flowNode) {
-  // 会插入到历史节点表 ACT_HI_ACTINST
-  commandContext.getHistoryManager().recordActivityStart(execution);
-
-  // Execution listener: event 'start'
-  // 执行监听器，默认为空
-  if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-      executeExecutionListeners(flowNode,
-                                ExecutionListener.EVENTNAME_START);
-  }
+    // 会插入到历史节点表 ACT_HI_ACTINST
+    commandContext.getHistoryManager().recordActivityStart(execution);
   
-  // Execute any boundary events, sub process boundary events will be executed from the activity behavior
-  if (!inCompensation && flowNode instanceof Activity) { // Only activities can have boundary events
-      List<BoundaryEvent> boundaryEvents = ((Activity) flowNode).getBoundaryEvents();
-      if (CollectionUtil.isNotEmpty(boundaryEvents)) {
-          // 执行 BoundaryEvent，这个很重要，会在以后的章节解析
-          // 这里会新增一条 ACT_RU_EXECUTION 表的数据
-          executeBoundaryEvents(boundaryEvents, execution);
-      }
-  }
-
-  // Execute actual behavior
-  // 获取 behavior, 在【解析流程】章节说过的
-  ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
-
-  if (activityBehavior != null) {
-      // 执行 behavior
-      // 当前的 flowNode 是 StartEvent，所以 behavior 为 NoneStartEventActivityBehavior
-      executeActivityBehavior(activityBehavior,
-                              flowNode);
-  } else {
-      logger.debug("No activityBehavior on activity '{}' with execution {}",
-                   flowNode.getId(),
-                   execution.getId());
-      // behavior 为 null，会流转到下个节点
-      Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
-  }
+    // Execution listener: event 'start'
+    // 执行监听器，默认为空
+    if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
+        executeExecutionListeners(flowNode,
+                                  ExecutionListener.EVENTNAME_START);
+    }
+    
+    // Execute any boundary events, sub process boundary events will be executed from the activity behavior
+    if (!inCompensation && flowNode instanceof Activity) { // Only activities can have boundary events
+        List<BoundaryEvent> boundaryEvents = ((Activity) flowNode).getBoundaryEvents();
+        if (CollectionUtil.isNotEmpty(boundaryEvents)) {
+            // 执行 BoundaryEvent，这个很重要，会在以后的章节解析
+            // 这里会新增一条 ACT_RU_EXECUTION 表的数据
+            executeBoundaryEvents(boundaryEvents, execution);
+        }
+    }
+  
+    // Execute actual behavior
+    // 获取 behavior, 在【解析流程】章节说过的
+    ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
+  
+    if (activityBehavior != null) {
+        // 执行 behavior
+        // 当前的 flowNode 是 StartEvent，所以 behavior 为 NoneStartEventActivityBehavior
+        executeActivityBehavior(activityBehavior,
+                                flowNode);
+    } else {
+        logger.debug("No activityBehavior on activity '{}' with execution {}",
+                     flowNode.getId(),
+                     execution.getId());
+        // behavior 为 null，会流转到下个节点
+        Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
+    }
 }
 ```
 
@@ -121,8 +121,8 @@ public void execute(DelegateExecution execution) {
 
 // 离开当前节点
 public void leave(DelegateExecution execution) {
-  // 执行 outgoing
-  bpmnActivityBehavior.performDefaultOutgoingBehavior((ExecutionEntity) execution);
+    // 执行 outgoing
+    bpmnActivityBehavior.performDefaultOutgoingBehavior((ExecutionEntity) execution);
 }
 
 // 执行 outgoing
@@ -140,21 +140,21 @@ protected void performOutgoingBehavior(ExecutionEntity execution,
 // TakeOutgoingSequenceFlowsOperation
 @Override
 public void run() {
-  // 当前节点元素，此时是 startEvent
-  FlowElement currentFlowElement = getCurrentFlowElement(execution);
-
-  ...
-  // When leaving the current activity, we need to delete any related execution (eg active boundary events)
-  // 这里会清除 BoundaryEvent, 也就是删除表中的数据
-  cleanupExecutions(currentFlowElement);
-
-  if (currentFlowElement instanceof FlowNode) {
-      // 处理节点，最终会执行 leaveFlowNode 方法
-      handleFlowNode((FlowNode) currentFlowElement);
-  } else if (currentFlowElement instanceof SequenceFlow) {
-      // 处理连线, 会执行 planContinueProcessOperation
-      handleSequenceFlow();
-  }
+    // 当前节点元素，此时是 startEvent
+    FlowElement currentFlowElement = getCurrentFlowElement(execution);
+  
+    ...
+    // When leaving the current activity, we need to delete any related execution (eg active boundary events)
+    // 这里会清除 BoundaryEvent, 也就是删除表中的数据
+    cleanupExecutions(currentFlowElement);
+  
+    if (currentFlowElement instanceof FlowNode) {
+        // 处理节点，最终会执行 leaveFlowNode 方法
+        handleFlowNode((FlowNode) currentFlowElement);
+    } else if (currentFlowElement instanceof SequenceFlow) {
+        // 处理连线, 会执行 planContinueProcessOperation
+        handleSequenceFlow();
+    }
 }
 ```
 
@@ -237,16 +237,16 @@ protected void leaveFlowNode(FlowNode flowNode) {
 ```java
 // 流转到第二个节点
 protected void continueThroughSequenceFlow(SequenceFlow sequenceFlow) {
-  ...
-  // 获取目标节点，也就是第二个节点
-  FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
-  execution.setCurrentFlowElement(targetFlowElement);
-
-  logger.debug("Sequence flow '{}' encountered. Continuing process by following it using execution {}",
-               sequenceFlow.getId(),
-               execution.getId());
-  // 继续执行 ContinueProcessOperation，这里就回到了第一个方法调用的逻辑
-  Context.getAgenda().planContinueProcessOperation(execution);
+    ...
+    // 获取目标节点，也就是第二个节点
+    FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
+    execution.setCurrentFlowElement(targetFlowElement);
+  
+    logger.debug("Sequence flow '{}' encountered. Continuing process by following it using execution {}",
+                 sequenceFlow.getId(),
+                 execution.getId());
+    // 继续执行 ContinueProcessOperation，这里就回到了第一个方法调用的逻辑
+    Context.getAgenda().planContinueProcessOperation(execution);
 }
 ```
 
