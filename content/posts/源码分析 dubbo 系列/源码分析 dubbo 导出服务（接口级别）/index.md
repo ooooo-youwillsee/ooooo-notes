@@ -35,6 +35,8 @@ public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcExceptio
 }
 ```
 
+## ZookeeperRegistry#register 注册服务
+
 源码位置: `org.apache.dubbo.registry.support.FailbackRegistry#register`
 
 ```java
