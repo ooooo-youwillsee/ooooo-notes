@@ -5,7 +5,7 @@
 
 > 在 `dubbo` 中**导出服务的源码是非常复杂**的，这里只介绍**主要流程**。
 
-## exportServices 导出服务
+## DefaultModuleDeployer#exportServices 导出服务
 
 源码位置: `org.apache.dubbo.config.deploy.DefaultModuleDeployer#exportServices`
 
@@ -441,7 +441,7 @@ public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcExceptio
     final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
   
     // url to registry
-    // 根据 SPI 机制获取对应的 registry 实现类
+    // 根据 SPI 机制获取对应的 registry 实现类, 比如 ServiceDiscoveryRegistry
     final Registry registry = getRegistry(registryUrl);
     // 获取注册的 url
     final URL registeredProviderUrl = getUrlToRegistry(providerUrl, registryUrl);
@@ -512,7 +512,7 @@ protected void exported() {
 }
 ```
 
-## registerServices 注册服务
+## DefaultModuleDeployer#registerServices 注册服务
 
 源码位置: `org.apache.dubbo.config.deploy.DefaultModuleDeployer#registerServices`
 
