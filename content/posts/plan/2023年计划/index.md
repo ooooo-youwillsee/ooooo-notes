@@ -67,9 +67,9 @@ categories: [计划]
 
 :one::four:. [《深入剖析Kubernetes》](https://book.douban.com/subject/35424872/)
 
-:one::five:. [《Kubernetes编程》](https://book.douban.com/subject/35498478/) :o:
+:one::five:. [《Kubernetes编程》](https://book.douban.com/subject/35498478/) :x:
 
-:one::six:. [《Kubernetes设计模式》](https://book.douban.com/subject/35175701/)
+:one::six:. [《Kubernetes设计模式》](https://book.douban.com/subject/35175701/) :x:
 
 :one::seven:. [《深入剖析Java虚拟机》](https://book.douban.com/subject/35571969/)
 
@@ -119,7 +119,7 @@ categories: [计划]
 
 :zero::two:. [《kubernetes 源码》](https://github.com/kubernetes/kubernetes) :o:
 
-:zero::three:. [《istio 源码》](https://github.com/istio/istio)  :o:
+:zero::three:. [《istio 源码》](https://github.com/istio/istio)  :x:
 
 :zero::four:. [《etcd 源码》](https://github.com/etcd-io/etcd)
 
@@ -127,21 +127,23 @@ categories: [计划]
 
 :zero::six:. [《arthas 源码》](https://github.com/alibaba/arthas)
 
-:zero::seven:. [《nsq 源码》](https://github.com/nsqio/nsq)
+:zero::seven:. [《nsq 源码》](https://github.com/nsqio/nsq) :x:
 
 :zero::eight:. [《eventing 源码》](https://github.com/knative/eventing) :x:
 
 :zero::nine:. [《serving 源码》](https://github.com/knative/serving) :x:
 
-:one::zero:. [《grpc-go 源码》](https://github.com/grpc/grpc-go) :o:
+:one::zero:. [《grpc-go 源码》](https://github.com/grpc/grpc-go)
 
 :one::one:. [《nacos 源码》](https://github.com/alibaba/nacos) :white_check_mark:
+
+:one::two:. [《activiti 源码》](https://github.com/Activiti/Activiti) :white_check_mark:
 
 ### 4、视频
 
 :zero::one:. [《玩转算法系列--图论精讲》](https://coding.imooc.com/class/370.html) :x:
 
-:zero::two:. [《玩转算法面试》](https://coding.imooc.com/class/82.html) :o:
+:zero::two:. [《玩转算法面试》](https://coding.imooc.com/class/82.html) :x:
 
 ## 4、关于其他
 
