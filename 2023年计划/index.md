@@ -96,6 +96,10 @@
 
 :three::one:. [《数据密集型应用系统设计》](https://book.douban.com/subject/30329536/) :white_check_mark:
 
+:three::two:. [《C++语言导学（第二版）》](https://book.douban.com/subject/34809273/) :white_check_mark:
+
+:three::three:. [《Linux内核设计与实现(原书第3版)》](https://book.douban.com/subject/6097773/) :o:
+
 ### 2、文档
 
 :zero::one:. [《深入拆解 Java 虚拟机》](https://time.geekbang.org/column/intro/100010301)
