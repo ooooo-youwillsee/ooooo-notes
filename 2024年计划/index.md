@@ -21,6 +21,12 @@
 
 :zero::five:. [《Vim实用技巧（第2版）》](https://book.douban.com/subject/26967597/) :o:
 
+:zero::six:. [《C和指针》](https://book.douban.com/subject/3012360/)
+
+:zero::seven:. [《C专家编程》](https://book.douban.com/subject/2377310/)
+
+:zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/)
+
 ## 2. 关于源码笔记
 
 :zero::one:. [《rocketmq 源码》](https://github.com/apache/rocketmq) :o:
@@ -33,4 +39,4 @@
 
 :zero::five:. [《netty 源码》](https://github.com/netty/netty)
 
-
+:zero::six:. [《tomcat 源码》](https://github.com/apache/tomcat)

@@ -68,7 +68,7 @@
 
 :one::seven:. [《深入剖析Java虚拟机》](https://book.douban.com/subject/35571969/)
 
-:one::eight:. [《算法训练营：海量图解+竞赛刷题（入门篇》](https://book.douban.com/subject/35528404/) :o:
+:one::eight:. [《算法训练营：海量图解+竞赛刷题（入门篇》](https://book.douban.com/subject/35528404/) :white_check_mark:
 
 :one::nine:. [《算法训练营：海量图解+竞赛刷题（进阶篇）》](https://book.douban.com/subject/35430410/)
 
