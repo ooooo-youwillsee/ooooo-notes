@@ -11,7 +11,7 @@
 
 ## 1. 关于阅读
 
-:zero::one:. [《操作系统导论》](https://book.douban.com/subject/33463930/) :o:
+:zero::one:. [《操作系统导论》](https://book.douban.com/subject/33463930/) :white_check_mark:
 
 :zero::two:. [《深入理解计算机系统（原书第3版）》](https://book.douban.com/subject/26912767/) :o:
 
@@ -26,6 +26,10 @@
 :zero::seven:. [《C专家编程》](https://book.douban.com/subject/2377310/)
 
 :zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/)
+
+:zero::nine:. [Rust 编程第一课](https://time.geekbang.org/column/intro/100085301)
+
+:one::zero:. [长安的荔枝](https://book.douban.com/subject/36104107/) :white_check_mark:
 
 ## 2. 关于源码笔记
 
