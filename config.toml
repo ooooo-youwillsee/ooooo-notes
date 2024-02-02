@@ -139,7 +139,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
   # {{< version 0.2.0 >}} List (目录或标签) 页面配置
   [params.list]
     # list 页面每页显示文章数量
-    paginate = 20
+    paginate = 10
     # 日期格式 (月和日)
     dateFormat = "01-02"
     # RSS 文章数目
