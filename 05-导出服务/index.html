@@ -1,0 +1,1177 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>05 导出服务 - 线偶的IT笔记</title><meta name=Description content="线偶的IT笔记"><meta property="og:title" content="05 导出服务">
+<meta property="og:description" content="dubbo 基于 3.2.6 版本 在 dubbo 中导出服务的源码是非常复杂的，这里只介绍主要流程。 DefaultModuleDeployer#exportServices 导出服务 源码位置: org.apache.dubbo.config.deploy.DefaultModuleDeployer#exportServices 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26"><meta property="og:type" content="article"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1/"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-11-25T08:00:00+08:00"><meta property="article:modified_time" content="2023-11-25T08:00:00+08:00"><meta property="og:site_name" content="我的网站"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="05 导出服务"><meta name=twitter:description content="dubbo 基于 3.2.6 版本 在 dubbo 中导出服务的源码是非常复杂的，这里只介绍主要流程。 DefaultModuleDeployer#exportServices 导出服务 源码位置: org.apache.dubbo.config.deploy.DefaultModuleDeployer#exportServices 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/%E4%BB%8E%E9%9B%B6%E5%AD%A6-dubbo/><link rel=next href=https://ooooo-youwillsee.github.io/ooooo-notes/06-%E5%BC%95%E7%94%A8%E6%9C%8D%E5%8A%A1/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"05 导出服务","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1\/"},"genre":"posts","keywords":"dubbo, source code, 源码分析 dubbo 系列","wordcount":3568,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1\/","datePublished":"2023-11-25T08:00:00+08:00","dateModified":"2023-11-25T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"ooooo-youwillsee"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章 </a><a class=menu-item href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签 </a><a class=menu-item href=/ooooo-notes/categories/><i class='fa fa-archive' aria-hidden=true></i> 分类 </a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder="Search titles or contents..." id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i>
+</a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i>
+</a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i>
+</span></span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span>线偶</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder="Search titles or contents..." id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i>
+</a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i>
+</a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/ooooo-notes/posts/ title><i class='fa fa-list' aria-hidden=true></i>文章</a><a class=menu-item href=/ooooo-notes/tags/ title><i class='fa fa-tags' aria-hidden=true></i>标签</a><a class=menu-item href=/ooooo-notes/categories/ title><i class='fa fa-archive' aria-hidden=true></i>分类</a><a class=menu-item href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">05 导出服务</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://github.com/ooooo-youwillsee title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>ooooo-youwillsee</a></span>&nbsp;<span class=post-category>included in <a href=/ooooo-notes/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-dubbo-%E7%B3%BB%E5%88%97/><i class="far fa-folder fa-fw" aria-hidden=true></i>源码分析 dubbo 系列</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="2023-11-25 08:00:00">2023-11-25 08:00:00</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;3568 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;8 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#defaultmoduledeployerexportservices-导出服务>DefaultModuleDeployer#exportServices 导出服务</a><ul><li><a href=#doexporturls-导出接口>doExportUrls 导出接口</a></li><li><a href=#loadregistries-加载注册中心>loadRegistries 加载注册中心</a></li><li><a href=#doexporturlsfor1protocol-对单协议导出>doExportUrlsFor1Protocol 对单协议导出</a></li><li><a href=#exportremote-导出接口>exportRemote 导出接口</a></li><li><a href=#registryprotocolexport-导出接口>RegistryProtocol#export 导出接口</a></li><li><a href=#serviceconfigexported>ServiceConfig#exported</a></li></ul></li><li><a href=#defaultmoduledeployerregisterservices-注册服务>DefaultModuleDeployer#registerServices 注册服务</a><ul><li><a href=#exporterchangeablewrapperregister>ExporterChangeableWrapper#register</a></li><li><a href=#servicediscoveryregistryregister-服务级别注册>ServiceDiscoveryRegistry#register 服务级别注册</a></li></ul></li><li><a href=#defaultapplicationdeployerrefreshserviceinstance-刷新服务实例>DefaultApplicationDeployer#refreshServiceInstance 刷新服务实例</a><ul><li><a href=#servicediscoveryupdate-更新服务实例>ServiceDiscovery#update 更新服务实例</a></li></ul></li></ul></nav></div></div><div class=content id=content><blockquote><p>dubbo 基于 3.2.6 版本</p></blockquote><blockquote><p>在 <code>dubbo</code> 中<strong>导出服务的源码是非常复杂</strong>的，这里只介绍<strong>主要流程</strong>。</p></blockquote><h2 id=defaultmoduledeployerexportservices-导出服务>DefaultModuleDeployer#exportServices 导出服务</h2><p>源码位置: <code>org.apache.dubbo.config.deploy.DefaultModuleDeployer#exportServices</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>exportServices</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 遍历 serviceConfig</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>ServiceConfigBase</span><span class=w> </span><span class=n>sc</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>configManager</span><span class=p>.</span><span class=na>getServices</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>exportServiceInternal</span><span class=p>(</span><span class=n>sc</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>exportServiceInternal</span><span class=p>(</span><span class=n>ServiceConfigBase</span><span class=w> </span><span class=n>sc</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ServiceConfig</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>serviceConfig</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>ServiceConfig</span><span class=o>&lt;?&gt;</span><span class=p>)</span><span class=w> </span><span class=n>sc</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 刷新服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>serviceConfig</span><span class=p>.</span><span class=na>isRefreshed</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>serviceConfig</span><span class=p>.</span><span class=na>refresh</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sc</span><span class=p>.</span><span class=na>isExported</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 异步导出服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>exportAsync</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>sc</span><span class=p>.</span><span class=na>shouldExportAsync</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ExecutorService</span><span class=w> </span><span class=n>executor</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>executorRepository</span><span class=p>.</span><span class=na>getServiceExportExecutor</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>CompletableFuture</span><span class=o>&lt;</span><span class=n>Void</span><span class=o>&gt;</span><span class=w> </span><span class=n>future</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>CompletableFuture</span><span class=p>.</span><span class=na>runAsync</span><span class=p>(()</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>sc</span><span class=p>.</span><span class=na>isExported</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>sc</span><span class=p>.</span><span class=na>export</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>exportedServices</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>sc</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>catch</span><span class=w> </span><span class=p>(</span><span class=n>Throwable</span><span class=w> </span><span class=n>t</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>logger</span><span class=p>.</span><span class=na>error</span><span class=p>(</span><span class=n>CONFIG_FAILED_EXPORT_SERVICE</span><span class=p>,</span><span class=w> </span><span class=s>&#34;&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;Failed to async export service config: &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>getIdentifier</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; , catch error : &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>t</span><span class=p>.</span><span class=na>getMessage</span><span class=p>(),</span><span class=w> </span><span class=n>t</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>},</span><span class=w> </span><span class=n>executor</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>asyncExportingFutures</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>future</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 同步导出服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>sc</span><span class=p>.</span><span class=na>isExported</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>sc</span><span class=p>.</span><span class=na>export</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>AUTO_REGISTER_BY_DEPLOYER</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>exportedServices</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>sc</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#export</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>export</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=na>exported</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>isLifeCycleManagedExternally</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// prepare model for reference</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>getDeployer</span><span class=p>().</span><span class=na>prepare</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// ensure start module, compatible with old api usage</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>getDeployer</span><span class=p>().</span><span class=na>start</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>synchronized</span><span class=w> </span><span class=p>(</span><span class=k>this</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=na>exported</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 刷新配置</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=k>this</span><span class=p>.</span><span class=na>isRefreshed</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>this</span><span class=p>.</span><span class=na>refresh</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=na>shouldExport</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 初始化，这里是初始化 serviceListeners 和 serviceMetadata</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>this</span><span class=p>.</span><span class=na>init</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>shouldDelay</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// should register if delay export</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 延迟导出</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>doDelayExport</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>Integer</span><span class=p>.</span><span class=na>valueOf</span><span class=p>(</span><span class=o>-</span><span class=n>1</span><span class=p>).</span><span class=na>equals</span><span class=p>(</span><span class=n>getDelay</span><span class=p>())</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>Boolean</span><span class=p>.</span><span class=na>parseBoolean</span><span class=p>(</span><span class=n>ConfigurationUtils</span><span class=p>.</span><span class=na>getProperty</span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>getScopeModel</span><span class=p>(),</span><span class=w> </span><span class=n>CommonConstants</span><span class=p>.</span><span class=na>DUBBO_MANUAL_REGISTER_KEY</span><span class=p>,</span><span class=w> </span><span class=s>&#34;false&#34;</span><span class=p>)))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// should not register by default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>doExport</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>MANUAL_REGISTER</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 导出服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>doExport</span><span class=p>(</span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#doExport</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>protected</span><span class=w> </span><span class=kd>synchronized</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doExport</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>unexported</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>IllegalStateException</span><span class=p>(</span><span class=s>&#34;The service &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>interfaceClass</span><span class=p>.</span><span class=na>getName</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; has already unexported!&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>exported</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isEmpty</span><span class=p>(</span><span class=n>path</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>path</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>interfaceName</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 导出 urls，这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>doExportUrls</span><span class=p>(</span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 标记已导出，执行 serviceNameMapping.map(url)，这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exported</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=doexporturls-导出接口>doExportUrls 导出接口</h3><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#doExportUrls</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出 urls</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// 因为 dubbo 支持多协议服务，所以需要对每个协议执行导出服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doExportUrls</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 获取 ServiceRepository，调用的时候，可以通过这个来获取接口的元数据信息</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ModuleServiceRepository</span><span class=w> </span><span class=n>repository</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>getServiceRepository</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ServiceDescriptor</span><span class=w> </span><span class=n>serviceDescriptor</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>serverService</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ref</span><span class=w> </span><span class=k>instanceof</span><span class=w> </span><span class=n>ServerService</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>serverService</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>serviceDescriptor</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>((</span><span class=n>ServerService</span><span class=p>)</span><span class=w> </span><span class=n>ref</span><span class=p>).</span><span class=na>getServiceDescriptor</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 注册服务元数据</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>repository</span><span class=p>.</span><span class=na>registerService</span><span class=p>(</span><span class=n>serviceDescriptor</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 注册服务元数据</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>serviceDescriptor</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>repository</span><span class=p>.</span><span class=na>registerService</span><span class=p>(</span><span class=n>getInterfaceClass</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 创建 ProviderModel</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>providerModel</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ProviderModel</span><span class=p>(</span><span class=n>serviceMetadata</span><span class=p>.</span><span class=na>getServiceKey</span><span class=p>(),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ref</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>serviceDescriptor</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>getScopeModel</span><span class=p>(),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>serviceMetadata</span><span class=p>,</span><span class=w> </span><span class=n>interfaceClassLoader</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// Compatible with dependencies on ServiceModel#getServiceConfig(), and will be removed in a future version</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>providerModel</span><span class=p>.</span><span class=na>setConfig</span><span class=p>(</span><span class=k>this</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>providerModel</span><span class=p>.</span><span class=na>setDestroyRunner</span><span class=p>(</span><span class=n>getDestroyRunner</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 注册 provider</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>repository</span><span class=p>.</span><span class=na>registerProvider</span><span class=p>(</span><span class=n>providerModel</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 加载注册中心配置, 很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>registryURLs</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ConfigValidationUtils</span><span class=p>.</span><span class=na>loadRegistries</span><span class=p>(</span><span class=k>this</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 遍历协议</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>ProtocolConfig</span><span class=w> </span><span class=n>protocolConfig</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>protocols</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>pathKey</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>URL</span><span class=p>.</span><span class=na>buildKey</span><span class=p>(</span><span class=n>getContextPath</span><span class=p>(</span><span class=n>protocolConfig</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>.</span><span class=na>map</span><span class=p>(</span><span class=n>p</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=n>p</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34;/&#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>path</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>.</span><span class=na>orElse</span><span class=p>(</span><span class=n>path</span><span class=p>),</span><span class=w> </span><span class=n>group</span><span class=p>,</span><span class=w> </span><span class=n>version</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// stub service will use generated service name</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>serverService</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// In case user specified path, register service one more time to map it to path.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>repository</span><span class=p>.</span><span class=na>registerService</span><span class=p>(</span><span class=n>pathKey</span><span class=p>,</span><span class=w> </span><span class=n>interfaceClass</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 对每个协议导出服务，很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>doExportUrlsFor1Protocol</span><span class=p>(</span><span class=n>protocolConfig</span><span class=p>,</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 设置 urls</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>providerModel</span><span class=p>.</span><span class=na>setServiceUrls</span><span class=p>(</span><span class=n>urls</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=loadregistries-加载注册中心>loadRegistries 加载注册中心</h3><p>源码位置: <code>org.apache.dubbo.config.utils.ConfigValidationUtils#loadRegistries</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 加载注册中心配置</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=nf>loadRegistries</span><span class=p>(</span><span class=n>AbstractInterfaceConfig</span><span class=w> </span><span class=n>interfaceConfig</span><span class=p>,</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>provider</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// check &amp;&amp; override if necessary</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>registryList</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ArrayList</span><span class=o>&lt;&gt;</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ApplicationConfig</span><span class=w> </span><span class=n>application</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>interfaceConfig</span><span class=p>.</span><span class=na>getApplication</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>List</span><span class=o>&lt;</span><span class=n>RegistryConfig</span><span class=o>&gt;</span><span class=w> </span><span class=n>registries</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>interfaceConfig</span><span class=p>.</span><span class=na>getRegistries</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>CollectionUtils</span><span class=p>.</span><span class=na>isNotEmpty</span><span class=p>(</span><span class=n>registries</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 遍历 registries</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>RegistryConfig</span><span class=w> </span><span class=n>config</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>registries</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// try to refresh registry in case it is set directly by user using config.setRegistries()</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 刷新配置</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>config</span><span class=p>.</span><span class=na>isRefreshed</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>config</span><span class=p>.</span><span class=na>refresh</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>String</span><span class=w> </span><span class=n>address</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>config</span><span class=p>.</span><span class=na>getAddress</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isEmpty</span><span class=p>(</span><span class=n>address</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>address</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ANYHOST_VALUE</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 是可用的地址</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>RegistryConfig</span><span class=p>.</span><span class=na>NO_AVAILABLE</span><span class=p>.</span><span class=na>equalsIgnoreCase</span><span class=p>(</span><span class=n>address</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 组合参数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>Map</span><span class=o>&lt;</span><span class=n>String</span><span class=p>,</span><span class=w> </span><span class=n>String</span><span class=o>&gt;</span><span class=w> </span><span class=n>map</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>HashMap</span><span class=o>&lt;</span><span class=n>String</span><span class=p>,</span><span class=w> </span><span class=n>String</span><span class=o>&gt;</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>AbstractConfig</span><span class=p>.</span><span class=na>appendParameters</span><span class=p>(</span><span class=n>map</span><span class=p>,</span><span class=w> </span><span class=n>application</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>AbstractConfig</span><span class=p>.</span><span class=na>appendParameters</span><span class=p>(</span><span class=n>map</span><span class=p>,</span><span class=w> </span><span class=n>config</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>map</span><span class=p>.</span><span class=na>put</span><span class=p>(</span><span class=n>PATH_KEY</span><span class=p>,</span><span class=w> </span><span class=n>RegistryService</span><span class=p>.</span><span class=na>class</span><span class=p>.</span><span class=na>getName</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>AbstractInterfaceConfig</span><span class=p>.</span><span class=na>appendRuntimeParameters</span><span class=p>(</span><span class=n>map</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>map</span><span class=p>.</span><span class=na>containsKey</span><span class=p>(</span><span class=n>PROTOCOL_KEY</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>map</span><span class=p>.</span><span class=na>put</span><span class=p>(</span><span class=n>PROTOCOL_KEY</span><span class=p>,</span><span class=w> </span><span class=n>DUBBO_PROTOCOL</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>urls</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>UrlUtils</span><span class=p>.</span><span class=na>parseURLs</span><span class=p>(</span><span class=n>address</span><span class=p>,</span><span class=w> </span><span class=n>map</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 组合 url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>urls</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>URLBuilder</span><span class=p>.</span><span class=na>from</span><span class=p>(</span><span class=n>url</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=c1>// 保留原始的协议类型，对服务级别注册有用</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=p>.</span><span class=na>addParameter</span><span class=p>(</span><span class=n>REGISTRY_KEY</span><span class=p>,</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>getProtocol</span><span class=p>())</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=c1>// 提取注册类型，设置协议，这个很重要，在 dubbo 3.0 有服务级别和接口级别两种注册方式</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=p>.</span><span class=na>setProtocol</span><span class=p>(</span><span class=n>extractRegistryType</span><span class=p>(</span><span class=n>url</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=p>.</span><span class=na>setScopeModel</span><span class=p>(</span><span class=n>interfaceConfig</span><span class=p>.</span><span class=na>getScopeModel</span><span class=p>())</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=p>.</span><span class=na>build</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=c1>// provider delay register state will be checked in RegistryProtocol#export</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>provider</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>SUBSCRIBE_KEY</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=n>registryList</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 兼容处理，不解析</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>genCompatibleRegistries</span><span class=p>(</span><span class=n>interfaceConfig</span><span class=p>.</span><span class=na>getScopeModel</span><span class=p>(),</span><span class=w> </span><span class=n>registryList</span><span class=p>,</span><span class=w> </span><span class=n>provider</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=doexporturlsfor1protocol-对单协议导出>doExportUrlsFor1Protocol 对单协议导出</h3><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#doExportUrlsFor1Protocol</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 对单个协议导出</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doExportUrlsFor1Protocol</span><span class=p>(</span><span class=n>ProtocolConfig</span><span class=w> </span><span class=n>protocolConfig</span><span class=p>,</span><span class=w> </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>Map</span><span class=o>&lt;</span><span class=n>String</span><span class=p>,</span><span class=w> </span><span class=n>String</span><span class=o>&gt;</span><span class=w> </span><span class=n>map</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>buildAttributes</span><span class=p>(</span><span class=n>protocolConfig</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// remove null key and null value</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>map</span><span class=p>.</span><span class=na>keySet</span><span class=p>().</span><span class=na>removeIf</span><span class=p>(</span><span class=n>key</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isEmpty</span><span class=p>(</span><span class=n>key</span><span class=p>)</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isEmpty</span><span class=p>(</span><span class=n>map</span><span class=p>.</span><span class=na>get</span><span class=p>(</span><span class=n>key</span><span class=p>)));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// init serviceMetadata attachments</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>serviceMetadata</span><span class=p>.</span><span class=na>getAttachments</span><span class=p>().</span><span class=na>putAll</span><span class=p>(</span><span class=n>map</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 构建 url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>buildUrl</span><span class=p>(</span><span class=n>protocolConfig</span><span class=p>,</span><span class=w> </span><span class=n>map</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 设置单独的 executor, 之后会用这个 executor 去执行请求</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>processServiceExecutor</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 导出 url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exportUrl</span><span class=p>(</span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>initServiceMethodMetrics</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#exportUrl</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出 url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>exportUrl</span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 获取 scope, scope 分为 remote 和 local, 默认为空，表示两种都会导出</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>String</span><span class=w> </span><span class=n>scope</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>SCOPE_KEY</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// don&#39;t export when none is configured</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>SCOPE_NONE</span><span class=p>.</span><span class=na>equalsIgnoreCase</span><span class=p>(</span><span class=n>scope</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// export to local if the config is not remote (export to remote only when config is remote)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>SCOPE_REMOTE</span><span class=p>.</span><span class=na>equalsIgnoreCase</span><span class=p>(</span><span class=n>scope</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 导出本地服务, 不解析这个</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>exportLocal</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// export to remote if the config is not local (export to local only when config is local)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>SCOPE_LOCAL</span><span class=p>.</span><span class=na>equalsIgnoreCase</span><span class=p>(</span><span class=n>scope</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// export to extra protocol is used in remote export</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// extProtocol 默认为空</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>String</span><span class=w> </span><span class=n>extProtocol</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=s>&#34;ext.protocol&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>List</span><span class=o>&lt;</span><span class=n>String</span><span class=o>&gt;</span><span class=w> </span><span class=n>protocols</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ArrayList</span><span class=o>&lt;&gt;</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isNotBlank</span><span class=p>(</span><span class=n>extProtocol</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// export original url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>URLBuilder</span><span class=p>.</span><span class=na>from</span><span class=p>(</span><span class=n>url</span><span class=p>).</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>addParameter</span><span class=p>(</span><span class=n>IS_PU_SERVER_KEY</span><span class=p>,</span><span class=w> </span><span class=n>Boolean</span><span class=p>.</span><span class=na>TRUE</span><span class=p>.</span><span class=na>toString</span><span class=p>()).</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>removeParameter</span><span class=p>(</span><span class=s>&#34;ext.protocol&#34;</span><span class=p>).</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>build</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 导出远程服务, 这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>exportRemote</span><span class=p>(</span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>isGeneric</span><span class=p>(</span><span class=n>generic</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=o>!</span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>isInternal</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 元数据中心，发布服务定义，这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>MetadataUtils</span><span class=p>.</span><span class=na>publishServiceDefinition</span><span class=p>(</span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=n>providerModel</span><span class=p>.</span><span class=na>getServiceModel</span><span class=p>(),</span><span class=w> </span><span class=n>getApplicationModel</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isNotBlank</span><span class=p>(</span><span class=n>extProtocol</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>String</span><span class=o>[]</span><span class=w> </span><span class=n>extProtocols</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>extProtocol</span><span class=p>.</span><span class=na>split</span><span class=p>(</span><span class=s>&#34;,&#34;</span><span class=p>,</span><span class=w> </span><span class=o>-</span><span class=n>1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>protocols</span><span class=p>.</span><span class=na>addAll</span><span class=p>(</span><span class=n>Arrays</span><span class=p>.</span><span class=na>asList</span><span class=p>(</span><span class=n>extProtocols</span><span class=p>));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// export extra protocols</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 导出额外协议</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>String</span><span class=w> </span><span class=n>protocol</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>protocols</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isNotBlank</span><span class=p>(</span><span class=n>protocol</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>URL</span><span class=w> </span><span class=n>localUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>URLBuilder</span><span class=p>.</span><span class=na>from</span><span class=p>(</span><span class=n>url</span><span class=p>).</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=n>setProtocol</span><span class=p>(</span><span class=n>protocol</span><span class=p>).</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=n>build</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=c1>// 导出远程服务, 这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>localUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>exportRemote</span><span class=p>(</span><span class=n>localUrl</span><span class=p>,</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>isGeneric</span><span class=p>(</span><span class=n>generic</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=o>!</span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>isInternal</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=c1>// 元数据中心，发布服务定义，这个很重要 </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=n>MetadataUtils</span><span class=p>.</span><span class=na>publishServiceDefinition</span><span class=p>(</span><span class=n>localUrl</span><span class=p>,</span><span class=w> </span><span class=n>providerModel</span><span class=p>.</span><span class=na>getServiceModel</span><span class=p>(),</span><span class=w> </span><span class=n>getApplicationModel</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=k>this</span><span class=p>.</span><span class=na>urls</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>localUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>urls</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=exportremote-导出接口>exportRemote 导出接口</h3><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#exportRemote</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 对每一个注册中心，都导出接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=n>URL</span><span class=w> </span><span class=nf>exportRemote</span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>registryURLs</span><span class=p>,</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>CollectionUtils</span><span class=p>.</span><span class=na>isNotEmpty</span><span class=p>(</span><span class=n>registryURLs</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>registerType</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>NEVER_REGISTER</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 遍历 registryUrl</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>registryURL</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>registryURLs</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// dubbo3 中是 service-registry</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>SERVICE_REGISTRY_PROTOCOL</span><span class=p>.</span><span class=na>equals</span><span class=p>(</span><span class=n>registryURL</span><span class=p>.</span><span class=na>getProtocol</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>addParameterIfAbsent</span><span class=p>(</span><span class=n>SERVICE_NAME_MAPPING_KEY</span><span class=p>,</span><span class=w> </span><span class=s>&#34;true&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>//if protocol is only injvm ,not register</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 如果是 injvm 协议，跳过</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>LOCAL_PROTOCOL</span><span class=p>.</span><span class=na>equalsIgnoreCase</span><span class=p>(</span><span class=n>url</span><span class=p>.</span><span class=na>getProtocol</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>continue</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 添加 dynamic 参数，表示这个接口是临时的，当注册中心注销时，需要注销这个接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>addParameterIfAbsent</span><span class=p>(</span><span class=n>DYNAMIC_KEY</span><span class=p>,</span><span class=w> </span><span class=n>registryURL</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>DYNAMIC_KEY</span><span class=p>));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 添加 monitor 参数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>URL</span><span class=w> </span><span class=n>monitorUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ConfigValidationUtils</span><span class=p>.</span><span class=na>loadMonitor</span><span class=p>(</span><span class=k>this</span><span class=p>,</span><span class=w> </span><span class=n>registryURL</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>monitorUrl</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>putAttribute</span><span class=p>(</span><span class=n>MONITOR_KEY</span><span class=p>,</span><span class=w> </span><span class=n>monitorUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// For providers, this is used to enable custom proxy to generate invoker</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 添加 proxy 参数，可以自定义代理实现, 默认为 javassist</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>String</span><span class=w> </span><span class=n>proxy</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>PROXY_KEY</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>StringUtils</span><span class=p>.</span><span class=na>isNotEmpty</span><span class=p>(</span><span class=n>proxy</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>registryURL</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>registryURL</span><span class=p>.</span><span class=na>addParameter</span><span class=p>(</span><span class=n>PROXY_KEY</span><span class=p>,</span><span class=w> </span><span class=n>proxy</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>logger</span><span class=p>.</span><span class=na>isInfoEnabled</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>url</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>REGISTER_KEY</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>logger</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=s>&#34;Register dubbo service &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>interfaceClass</span><span class=p>.</span><span class=na>getName</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; url &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>url</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; to registry &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>registryURL</span><span class=p>.</span><span class=na>getAddress</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>logger</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=s>&#34;Export dubbo service &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>interfaceClass</span><span class=p>.</span><span class=na>getName</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; to url &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 导出 url，这里很重要，把 url 添加到 registryUrl 的 export 参数中</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>doExportUrl</span><span class=p>(</span><span class=n>registryURL</span><span class=p>.</span><span class=na>putAttribute</span><span class=p>(</span><span class=n>EXPORT_KEY</span><span class=p>,</span><span class=w> </span><span class=n>url</span><span class=p>),</span><span class=w> </span><span class=kc>true</span><span class=p>,</span><span class=w> </span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>logger</span><span class=p>.</span><span class=na>isInfoEnabled</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>logger</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=s>&#34;Export dubbo service &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>interfaceClass</span><span class=p>.</span><span class=na>getName</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; to url &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 导出url，不会把接口注册到注册中心</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>doExportUrl</span><span class=p>(</span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>,</span><span class=w> </span><span class=n>registerType</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>url</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#doExportUrl</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doExportUrl</span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>withMetaData</span><span class=p>,</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=w> </span><span class=n>registerType</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 在 dubbo3 中，registerType 默认就是 AUTO_REGISTER_BY_DEPLOYER</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>url</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>REGISTER_KEY</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>registerType</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>MANUAL_REGISTER</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>registerType</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>NEVER_REGISTER</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>registerType</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>MANUAL_REGISTER</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>registerType</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>AUTO_REGISTER_BY_DEPLOYER</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>url</span><span class=p>.</span><span class=na>addParameter</span><span class=p>(</span><span class=n>REGISTER_KEY</span><span class=p>,</span><span class=w> </span><span class=kc>false</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 包装 ref，生成 invoker</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>Invoker</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>invoker</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>proxyFactory</span><span class=p>.</span><span class=na>getInvoker</span><span class=p>(</span><span class=n>ref</span><span class=p>,</span><span class=w> </span><span class=p>(</span><span class=n>Class</span><span class=p>)</span><span class=w> </span><span class=n>interfaceClass</span><span class=p>,</span><span class=w> </span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>withMetaData</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>invoker</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>DelegateProviderMetaDataInvoker</span><span class=p>(</span><span class=n>invoker</span><span class=p>,</span><span class=w> </span><span class=k>this</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 通过 SPI 机制获取对应的实现类，这里的 url 是 registryUrl，实现类为 RegistryProtocol</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>Exporter</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>exporter</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>protocolSPI</span><span class=p>.</span><span class=na>export</span><span class=p>(</span><span class=n>invoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 注册 exporter</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exporters</span><span class=p>.</span><span class=na>computeIfAbsent</span><span class=p>(</span><span class=n>registerType</span><span class=p>,</span><span class=w> </span><span class=n>k</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>CopyOnWriteArrayList</span><span class=o>&lt;&gt;</span><span class=p>()).</span><span class=na>add</span><span class=p>(</span><span class=n>exporter</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=registryprotocolexport-导出接口>RegistryProtocol#export 导出接口</h3><p>源码位置: <code>org.apache.dubbo.registry.integration.RegistryProtocol#export</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=n>Exporter</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=nf>export</span><span class=p>(</span><span class=kd>final</span><span class=w> </span><span class=n>Invoker</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=n>originInvoker</span><span class=p>)</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>RpcException</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 获取 registryUrl</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>URL</span><span class=w> </span><span class=n>registryUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getRegistryUrl</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 获取 providerUrl, 之前这个url 放在 registryUrl 的 export 参数中</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>URL</span><span class=w> </span><span class=n>providerUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getProviderUrl</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// Subscribe the override data</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// FIXME When the provider subscribes, it will affect the scene : a certain JVM exposes the service and call</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>//  the same service. Because the subscribed is cached key with the name of the service, it causes the</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>//  subscription information to cover.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 一些覆盖配置的监听器，这里包括 provider, service 两个维度的</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=n>URL</span><span class=w> </span><span class=n>overrideSubscribeUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getSubscribedOverrideUrl</span><span class=p>(</span><span class=n>providerUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=n>OverrideListener</span><span class=w> </span><span class=n>overrideSubscribeListener</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>OverrideListener</span><span class=p>(</span><span class=n>overrideSubscribeUrl</span><span class=p>,</span><span class=w> </span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>Map</span><span class=o>&lt;</span><span class=n>URL</span><span class=p>,</span><span class=w> </span><span class=n>Set</span><span class=o>&lt;</span><span class=n>NotifyListener</span><span class=o>&gt;&gt;</span><span class=w> </span><span class=n>overrideListeners</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getProviderConfigurationListener</span><span class=p>(</span><span class=n>overrideSubscribeUrl</span><span class=p>).</span><span class=na>getOverrideListeners</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>overrideListeners</span><span class=p>.</span><span class=na>computeIfAbsent</span><span class=p>(</span><span class=n>overrideSubscribeUrl</span><span class=p>,</span><span class=w> </span><span class=n>k</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ConcurrentHashSet</span><span class=o>&lt;&gt;</span><span class=p>())</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>overrideSubscribeListener</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>providerUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>overrideUrlWithConfig</span><span class=p>(</span><span class=n>providerUrl</span><span class=p>,</span><span class=w> </span><span class=n>overrideSubscribeListener</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>//export invoker</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 导出接口，这个最重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=n>ExporterChangeableWrapper</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=n>exporter</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>doLocalExport</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>,</span><span class=w> </span><span class=n>providerUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// url to registry</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 根据 SPI 机制获取对应的 registry 实现类, 比如 ServiceDiscoveryRegistry</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=n>Registry</span><span class=w> </span><span class=n>registry</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getRegistry</span><span class=p>(</span><span class=n>registryUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 获取注册的 url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=n>URL</span><span class=w> </span><span class=n>registeredProviderUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getUrlToRegistry</span><span class=p>(</span><span class=n>providerUrl</span><span class=p>,</span><span class=w> </span><span class=n>registryUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// decide if we need to delay publish (provider itself and registry should both need to register)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 决定是否要注册 url，刚才是 AUTO_REGISTER_BY_DEPLOYER，所以不会注册</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>boolean</span><span class=w> </span><span class=n>register</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>providerUrl</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>REGISTER_KEY</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>registryUrl</span><span class=p>.</span><span class=na>getParameter</span><span class=p>(</span><span class=n>REGISTER_KEY</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>register</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>register</span><span class=p>(</span><span class=n>registry</span><span class=p>,</span><span class=w> </span><span class=n>registeredProviderUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// register stated url on provider model</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>registerStatedUrl</span><span class=p>(</span><span class=n>registryUrl</span><span class=p>,</span><span class=w> </span><span class=n>registeredProviderUrl</span><span class=p>,</span><span class=w> </span><span class=n>register</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 设置一些参数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exporter</span><span class=p>.</span><span class=na>setRegisterUrl</span><span class=p>(</span><span class=n>registeredProviderUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exporter</span><span class=p>.</span><span class=na>setSubscribeUrl</span><span class=p>(</span><span class=n>overrideSubscribeUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exporter</span><span class=p>.</span><span class=na>setNotifyListener</span><span class=p>(</span><span class=n>overrideSubscribeListener</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exporter</span><span class=p>.</span><span class=na>setRegistered</span><span class=p>(</span><span class=n>register</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 执行 RegistryProtocolListener 钩子函数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>notifyExport</span><span class=p>(</span><span class=n>exporter</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>//Ensure that a new exporter instance is returned every time export</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>DestroyableExporter</span><span class=o>&lt;&gt;</span><span class=p>(</span><span class=n>exporter</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.registry.integration.RegistryProtocol#doLocalExport</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 导出接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=n>ExporterChangeableWrapper</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=nf>doLocalExport</span><span class=p>(</span><span class=kd>final</span><span class=w> </span><span class=n>Invoker</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=n>originInvoker</span><span class=p>,</span><span class=w> </span><span class=n>URL</span><span class=w> </span><span class=n>providerUrl</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>String</span><span class=w> </span><span class=n>providerUrlKey</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getProviderUrlKey</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>String</span><span class=w> </span><span class=n>registryUrlKey</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getRegistryUrlKey</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>Invoker</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>invokerDelegate</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>InvokerDelegate</span><span class=o>&lt;&gt;</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>,</span><span class=w> </span><span class=n>providerUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 根据 SPI 机制获取对应的实现类，如 DubboProtocol, TripleProtocol, 在后面的章节会继续解析</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ReferenceCountExporter</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>exporter</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>exporterFactory</span><span class=p>.</span><span class=na>createExporter</span><span class=p>(</span><span class=n>psfdsnroviderUrlKey</span><span class=p>,</span><span class=w> </span><span class=p>()</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=n>protocol</span><span class=p>.</span><span class=na>export</span><span class=p>(</span><span class=n>invokerDelegate</span><span class=p>));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 记录导出的接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=p>(</span><span class=n>ExporterChangeableWrapper</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=p>)</span><span class=w> </span><span class=n>bounds</span><span class=p>.</span><span class=na>computeIfAbsent</span><span class=p>(</span><span class=n>providerUrlKey</span><span class=p>,</span><span class=w> </span><span class=n>_k</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ConcurrentHashMap</span><span class=o>&lt;&gt;</span><span class=p>())</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>.</span><span class=na>computeIfAbsent</span><span class=p>(</span><span class=n>registryUrlKey</span><span class=p>,</span><span class=w> </span><span class=n>s</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// ExporterChangeableWrapper 这个类很重要，后续会调用 registry 方法来注册接口</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ExporterChangeableWrapper</span><span class=o>&lt;&gt;</span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>(</span><span class=n>ReferenceCountExporter</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=p>)</span><span class=w> </span><span class=n>exporter</span><span class=p>,</span><span class=w> </span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>});</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=serviceconfigexported>ServiceConfig#exported</h3><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#exported</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 在导出接口后，会调用这个方法</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>protected</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>exported</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exported</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>true</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>List</span><span class=o>&lt;</span><span class=n>URL</span><span class=o>&gt;</span><span class=w> </span><span class=n>exportedURLs</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>getExportedUrls</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>exportedURLs</span><span class=p>.</span><span class=na>forEach</span><span class=p>(</span><span class=n>url</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>url</span><span class=p>.</span><span class=na>getParameters</span><span class=p>().</span><span class=na>containsKey</span><span class=p>(</span><span class=n>SERVICE_NAME_MAPPING_KEY</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>ServiceNameMapping</span><span class=w> </span><span class=n>serviceNameMapping</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ServiceNameMapping</span><span class=p>.</span><span class=na>getDefaultExtension</span><span class=p>(</span><span class=n>getScopeModel</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>ScheduledExecutorService</span><span class=w> </span><span class=n>scheduledExecutor</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getScopeModel</span><span class=p>().</span><span class=na>getBeanFactory</span><span class=p>()</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>.</span><span class=na>getBean</span><span class=p>(</span><span class=n>FrameworkExecutorRepository</span><span class=p>.</span><span class=na>class</span><span class=p>).</span><span class=na>getSharedScheduledExecutor</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 对接口创建对应的 mappping，这样可以根据接口来获取是服务名，很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>mapServiceName</span><span class=p>(</span><span class=n>url</span><span class=p>,</span><span class=w> </span><span class=n>serviceNameMapping</span><span class=p>,</span><span class=w> </span><span class=n>scheduledExecutor</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>});</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 执行 ServiceListener 钩子函数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>onExported</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=defaultmoduledeployerregisterservices-注册服务>DefaultModuleDeployer#registerServices 注册服务</h2><p>源码位置: <code>org.apache.dubbo.config.deploy.DefaultModuleDeployer#registerServices</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 注册服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>registerServices</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 遍历所有的 service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>ServiceConfigBase</span><span class=w> </span><span class=n>sc</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>configManager</span><span class=p>.</span><span class=na>getServices</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>Boolean</span><span class=p>.</span><span class=na>FALSE</span><span class=p>.</span><span class=na>equals</span><span class=p>(</span><span class=n>sc</span><span class=p>.</span><span class=na>isRegister</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 注册 service, 这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>registerServiceInternal</span><span class=p>(</span><span class=n>sc</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 刷新服务实例, 这个很重要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>applicationDeployer</span><span class=p>.</span><span class=na>refreshServiceInstance</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.config.deploy.DefaultModuleDeployer#registerServiceInternal</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 注册 service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>registerServiceInternal</span><span class=p>(</span><span class=n>ServiceConfigBase</span><span class=w> </span><span class=n>sc</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ServiceConfig</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>serviceConfig</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>ServiceConfig</span><span class=o>&lt;?&gt;</span><span class=p>)</span><span class=w> </span><span class=n>sc</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 刷新配置</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>serviceConfig</span><span class=p>.</span><span class=na>isRefreshed</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>serviceConfig</span><span class=p>.</span><span class=na>refresh</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>sc</span><span class=p>.</span><span class=na>isExported</span><span class=p>())</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 注册</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>sc</span><span class=p>.</span><span class=na>register</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.config.ServiceConfig#register</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 注册, byDeployer 参数为 true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>register</span><span class=p>(</span><span class=kt>boolean</span><span class=w> </span><span class=n>byDeployer</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=k>this</span><span class=p>.</span><span class=na>exported</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>synchronized</span><span class=w> </span><span class=p>(</span><span class=k>this</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=k>this</span><span class=p>.</span><span class=na>exported</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// AUTO_REGISTER 类型的注册</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>Exporter</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>exporter</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>exporters</span><span class=p>.</span><span class=na>getOrDefault</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>AUTO_REGISTER</span><span class=p>,</span><span class=w> </span><span class=n>Collections</span><span class=p>.</span><span class=na>emptyList</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>exporter</span><span class=p>.</span><span class=na>register</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// AUTO_REGISTER_BY_DEPLOYER 类型的注册, dubbo3 默认走这里</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>byDeployer</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>for</span><span class=w> </span><span class=p>(</span><span class=n>Exporter</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>exporter</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>exporters</span><span class=p>.</span><span class=na>getOrDefault</span><span class=p>(</span><span class=n>RegisterTypeEnum</span><span class=p>.</span><span class=na>AUTO_REGISTER_BY_DEPLOYER</span><span class=p>,</span><span class=w> </span><span class=n>Collections</span><span class=p>.</span><span class=na>emptyList</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// exporter 实现类为 ExporterChangeableWrapper</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>exporter</span><span class=p>.</span><span class=na>register</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=exporterchangeablewrapperregister>ExporterChangeableWrapper#register</h3><p>源码位置: <code>org.apache.dubbo.registry.integration.RegistryProtocol.ExporterChangeableWrapper#register</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// ExporterChangeableWrapper 在 RegistryProtocol#doLocalExport 方法中会生成</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>register</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>registered</span><span class=p>.</span><span class=na>compareAndSet</span><span class=p>(</span><span class=kc>false</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>URL</span><span class=w> </span><span class=n>registryUrl</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getRegistryUrl</span><span class=p>(</span><span class=n>originInvoker</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 根据 SPI 机制获取 registry, 实现类为 ServiceDiscoveryRegistry（服务级别注册），ZookeeperRegistry（接口级别注册）</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Registry</span><span class=w> </span><span class=n>registry</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getRegistry</span><span class=p>(</span><span class=n>registryUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 注册 url，这个很重要，这里只分析 ServiceDiscoveryRegistry#register</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>RegistryProtocol</span><span class=p>.</span><span class=na>register</span><span class=p>(</span><span class=n>registry</span><span class=p>,</span><span class=w> </span><span class=n>getRegisterUrl</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ProviderModel</span><span class=w> </span><span class=n>providerModel</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>frameworkModel</span><span class=p>.</span><span class=na>getServiceRepository</span><span class=p>()</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>.</span><span class=na>lookupExportedService</span><span class=p>(</span><span class=n>getRegisterUrl</span><span class=p>().</span><span class=na>getServiceKey</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 标记已注册</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>List</span><span class=o>&lt;</span><span class=n>ProviderModel</span><span class=p>.</span><span class=na>RegisterStatedURL</span><span class=o>&gt;</span><span class=w> </span><span class=n>statedUrls</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>providerModel</span><span class=p>.</span><span class=na>getStatedUrl</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>statedUrls</span><span class=p>.</span><span class=na>stream</span><span class=p>()</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>.</span><span class=na>filter</span><span class=p>(</span><span class=n>u</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=n>u</span><span class=p>.</span><span class=na>getRegistryUrl</span><span class=p>().</span><span class=na>equals</span><span class=p>(</span><span class=n>registryUrl</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>u</span><span class=p>.</span><span class=na>getProviderUrl</span><span class=p>().</span><span class=na>getProtocol</span><span class=p>().</span><span class=na>equals</span><span class=p>(</span><span class=n>getRegisterUrl</span><span class=p>().</span><span class=na>getProtocol</span><span class=p>()))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>.</span><span class=na>forEach</span><span class=p>(</span><span class=n>u</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=n>u</span><span class=p>.</span><span class=na>setRegistered</span><span class=p>(</span><span class=kc>true</span><span class=p>));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>logger</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=s>&#34;Registered dubbo service &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>getRegisterUrl</span><span class=p>().</span><span class=na>getServiceKey</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; url &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>getRegisterUrl</span><span class=p>()</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; to registry &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>registryUrl</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=servicediscoveryregistryregister-服务级别注册>ServiceDiscoveryRegistry#register 服务级别注册</h3><p>源码位置: <code>org.apache.dubbo.registry.client.ServiceDiscoveryRegistry#register</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>register</span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>shouldRegister</span><span class=p>(</span><span class=n>url</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=c1>// Should Not Register</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>doRegister</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doRegister</span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// fixme, add registry-cluster is not necessary anymore</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>url</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>addRegistryClusterKey</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 注册 url</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>serviceDiscovery</span><span class=p>.</span><span class=na>register</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.registry.client.AbstractServiceDiscovery#register</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>register</span><span class=p>(</span><span class=n>URL</span><span class=w> </span><span class=n>url</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 只是添加了 url，实际并没有发布</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>metadataInfo</span><span class=p>.</span><span class=na>addService</span><span class=p>(</span><span class=n>url</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=defaultapplicationdeployerrefreshserviceinstance-刷新服务实例>DefaultApplicationDeployer#refreshServiceInstance 刷新服务实例</h2><p>源码位置: <code>org.apache.dubbo.config.deploy.DefaultApplicationDeployer#refreshServiceInstance</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>refreshServiceInstance</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>registered</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 刷新元数据和实例</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>ServiceInstanceMetadataUtils</span><span class=p>.</span><span class=na>refreshMetadataAndInstance</span><span class=p>(</span><span class=n>applicationModel</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>catch</span><span class=w> </span><span class=p>(</span><span class=n>Exception</span><span class=w> </span><span class=n>e</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>logger</span><span class=p>.</span><span class=na>error</span><span class=p>(</span><span class=n>CONFIG_REFRESH_INSTANCE_ERROR</span><span class=p>,</span><span class=w> </span><span class=s>&#34;&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;&#34;</span><span class=p>,</span><span class=w> </span><span class=s>&#34;Refresh instance and metadata error.&#34;</span><span class=p>,</span><span class=w> </span><span class=n>e</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// 刷新元数据和实例</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>refreshMetadataAndInstance</span><span class=p>(</span><span class=n>ApplicationModel</span><span class=w> </span><span class=n>applicationModel</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>RegistryManager</span><span class=w> </span><span class=n>registryManager</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>applicationModel</span><span class=p>.</span><span class=na>getBeanFactory</span><span class=p>().</span><span class=na>getBean</span><span class=p>(</span><span class=n>RegistryManager</span><span class=p>.</span><span class=na>class</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// update service instance revision</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 对每一个 serviceDiscovery 都更新</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>registryManager</span><span class=p>.</span><span class=na>getServiceDiscoveries</span><span class=p>().</span><span class=na>forEach</span><span class=p>(</span><span class=n>ServiceDiscovery</span><span class=p>::</span><span class=n>update</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=servicediscoveryupdate-更新服务实例>ServiceDiscovery#update 更新服务实例</h3><p>源码位置: <code>org.apache.dubbo.registry.client.AbstractServiceDiscovery#update</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>synchronized</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>update</span><span class=p>()</span><span class=w> </span><span class=kd>throws</span><span class=w> </span><span class=n>RuntimeException</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>isDestroy</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 注册实例, 会根据 metadataInfo 创建 serviceInstance</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=na>serviceInstance</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>register</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>isValidInstance</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=na>serviceInstance</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>ServiceInstance</span><span class=w> </span><span class=n>oldServiceInstance</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>serviceInstance</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>DefaultServiceInstance</span><span class=w> </span><span class=n>newServiceInstance</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>DefaultServiceInstance</span><span class=p>((</span><span class=n>DefaultServiceInstance</span><span class=p>)</span><span class=w> </span><span class=n>oldServiceInstance</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 计算 revision 是否发生改变</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>boolean</span><span class=w> </span><span class=n>revisionUpdated</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>calOrUpdateInstanceRevision</span><span class=p>(</span><span class=n>newServiceInstance</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>revisionUpdated</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>logger</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=n>String</span><span class=p>.</span><span class=na>format</span><span class=p>(</span><span class=s>&#34;Metadata of instance changed, updating instance with revision %s.&#34;</span><span class=p>,</span><span class=w> </span><span class=n>newServiceInstance</span><span class=p>.</span><span class=na>getServiceMetadata</span><span class=p>().</span><span class=na>getRevision</span><span class=p>()));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 更新服务实例</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>doUpdate</span><span class=p>(</span><span class=n>oldServiceInstance</span><span class=p>,</span><span class=w> </span><span class=n>newServiceInstance</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>serviceInstance</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>newServiceInstance</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.apache.dubbo.registry.client.AbstractServiceDiscovery#doUpdate</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>protected</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>doUpdate</span><span class=p>(</span><span class=n>ServiceInstance</span><span class=w> </span><span class=n>oldServiceInstance</span><span class=p>,</span><span class=w> </span><span class=n>ServiceInstance</span><span class=w> </span><span class=n>newServiceInstance</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 注销旧的服务实例</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>doUnregister</span><span class=p>(</span><span class=n>oldServiceInstance</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>serviceInstance</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>newServiceInstance</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>EMPTY_REVISION</span><span class=p>.</span><span class=na>equals</span><span class=p>(</span><span class=n>getExportedServicesRevision</span><span class=p>(</span><span class=n>newServiceInstance</span><span class=p>)))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 报告服务元数据</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>reportMetadata</span><span class=p>(</span><span class=n>newServiceInstance</span><span class=p>.</span><span class=na>getServiceMetadata</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 注册新的服务实例</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>doRegister</span><span class=p>(</span><span class=n>newServiceInstance</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on 2023-11-25 08:00:00</span></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=/ooooo-notes/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1/index.md target=_blank>Read Markdown</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://ooooo-youwillsee.github.io/ooooo-notes/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1/ data-title="05 导出服务"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://ooooo-youwillsee.github.io/ooooo-notes/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1/ data-title="05 导出服务"><i data-svg-src=/ooooo-notes/lib/simple-icons/icons/line.min.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/05-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1/ data-title="05 导出服务"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/ooooo-notes/tags/dubbo/>dubbo</a>,&nbsp;<a href=/ooooo-notes/tags/source-code/>source code</a>,&nbsp;<a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-dubbo-%E7%B3%BB%E5%88%97/>源码分析 dubbo 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>Home</a></span></section></div><div class=post-nav><a href=/ooooo-notes/%E4%BB%8E%E9%9B%B6%E5%AD%A6-dubbo/ class=prev rel=prev title="从零学 dubbo"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>从零学 dubbo</a>
+<a href=/ooooo-notes/06-%E5%BC%95%E7%94%A8%E6%9C%8D%E5%8A%A1/ class=next rel=next title="06 引用服务">06 引用服务<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.122.0">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden=true></i> LoveIt</a></div><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022 - 2024</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/ooooo-youwillsee target=_blank>ooooo-youwillsee</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=/ooooo-notes/lib/gitalk/gitalk.min.css><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><script type=text/javascript src=/ooooo-notes/lib/gitalk/gitalk.min.js></script><script type=text/javascript src=/ooooo-notes/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lunr/lunr.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/ooooo-notes/lib/twemoji/twemoji.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js></script><script type=text/javascript src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js></script><script type=text/javascript src=/ooooo-notes/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/ooooo-notes/lib/sharer/sharer.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/katex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/auto-render.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/copy-tex.min.js></script><script type=text/javascript src=/ooooo-notes/lib/katex/contrib/mhchem.min.js></script><script type=text/javascript src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:100},comment:{gitalk:{admin:["ooooo-youwillsee"],clientID:"9fcbefe148801287b34f",clientSecret:"3833b0f8bda400fb1ea7093446f340821394e501",id:"2023-11-25T08:00:00+08:00",owner:"ooooo-youwillsee",repo:"ooooo-notes-gitalk",title:"05 导出服务"}},cookieconsent:{content:{dismiss:"Got it!",link:"Learn more",message:"This website uses Cookies to improve your experience."},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/ooooo-notes/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:50,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/ooooo-notes/js/theme.min.js></script></body></html>
