@@ -1,5 +1,5 @@
 ---
-title: mybatis-plus 的自定义 mapper
+title: mybatis-plus 自定义 mapper
 date: 2023-06-08T08:00:00+08:00
 draft: false
 tags: [ spring, mybatis ]
@@ -96,4 +96,48 @@ public class ComponentConfigMybatiPlusConfiguration {
   }
 }
 
+```
+
+## 手动创建 Mapper
+
+
+```java
+// 用法
+DataSource dataSource = DBUtil.buildDataSource(dbProperties);
+SqlSession sqlSession = DBUtil.buildSqlSession(dbProperties.getName(), dataSource,
+        MockInfoMapper.class);
+mockInfoMapper = sqlSession.getMapper(MockInfoMapper.class);
+
+// 工具类
+public class DBUtil {
+
+    public static DataSource buildDataSource(AbstractDBProperties dbProperties) {
+        HikariConfig config = new HikariConfig();
+        config.setPoolName("pool-" + dbProperties.getName());
+        config.setDriverClassName(dbProperties.getDriverClassName());
+        config.setJdbcUrl(dbProperties.getUrl());
+        config.setUsername(dbProperties.getUsername());
+        config.setPassword(dbProperties.getPassword());
+        return new HikariDataSource(config);
+    }
+
+    public static SqlSessionTemplate buildSqlSession(String id, DataSource dataSource, Class<?>... mapperClazz) {
+        Environment environment = new Environment(id, new SpringManagedTransactionFactory(), dataSource);
+        MybatisConfiguration configuration = new MybatisConfiguration(environment);
+        if (ArrayUtil.isNotEmpty(mapperClazz)) {
+            for (Class<?> clazz : mapperClazz) {
+                configuration.addMapper(clazz);
+            }
+        }
+        configuration.addInterceptor(buildInterceptor());
+        SqlSessionFactory sqlSessionFactory = new MybatisSqlSessionFactoryBuilder().build(configuration);
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
+    private static MybatisPlusInterceptor buildInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        return interceptor;
+    }
+}
 ```
