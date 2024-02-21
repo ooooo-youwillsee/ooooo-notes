@@ -13,7 +13,7 @@
 
 :zero::one:. [《操作系统导论》](https://book.douban.com/subject/33463930/) :white_check_mark:
 
-:zero::two:. [《深入理解计算机系统（原书第3版）》](https://book.douban.com/subject/26912767/) :o:
+:zero::two:. [《深入理解计算机系统（原书第3版）》](https://book.douban.com/subject/26912767/) :white_check_mark:
 
 :zero::three:. [《MySQL技术内幕》](https://book.douban.com/subject/24708143/) :o:
 
@@ -27,9 +27,11 @@
 
 :zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/)
 
-:zero::nine:. [Rust 编程第一课](https://time.geekbang.org/column/intro/100085301)
+:zero::nine:. [Rust 编程第一课](https://time.geekbang.org/column/intro/100085301) :o:
 
 :one::zero:. [长安的荔枝](https://book.douban.com/subject/36104107/) :white_check_mark:
+
+:one::one:. [x86汇编语言（第2版）](https://book.douban.com/subject/36238072/)
 
 ## 2. 关于源码笔记
 
