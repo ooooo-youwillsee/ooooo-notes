@@ -21,9 +21,9 @@ create procedure idata()
 begin
   declare i int;
   set i=1;
-  while(i<=100000)do
+  while(i&lt;=100000)do
     insert into x values(i, i, i);
-    set i=i+1;
+    set i=i&#43;1;
   end while;
 end;;
 delimiter ;
@@ -46,8 +46,8 @@ call idata();
 
 临时开启慢查询：
 ```shell script
-set global slow_query_log='ON';
-set global slow_query_log_file='/var/lib/mysql/instance-1-slow.log';
+set global slow_query_log=&#39;ON&#39;;
+set global slow_query_log_file=&#39;/var/lib/mysql/instance-1-slow.log&#39;;
 ```
 
 实验过程就是这三个语句：
@@ -84,7 +84,7 @@ MySQL 选错索引，是因为索引统计信息不准确，修正统计信息�
 
 另外一个语句：
 ```shell script
-mysql> select * from t where (a between 1 and 1000)  and (b between 50000 and 100000) order by b limit 1;
+mysql&gt; select * from t where (a between 1 and 1000)  and (b between 50000 and 100000) order by b limit 1;
 ```
 从条件上看，这个查询没有符合条件的记录，因此会返回空集合。
 
@@ -139,4 +139,10 @@ delete 语句删掉了所有的数据，然后再通过 call idata() 插入了 1
 表的行数，优化器直接用的是 `show table status` 的值。
 
 ![执行命令](./imgs/10_09.png)
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/mysql-45/10/  
 

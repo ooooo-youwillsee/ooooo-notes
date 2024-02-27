@@ -26,10 +26,10 @@ public class DevDataSourceConfiguration implements BeanPostProcessor, Environmen
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof DataSource && parseBoolean(environment.resolvePlaceholders("${dev.sql-log.enabled:false}"))) {
-			log.info("已开启日志打印，将使用[P6SpyDriver]");
-			if (environment.acceptsProfiles(Profiles.of("run"))) {
-				log.warn("在生产环境一定要关闭配置[dev.sql-log.enabled]");
+		if (bean instanceof DataSource &amp;&amp; parseBoolean(environment.resolvePlaceholders(&#34;${dev.sql-log.enabled:false}&#34;))) {
+			log.info(&#34;已开启日志打印，将使用[P6SpyDriver]&#34;);
+			if (environment.acceptsProfiles(Profiles.of(&#34;run&#34;))) {
+				log.warn(&#34;在生产环境一定要关闭配置[dev.sql-log.enabled]&#34;);
 			}
 			return proxyDataSource((DataSource) bean);
 		}
@@ -41,17 +41,17 @@ public class DevDataSourceConfiguration implements BeanPostProcessor, Environmen
 			AbstractRoutingDataSource abstractRoutingDataSource = (AbstractRoutingDataSource) dataSource;
 
 			// resolvedDataSources
-			Field resolvedDataSourcesField = findField(AbstractRoutingDataSource.class, "resolvedDataSources");
+			Field resolvedDataSourcesField = findField(AbstractRoutingDataSource.class, &#34;resolvedDataSources&#34;);
 			makeAccessible(resolvedDataSourcesField);
 
-			@SuppressWarnings("unchecked")
-			Map<Object, DataSource> resolvedDataSources = (Map<Object, DataSource>) getField(resolvedDataSourcesField, abstractRoutingDataSource);
+			@SuppressWarnings(&#34;unchecked&#34;)
+			Map&lt;Object, DataSource&gt; resolvedDataSources = (Map&lt;Object, DataSource&gt;) getField(resolvedDataSourcesField, abstractRoutingDataSource);
 			if (resolvedDataSources != null) {
-				resolvedDataSources.forEach((k, v) -> resolvedDataSources.put(k, convertToProxyDataSource(v)));
+				resolvedDataSources.forEach((k, v) -&gt; resolvedDataSources.put(k, convertToProxyDataSource(v)));
 			}
 
 			// resolvedDefaultDataSource
-			Field resolvedDefaultDataSourceField = findField(AbstractRoutingDataSource.class, "resolvedDefaultDataSource");
+			Field resolvedDefaultDataSourceField = findField(AbstractRoutingDataSource.class, &#34;resolvedDefaultDataSource&#34;);
 			makeAccessible(resolvedDefaultDataSourceField);
 
 			DataSource resolvedDefaultDataSource = (DataSource) getField(resolvedDefaultDataSourceField, abstractRoutingDataSource);
@@ -72,13 +72,13 @@ public class DevDataSourceConfiguration implements BeanPostProcessor, Environmen
 
 			// jdbc:h2:mem:test to  jdbc:p6spy:h2:mem:test
 			String jdbcUrl = oldConfig.getJdbcUrl();
-			if (!jdbcUrl.contains("p6spy")) {
-				jdbcUrl = "jdbc:p6spy" + jdbcUrl.substring(4);
+			if (!jdbcUrl.contains(&#34;p6spy&#34;)) {
+				jdbcUrl = &#34;jdbc:p6spy&#34; &#43; jdbcUrl.substring(4);
 			}
 
 			HikariConfig newConfig = new HikariConfig();
-			newConfig.setPoolName("proxy-P6SpyDriver");
-			newConfig.setDriverClassName("com.p6spy.engine.spy.P6SpyDriver");
+			newConfig.setPoolName(&#34;proxy-P6SpyDriver&#34;);
+			newConfig.setDriverClassName(&#34;com.p6spy.engine.spy.P6SpyDriver&#34;);
 			newConfig.setJdbcUrl(jdbcUrl);
 			newConfig.setUsername(oldConfig.getUsername());
 			newConfig.setPassword(oldConfig.getPassword());
@@ -93,4 +93,10 @@ public class DevDataSourceConfiguration implements BeanPostProcessor, Environmen
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-devDataSource)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E5%A6%82%E4%BD%95%E6%B7%BB%E5%8A%A0-sql-%E6%97%A5%E5%BF%97/  
 

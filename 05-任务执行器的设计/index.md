@@ -1,7 +1,7 @@
 # 05 任务执行器的设计
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 ## 任务执行器的设计
 
@@ -19,7 +19,7 @@ public interface NacosTask {
    * @return true means the nacos task should be done, otherwise false
    */
   // 对于立即执行的任务，默认 return true.
-  // 对于延时执行的任务，判断 System.currentTimeMillis() - this.lastProcessTime >= this.taskInterval.
+  // 对于延时执行的任务，判断 System.currentTimeMillis() - this.lastProcessTime &gt;= this.taskInterval.
   boolean shouldProcess();
 }
 ```
@@ -29,7 +29,7 @@ public interface NacosTask {
 // 从接口中可以看出
 // 1. addTask, 一个 key 对应一个 task
 // 2. addProcessor, 一个 key 对应一个 processor, 有默认的 processor
-public interface NacosTaskExecuteEngine<T extends NacosTask> extends Closeable {
+public interface NacosTaskExecuteEngine&lt;T extends NacosTask&gt; extends Closeable {
     
     /**
      * Get Task size in execute engine.
@@ -73,7 +73,7 @@ public interface NacosTaskExecuteEngine<T extends NacosTask> extends Closeable {
      *
      * @return collection of processors
      */
-    Collection<Object> getAllProcessorKey();
+    Collection&lt;Object&gt; getAllProcessorKey();
     
     /**
      * Set default task processor. If do not find task processor by task key, use this default processor to process
@@ -104,7 +104,7 @@ public interface NacosTaskExecuteEngine<T extends NacosTask> extends Closeable {
      *
      * @return collection of task keys.
      */
-    Collection<Object> getAllTaskKeys();
+    Collection&lt;Object&gt; getAllTaskKeys();
 }
 ```
 
@@ -121,7 +121,7 @@ public interface NacosTaskExecuteEngine<T extends NacosTask> extends Closeable {
 public PushDelayTask(Service service, long delay, String targetClient) {
     this.service = service;
     this.pushToAll = false;
-    this.targetClients = new HashSet<>(1);
+    this.targetClients = new HashSet&lt;&gt;(1);
     this.targetClients.add(targetClient);
     setTaskInterval(delay);
     // 设置上一次处理时间，用来判断是否过期
@@ -143,13 +143,13 @@ public void merge(AbstractDelayTask task) {
         targetClients.addAll(oldTask.getTargetClients());
     }
     setLastProcessTime(Math.min(getLastProcessTime(), task.getLastProcessTime()));
-    Loggers.PUSH.info("[PUSH] Task merge for {}", service);
+    Loggers.PUSH.info(&#34;[PUSH] Task merge for {}&#34;, service);
 }
     
 // shouldProcess 方法在父类上面, 判断当前任务都是过期
 @Override
 public boolean shouldProcess() {
-    return (System.currentTimeMillis() - this.lastProcessTime >= this.taskInterval);
+    return (System.currentTimeMillis() - this.lastProcessTime &gt;= this.taskInterval);
 }
 ```
 
@@ -169,7 +169,7 @@ public PushDelayTaskExecuteEngine(ClientManager clientManager, ClientServiceInde
 // 在父类 NacosDelayTaskExecuteEngine 中用单一的线程池来启动，然后处理任务
 public NacosDelayTaskExecuteEngine(String name, int initCapacity, Logger logger, long processInterval) {
     ...
-    tasks = new ConcurrentHashMap<>(initCapacity);
+    tasks = new ConcurrentHashMap&lt;&gt;(initCapacity);
     // 线程池
     processingExecutor = ExecutorFactory.newSingleScheduledExecutorService(new NameThreadFactory(name));
     // 最后调用自己的方法来处理任务
@@ -194,7 +194,7 @@ private class ProcessRunnable implements Runnable {
 // com.alibaba.nacos.common.task.engine.NacosDelayTaskExecuteEngine#processTasks
 protected void processTasks() {
     // 获取所有的 key，因为 addTask 方法，所以每一个 task 都会关联到一个 key
-    Collection<Object> keys = getAllTaskKeys();
+    Collection&lt;Object&gt; keys = getAllTaskKeys();
     for (Object taskKey : keys) {
         // 判断 task 是否到期，每个 task 创建时都是指定 taskInterval
         AbstractDelayTask task = removeTask(taskKey);
@@ -204,7 +204,7 @@ protected void processTasks() {
         // 获取相应的 processor 来处理，一般来说就是默认的 processor, 比如 PushDelayTaskProcessor, 下面会说这个类
         NacosTaskProcessor processor = getProcessor(taskKey);
         if (null == processor) {
-            getEngineLog().error("processor not found for task, so discarded. " + task);
+            getEngineLog().error(&#34;processor not found for task, so discarded. &#34; &#43; task);
             continue;
         }
         try {
@@ -214,7 +214,7 @@ protected void processTasks() {
                 retryFailedTask(taskKey, task);
             }
         } catch (Throwable e) {
-            getEngineLog().error("Nacos task execute error ", e);
+            getEngineLog().error(&#34;Nacos task execute error &#34;, e);
             retryFailedTask(taskKey, task);
         }
     }
@@ -253,3 +253,9 @@ private static class PushDelayTaskProcessor implements NacosTaskProcessor {
 ## 测试类
 
 `com.alibaba.nacos.common.task.engine.NacosDelayTaskExecuteEngineTest`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/05-%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8%E7%9A%84%E8%AE%BE%E8%AE%A1/  
+

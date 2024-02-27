@@ -1,9 +1,9 @@
 # 04 解析流程
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
-> 每次部署**新的流程**，必定会**解析流程**来检查文件是否**正确**，并将 `xml` 元素**映射**到 `java` 对象上。
+&gt; 每次部署**新的流程**，必定会**解析流程**来检查文件是否**正确**，并将 `xml` 元素**映射**到 `java` 对象上。
 
 ## 解析流程
 
@@ -92,13 +92,13 @@ public BpmnModel convertToBpmnModel(XMLStreamReader xtr) {
     model.setUserTaskFormTypes(userTaskFormTypes);
     try {
         Process activeProcess = null;
-        List<SubProcess> activeSubProcessList = new ArrayList<SubProcess>();
+        List&lt;SubProcess&gt; activeSubProcessList = new ArrayList&lt;SubProcess&gt;();
         while (xtr.hasNext()) {
             try {
                 xtr.next();
             } catch (Exception e) {
-                LOGGER.debug("Error reading XML document", e);
-                throw new XMLException("Error reading XML", e);
+                LOGGER.debug(&#34;Error reading XML document&#34;, e);
+                throw new XMLException(&#34;Error reading XML&#34;, e);
             }
             ...省略了一堆的判断代码
             } else if (ELEMENT_DI_EDGE.equals(xtr.getLocalName())) {
@@ -106,7 +106,7 @@ public BpmnModel convertToBpmnModel(XMLStreamReader xtr) {
       
             } else {
     
-                if (!activeSubProcessList.isEmpty() && ELEMENT_MULTIINSTANCE.equalsIgnoreCase(xtr.getLocalName())) {
+                if (!activeSubProcessList.isEmpty() &amp;&amp; ELEMENT_MULTIINSTANCE.equalsIgnoreCase(xtr.getLocalName())) {
       
                     multiInstanceParser.parseChildElement(xtr, activeSubProcessList.get(activeSubProcessList.size() - 1), model);
       
@@ -135,8 +135,8 @@ public BpmnModel convertToBpmnModel(XMLStreamReader xtr) {
         throw e;
 
     } catch (Exception e) {
-        LOGGER.error("Error processing BPMN document", e);
-        throw new XMLException("Error processing BPMN document", e);
+        LOGGER.error(&#34;Error processing BPMN document&#34;, e);
+        throw new XMLException(&#34;Error processing BPMN document&#34;, e);
     }
     return model;
 }
@@ -147,7 +147,7 @@ public BpmnModel convertToBpmnModel(XMLStreamReader xtr) {
 ```java
 // 应用解析器，会对流程元素设置 behavior, 这个很重要
 protected void applyParseHandlers() {
-    sequenceFlows = new HashMap<String, SequenceFlow>();
+    sequenceFlows = new HashMap&lt;String, SequenceFlow&gt;();
     // 遍历每个流程
     for (Process process : bpmnModel.getProcesses()) {
         currentProcess = process;
@@ -167,10 +167,10 @@ public void parseElement(BpmnParse bpmnParse, BaseElement element) {
   
     // Execute parse handlers
     // 获取解析器
-    List<BpmnParseHandler> handlers = parseHandlers.get(element.getClass());
+    List&lt;BpmnParseHandler&gt; handlers = parseHandlers.get(element.getClass());
   
     if (handlers == null) {
-        LOGGER.warn("Could not find matching parse handler for + " + element.getId() + " this is likely a bug.");
+        LOGGER.warn(&#34;Could not find matching parse handler for &#43; &#34; &#43; element.getId() &#43; &#34; this is likely a bug.&#34;);
     } else {
         for (BpmnParseHandler handler : handlers) {
             // 解析元素，以 ReceiveTaskParseHandler 为例子
@@ -184,9 +184,9 @@ public void parseElement(BpmnParse bpmnParse, BaseElement element) {
 
 ```java
 // 解析 receiveTask 
-public class ReceiveTaskParseHandler extends AbstractActivityBpmnParseHandler<ReceiveTask> {
+public class ReceiveTaskParseHandler extends AbstractActivityBpmnParseHandler&lt;ReceiveTask&gt; {
   
-    public Class<? extends BaseElement> getHandledType() {
+    public Class&lt;? extends BaseElement&gt; getHandledType() {
         return ReceiveTask.class;
     }
   
@@ -201,4 +201,10 @@ public class ReceiveTaskParseHandler extends AbstractActivityBpmnParseHandler<Re
 
 `org.activiti.examples.bpmn.receivetask.ReceiveTaskTest#testWaitStateBehavior`
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/04-%E8%A7%A3%E6%9E%90%E6%B5%81%E7%A8%8B/  
 

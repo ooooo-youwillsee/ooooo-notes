@@ -1,7 +1,7 @@
 # 18 删除配置
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 在 `nacos` 中，**删除配置**分为 `http` 和 `grpc` 两种方式，分别为 `ConfigControllerV2#deleteConfig` 和 `ConfigRemoveRequestHandler`。这两个方法的处理逻辑都是**一样的**，所以我就选择 `http` 的方式来分析代码。
 
@@ -11,16 +11,16 @@
 
 ```java
 // 接受 http 请求
-public Result<Boolean> deleteConfig(HttpServletRequest request, @RequestParam("dataId") String dataId,
-        @RequestParam("group") String group,
-        @RequestParam(value = "namespaceId", required = false, defaultValue = StringUtils.EMPTY) String namespaceId,
-        @RequestParam(value = "tag", required = false) String tag) throws NacosException {
+public Result&lt;Boolean&gt; deleteConfig(HttpServletRequest request, @RequestParam(&#34;dataId&#34;) String dataId,
+        @RequestParam(&#34;group&#34;) String group,
+        @RequestParam(value = &#34;namespaceId&#34;, required = false, defaultValue = StringUtils.EMPTY) String namespaceId,
+        @RequestParam(value = &#34;tag&#34;, required = false) String tag) throws NacosException {
     //fix issue #9783
     namespaceId = NamespaceUtil.processNamespaceParameter(namespaceId);
     // check namespaceId
     // 检查参数
     ParamUtils.checkTenantV2(namespaceId);
-    ParamUtils.checkParam(dataId, group, "datumId", "rm");
+    ParamUtils.checkParam(dataId, group, &#34;datumId&#34;, &#34;rm&#34;);
     ParamUtils.checkParamV2(tag);
     
     String clientIp = RequestUtil.getRemoteIp(request);
@@ -59,3 +59,9 @@ public Boolean deleteConfig(String dataId, String group, String namespaceId, Str
 ## 测试类
 
 `com.alibaba.nacos.test.config.ConfigAPI_V2_CITCase#test`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/18-%E5%88%A0%E9%99%A4%E9%85%8D%E7%BD%AE/  
+

@@ -1,9 +1,9 @@
 # 21 client 订阅配置
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
+&gt; 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
 
 ## 添加订阅者
 
@@ -17,7 +17,7 @@ public void addListener(String dataId, String group, Listener listener) throws N
 }
 
 // 添加监听器 
-public void addTenantListeners(String dataId, String group, List<? extends Listener> listeners)
+public void addTenantListeners(String dataId, String group, List&lt;? extends Listener&gt; listeners)
         throws NacosException {
     group = blank2defaultGroup(group);
     String tenant = agent.getTenant();
@@ -53,8 +53,8 @@ public void notifyListenConfig() {
 // 客户端启动会调用这个方法
 @Override
 public void startInternal() {
-    executor.schedule(() -> {
-        while (!executor.isShutdown() && !executor.isTerminated()) {
+    executor.schedule(() -&gt; {
+        while (!executor.isShutdown() &amp;&amp; !executor.isTerminated()) {
             try {
                 // 获取通知, 最大间隔时间为 5 秒
                 listenExecutebell.poll(5L, TimeUnit.SECONDS);
@@ -64,7 +64,7 @@ public void startInternal() {
                 // 执行配置监听
                 executeConfigListen();
             } catch (Throwable e) {
-                LOGGER.error("[rpc listen execute] [rpc listen] exception", e);
+                LOGGER.error(&#34;[rpc listen execute] [rpc listen] exception&#34;, e);
                 try {
                     Thread.sleep(50L);
                 } catch (InterruptedException interruptedException) {
@@ -84,11 +84,11 @@ public void startInternal() {
 // 执行配置监听
 @Override
 public void executeConfigListen() {
-    Map<String, List<CacheData>> listenCachesMap = new HashMap<>(16);
-    Map<String, List<CacheData>> removeListenCachesMap = new HashMap<>(16);
+    Map&lt;String, List&lt;CacheData&gt;&gt; listenCachesMap = new HashMap&lt;&gt;(16);
+    Map&lt;String, List&lt;CacheData&gt;&gt; removeListenCachesMap = new HashMap&lt;&gt;(16);
     long now = System.currentTimeMillis();
     // 每隔一段时间都需要全同步配置
-    boolean needAllSync = now - lastAllSyncTime >= ALL_SYNC_INTERNAL;
+    boolean needAllSync = now - lastAllSyncTime &gt;= ALL_SYNC_INTERNAL;
     // 遍历 cacheMap, 这个 map 都是要监听的配置
     for (CacheData cache : cacheMap.get().values()) {
         
@@ -108,20 +108,20 @@ public void executeConfigListen() {
             if (!cache.isDiscard()) {
                 //get listen  config
                 if (!cache.isUseLocalConfigInfo()) {
-                    List<CacheData> cacheDatas = listenCachesMap.get(String.valueOf(cache.getTaskId()));
+                    List&lt;CacheData&gt; cacheDatas = listenCachesMap.get(String.valueOf(cache.getTaskId()));
                     if (cacheDatas == null) {
-                        cacheDatas = new LinkedList<>();
+                        cacheDatas = new LinkedList&lt;&gt;();
                         listenCachesMap.put(String.valueOf(cache.getTaskId()), cacheDatas);
                     }
                     // 添加要监听的配置
                     cacheDatas.add(cache);
                 }
-            } else if (cache.isDiscard() && CollectionUtils.isEmpty(cache.getListeners())) {
+            } else if (cache.isDiscard() &amp;&amp; CollectionUtils.isEmpty(cache.getListeners())) {
                 // 是删除的配置，并且订阅者是空 
                 if (!cache.isUseLocalConfigInfo()) {
-                    List<CacheData> cacheDatas = removeListenCachesMap.get(String.valueOf(cache.getTaskId()));
+                    List&lt;CacheData&gt; cacheDatas = removeListenCachesMap.get(String.valueOf(cache.getTaskId()));
                     if (cacheDatas == null) {
-                        cacheDatas = new LinkedList<>();
+                        cacheDatas = new LinkedList&lt;&gt;();
                         removeListenCachesMap.put(String.valueOf(cache.getTaskId()), cacheDatas);
                     }
                     // 添加要删除的订阅者
@@ -157,17 +157,17 @@ public void executeConfigListen() {
 
 ```java
 // 拉取配置，检查是否改变
-private boolean checkListenCache(Map<String, List<CacheData>> listenCachesMap) {
+private boolean checkListenCache(Map&lt;String, List&lt;CacheData&gt;&gt; listenCachesMap) {
     
     final AtomicBoolean hasChangedKeys = new AtomicBoolean(false);
     if (!listenCachesMap.isEmpty()) {
-        List<Future> listenFutures = new ArrayList<>();
+        List&lt;Future&gt; listenFutures = new ArrayList&lt;&gt;();
         // 遍历 listenCachesMap, 每一个 taskId, 有一个线程负责拉取配置
-        for (Map.Entry<String, List<CacheData>> entry : listenCachesMap.entrySet()) {
+        for (Map.Entry&lt;String, List&lt;CacheData&gt;&gt; entry : listenCachesMap.entrySet()) {
             String taskId = entry.getKey();
             ExecutorService executorService = ensureSyncExecutor(taskId);
-            Future future = executorService.submit(() -> {
-                List<CacheData> listenCaches = entry.getValue();
+            Future future = executorService.submit(() -&gt; {
+                List&lt;CacheData&gt; listenCaches = entry.getValue();
                 //reset notify change flag.
                 // 重置
                 for (CacheData cacheData : listenCaches) {
@@ -181,12 +181,12 @@ private boolean checkListenCache(Map<String, List<CacheData>> listenCachesMap) {
                     // 请求服务端，如果 md5 值不一样，就会返回
                     ConfigChangeBatchListenResponse listenResponse = (ConfigChangeBatchListenResponse) requestProxy(
                             rpcClient, configChangeListenRequest);
-                    if (listenResponse != null && listenResponse.isSuccess()) {
+                    if (listenResponse != null &amp;&amp; listenResponse.isSuccess()) {
                         
                         // 表示是否拉取过配置
-                        Set<String> changeKeys = new HashSet<String>();
+                        Set&lt;String&gt; changeKeys = new HashSet&lt;String&gt;();
                         
-                        List<ConfigChangeBatchListenResponse.ConfigContext> changedConfigs = listenResponse.getChangedConfigs();
+                        List&lt;ConfigChangeBatchListenResponse.ConfigContext&gt; changedConfigs = listenResponse.getChangedConfigs();
                         //handle changed keys,notify listener
                         if (!CollectionUtils.isEmpty(changedConfigs)) {
                             hasChangedKeys.set(true);
@@ -233,7 +233,7 @@ private boolean checkListenCache(Map<String, List<CacheData>> listenCachesMap) {
                         
                     }
                 } catch (Throwable e) {
-                    LOGGER.error("Execute listen config change error ", e);
+                    LOGGER.error(&#34;Execute listen config change error &#34;, e);
                     try {
                         Thread.sleep(50L);
                     } catch (InterruptedException interruptedException) {
@@ -250,7 +250,7 @@ private boolean checkListenCache(Map<String, List<CacheData>> listenCachesMap) {
             try {
                 future.get();
             } catch (Throwable throwable) {
-                LOGGER.error("Async listen config change error ", throwable);
+                LOGGER.error(&#34;Async listen config change error &#34;, throwable);
             }
         }
         
@@ -276,14 +276,14 @@ private void refreshContentAndCheck(CacheData cacheData, boolean notify) {
             cacheData.setType(response.getConfigType());
         }
         if (notify) {
-            LOGGER.info("[{}] [data-received] dataId={}, group={}, tenant={}, md5={}, content={}, type={}",
+            LOGGER.info(&#34;[{}] [data-received] dataId={}, group={}, tenant={}, md5={}, content={}, type={}&#34;,
                     agent.getName(), cacheData.dataId, cacheData.group, cacheData.tenant, cacheData.getMd5(),
                     ContentUtils.truncateContent(response.getContent()), response.getConfigType());
         }
         // 检查 md5 值
         cacheData.checkListenerMd5();
     } catch (Exception e) {
-        LOGGER.error("refresh content and check md5 fail ,dataId={},group={},tenant={} ", cacheData.dataId,
+        LOGGER.error(&#34;refresh content and check md5 fail ,dataId={},group={},tenant={} &#34;, cacheData.dataId,
                 cacheData.group, cacheData.tenant, e);
     }
 }
@@ -306,10 +306,10 @@ void checkListenerMd5() {
 ```java
 private RpcClient ensureRpcClient(String taskId) throws NacosException {
     synchronized (ClientWorker.this) {
-        Map<String, String> labels = getLabels();
-        Map<String, String> newLabels = new HashMap<>(labels);
-        newLabels.put("taskId", taskId);
-        RpcClient rpcClient = RpcClientFactory.createClient(uuid + "_config-" + taskId, getConnectionType(),
+        Map&lt;String, String&gt; labels = getLabels();
+        Map&lt;String, String&gt; newLabels = new HashMap&lt;&gt;(labels);
+        newLabels.put(&#34;taskId&#34;, taskId);
+        RpcClient rpcClient = RpcClientFactory.createClient(uuid &#43; &#34;_config-&#34; &#43; taskId, getConnectionType(),
                 newLabels, RpcClientTlsConfig.properties(this.properties));
         if (rpcClient.isWaitInitiated()) {
             // 初始化 rpcClient
@@ -334,10 +334,10 @@ private void initRpcClientHandler(final RpcClient rpcClientInner) {
      * Register Config Change /Config ReSync Handler
      */
     // 注册配置通知的 requestHandler
-    rpcClientInner.registerServerRequestHandler((request) -> {
+    rpcClientInner.registerServerRequestHandler((request) -&gt; {
         if (request instanceof ConfigChangeNotifyRequest) {
             ConfigChangeNotifyRequest configChangeNotifyRequest = (ConfigChangeNotifyRequest) request;
-            LOGGER.info("[{}] [server-push] config changed. dataId={}, group={},tenant={}",
+            LOGGER.info(&#34;[{}] [server-push] config changed. dataId={}, group={},tenant={}&#34;,
                     rpcClientInner.getName(), configChangeNotifyRequest.getDataId(),
                     configChangeNotifyRequest.getGroup(), configChangeNotifyRequest.getTenant());
             String groupKey = GroupKey.getKeyTenant(configChangeNotifyRequest.getDataId(),
@@ -358,7 +358,7 @@ private void initRpcClientHandler(final RpcClient rpcClientInner) {
     });
     
     // ClientConfigMetricRequest
-    rpcClientInner.registerServerRequestHandler((request) -> {
+    rpcClientInner.registerServerRequestHandler((request) -&gt; {
         if (request instanceof ClientConfigMetricRequest) {
             ClientConfigMetricResponse response = new ClientConfigMetricResponse();
             response.setMetrics(getMetrics(((ClientConfigMetricRequest) request).getMetricsKeys()));
@@ -372,15 +372,15 @@ private void initRpcClientHandler(final RpcClient rpcClientInner) {
         
         @Override
         public void onConnected() {
-            LOGGER.info("[{}] Connected,notify listen context...", rpcClientInner.getName());
+            LOGGER.info(&#34;[{}] Connected,notify listen context...&#34;, rpcClientInner.getName());
             notifyListenConfig();
         }
         
         @Override
         public void onDisConnect() {
-            String taskId = rpcClientInner.getLabels().get("taskId");
-            LOGGER.info("[{}] DisConnected,clear listen context...", rpcClientInner.getName());
-            Collection<CacheData> values = cacheMap.get().values();
+            String taskId = rpcClientInner.getLabels().get(&#34;taskId&#34;);
+            LOGGER.info(&#34;[{}] DisConnected,clear listen context...&#34;, rpcClientInner.getName());
+            Collection&lt;CacheData&gt; values = cacheMap.get().values();
             
             for (CacheData cacheData : values) {
                 if (StringUtils.isNotBlank(taskId)) {
@@ -410,7 +410,7 @@ private void initRpcClientHandler(final RpcClient rpcClientInner) {
         }
         
         @Override
-        public List<String> getServerList() {
+        public List&lt;String&gt; getServerList() {
             return ConfigRpcTransportClient.super.serverListManager.getServerUrls();
             
         }
@@ -424,7 +424,7 @@ private void initRpcClientHandler(final RpcClient rpcClientInner) {
         }
         
         @Override
-        public Class<? extends Event> subscribeType() {
+        public Class&lt;? extends Event&gt; subscribeType() {
             return ServerlistChangeEvent.class;
         }
     };
@@ -432,4 +432,10 @@ private void initRpcClientHandler(final RpcClient rpcClientInner) {
 }
 ```
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/21-client-%E8%AE%A2%E9%98%85%E9%85%8D%E7%BD%AE/  
 

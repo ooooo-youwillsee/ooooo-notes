@@ -4,9 +4,9 @@
 
 ## 0、持续学习者
 
-> Talk is cheap. Show me the code.
+&gt; Talk is cheap. Show me the code.
 
-<br/>
+&lt;br/&gt;
 
 - **英语比编程简单。**
 - **学习和实践要平衡。**
@@ -55,11 +55,11 @@
 
 :one::zero:. [《Go Web 编程》](https://book.douban.com/subject/27204133/) :o:
 
-:one::two:. [《Effective C++》](https://book.douban.com/subject/1842426/)
+:one::two:. [《Effective C&#43;&#43;》](https://book.douban.com/subject/1842426/)
 
-:one::three:. [《More Effective C++》](https://book.douban.com/subject/5908727/)
+:one::three:. [《More Effective C&#43;&#43;》](https://book.douban.com/subject/5908727/)
 
-:one::four:. [《深度探索C++对象模型》](https://book.douban.com/subject/10427315/)
+:one::four:. [《深度探索C&#43;&#43;对象模型》](https://book.douban.com/subject/10427315/)
 
 :one::five:. [《Go语言设计与实现》](https://book.douban.com/subject/35635836/)
 
@@ -147,11 +147,11 @@
 
 :zero::six:. [Redis 源码剖析与实战](https://time.geekbang.org/column/intro/100084301) :o:
 
-:zero::seven:. [深入拆解 Tomcat & Jetty](https://time.geekbang.org/column/intro/100027701) :white_check_mark:
+:zero::seven:. [深入拆解 Tomcat &amp; Jetty](https://time.geekbang.org/column/intro/100027701) :white_check_mark:
 
 :zero::eight:. [深入 C 语言和程序运行原理](https://time.geekbang.org/column/intro/100100701)
 
-:zero::nine:. [罗剑锋的 C++ 实战笔记](https://time.geekbang.org/column/intro/100051801) :white_check_mark:
+:zero::nine:. [罗剑锋的 C&#43;&#43; 实战笔记](https://time.geekbang.org/column/intro/100051801) :white_check_mark:
 
 
 ### 3、视频
@@ -270,4 +270,10 @@
 
 :one::three:. [《工作细胞》](https://movie.douban.com/subject/28514091/) :white_check_mark: 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/2022%E5%B9%B4%E8%AE%A1%E5%88%92/  
 

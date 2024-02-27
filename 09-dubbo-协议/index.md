@@ -1,7 +1,7 @@
 # 09 dubbo 协议
 
 
-> 在 `dubbo 2.x` 中，**最常用**的协议就是 `dubbo` 协议，我们有必要**弄懂**整个实现过程。
+&gt; 在 `dubbo 2.x` 中，**最常用**的协议就是 `dubbo` 协议，我们有必要**弄懂**整个实现过程。
 
 ## export 导出服务
 
@@ -9,12 +9,12 @@
 
 ```java
 @Override
-public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
+public &lt;T&gt; Exporter&lt;T&gt; export(Invoker&lt;T&gt; invoker) throws RpcException {
     checkDestroyed();
     URL url = invoker.getUrl();
     String key = serviceKey(url);
     // 添加到 exporterMap
-    DubboExporter<T> exporter = new DubboExporter<T>(invoker, key, exporterMap);
+    DubboExporter&lt;T&gt; exporter = new DubboExporter&lt;T&gt;(invoker, key, exporterMap);
     ...
     // 打开服务，会监听端口
     openServer(url);
@@ -65,8 +65,8 @@ private ProtocolServer createServer(URL url) {
 
     // 使用 netty  
     String transporter = url.getParameter(SERVER_KEY, DEFAULT_REMOTING_SERVER);
-    if (StringUtils.isNotEmpty(transporter) && !url.getOrDefaultFrameworkModel().getExtensionLoader(Transporter.class).hasExtension(transporter)) {
-        throw new RpcException("Unsupported server type: " + transporter + ", url: " + url);
+    if (StringUtils.isNotEmpty(transporter) &amp;&amp; !url.getOrDefaultFrameworkModel().getExtensionLoader(Transporter.class).hasExtension(transporter)) {
+        throw new RpcException(&#34;Unsupported server type: &#34; &#43; transporter &#43; &#34;, url: &#34; &#43; url);
     }
 
     ExchangeServer server;
@@ -74,7 +74,7 @@ private ProtocolServer createServer(URL url) {
         // 绑定端口, 设置 requestHandler，因为 client 和 server 都是同一个 requestHandler, 最后再解析 
         server = Exchangers.bind(url, requestHandler);
     } catch (RemotingException e) {
-        throw new RpcException("Fail to start server(url: " + url + ") " + e.getMessage(), e);
+        throw new RpcException(&#34;Fail to start server(url: &#34; &#43; url &#43; &#34;) &#34; &#43; e.getMessage(), e);
     }
     ...
     return protocolServer;
@@ -87,19 +87,19 @@ private ProtocolServer createServer(URL url) {
 
 ```java
 @Override
-public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
+public &lt;T&gt; Invoker&lt;T&gt; refer(Class&lt;T&gt; type, URL url) throws RpcException {
     checkDestroyed();
     return protocolBindingRefer(type, url);
 }
 
 @Override
-public <T> Invoker<T> protocolBindingRefer(Class<T> serviceType, URL url) throws RpcException {
+public &lt;T&gt; Invoker&lt;T&gt; protocolBindingRefer(Class&lt;T&gt; serviceType, URL url) throws RpcException {
     checkDestroyed();
     // 优化序列化，不需要关心
     optimizeSerialization(url);
 
     // 获取 clients, 创建 dubboInvoker
-    DubboInvoker<T> invoker = new DubboInvoker<T>(serviceType, url, getClients(url), invokers);
+    DubboInvoker&lt;T&gt; invoker = new DubboInvoker&lt;T&gt;(serviceType, url, getClients(url), invokers);
     invokers.add(invoker);
     return invoker;
 }
@@ -120,8 +120,8 @@ private ClientsProvider getClients(URL url) {
     }
 
     // 获取多个client
-    List<ExchangeClient> clients = IntStream.range(0, connections)
-        .mapToObj((i) -> initClient(url))
+    List&lt;ExchangeClient&gt; clients = IntStream.range(0, connections)
+        .mapToObj((i) -&gt; initClient(url))
         .collect(Collectors.toList());
     return new ExclusiveClientsProvider(clients);
 }
@@ -151,36 +151,36 @@ private ExchangeClient initClient(URL url) {
             // 连接端口，设置 requestHandler
             : Exchangers.connect(url, requestHandler);
     } catch (RemotingException e) {
-        throw new RpcException("Fail to create remoting client for service(" + url + "): " + e.getMessage(), e);
+        throw new RpcException(&#34;Fail to create remoting client for service(&#34; &#43; url &#43; &#34;): &#34; &#43; e.getMessage(), e);
     }
 }
 ```
 
 ## requestHandler
 
-> client 和 server 共用的请求处理器
+&gt; client 和 server 共用的请求处理器
 
 源码位置: `org.apache.dubbo.remoting.exchange.support.ExchangeHandlerAdapter#reply`
 
 ```java
 @Override
-public CompletableFuture<Object> reply(ExchangeChannel channel, Object message) throws RemotingException {
+public CompletableFuture&lt;Object&gt; reply(ExchangeChannel channel, Object message) throws RemotingException {
     ...
     Invocation inv = (Invocation) message;
     // 获取 invoker
-    Invoker<?> invoker = inv.getInvoker() == null ? getInvoker(channel, inv) : inv.getInvoker();
+    Invoker&lt;?&gt; invoker = inv.getInvoker() == null ? getInvoker(channel, inv) : inv.getInvoker();
     // switch TCCL
     if (invoker.getUrl().getServiceModel() != null) {
         Thread.currentThread().setContextClassLoader(invoker.getUrl().getServiceModel().getClassLoader());
     }
     // 判断回调方法是否存在
     if (Boolean.TRUE.toString().equals(inv.getObjectAttachmentWithoutConvert(IS_CALLBACK_SERVICE_INVOKE))) {
-        String methodsStr = invoker.getUrl().getParameters().get("methods");
+        String methodsStr = invoker.getUrl().getParameters().get(&#34;methods&#34;);
         boolean hasMethod = false;
-        if (methodsStr == null || !methodsStr.contains(",")) {
+        if (methodsStr == null || !methodsStr.contains(&#34;,&#34;)) {
             hasMethod = inv.getMethodName().equals(methodsStr);
         } else {
-            String[] methods = methodsStr.split(",");
+            String[] methods = methodsStr.split(&#34;,&#34;);
             for (String method : methods) {
                 if (inv.getMethodName().equals(method)) {
                     hasMethod = true;
@@ -189,10 +189,10 @@ public CompletableFuture<Object> reply(ExchangeChannel channel, Object message) 
             }
         }
         if (!hasMethod) {
-            logger.warn(PROTOCOL_FAILED_REFER_INVOKER, "", "", new IllegalStateException("The methodName " + inv.getMethodName()
-                + " not found in callback service interface ,invoke will be ignored."
-                + " please update the api interface. url is:"
-                + invoker.getUrl()) + " ,invocation is :" + inv);
+            logger.warn(PROTOCOL_FAILED_REFER_INVOKER, &#34;&#34;, &#34;&#34;, new IllegalStateException(&#34;The methodName &#34; &#43; inv.getMethodName()
+                &#43; &#34; not found in callback service interface ,invoke will be ignored.&#34;
+                &#43; &#34; please update the api interface. url is:&#34;
+                &#43; invoker.getUrl()) &#43; &#34; ,invocation is :&#34; &#43; inv);
             return null;
         }
     }
@@ -203,4 +203,10 @@ public CompletableFuture<Object> reply(ExchangeChannel channel, Object message) 
 }
 ```
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/09-dubbo-%E5%8D%8F%E8%AE%AE/  
 

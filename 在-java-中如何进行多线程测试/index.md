@@ -17,8 +17,8 @@
 
 ```java
 @JCStressTest
-@Outcome(id = {"1, 2", "2, 1"}, expect = Expect.ACCEPTABLE, desc = "Mutex works")
-@Outcome(id = "1, 1", expect = Expect.FORBIDDEN, desc = "Mutex failure")
+@Outcome(id = {&#34;1, 2&#34;, &#34;2, 1&#34;}, expect = Expect.ACCEPTABLE, desc = &#34;Mutex works&#34;)
+@Outcome(id = &#34;1, 1&#34;, expect = Expect.FORBIDDEN, desc = &#34;Mutex failure&#34;)
 @State
 public class Mutex_03_SpinLock {
 
@@ -30,7 +30,7 @@ public class Mutex_03_SpinLock {
     while (taken.get() || !taken.compareAndSet(false, true))
       ; // wait
     { // critical section
-      r.r1 = ++v;
+      r.r1 = &#43;&#43;v;
     }
     taken.set(false);
   }
@@ -40,7 +40,7 @@ public class Mutex_03_SpinLock {
     while (taken.get() || !taken.compareAndSet(false, true))
       ; // wait
     { // critical section
-      r.r2 = ++v;
+      r.r2 = &#43;&#43;v;
     }
     taken.set(false);
   }
@@ -54,4 +54,10 @@ public class Mutex_03_SpinLock {
 
 ## 3. 参考
 
-> 强烈建议大家看官方代码, 地址: https://github.com/openjdk/jcstress
+&gt; 强烈建议大家看官方代码, 地址: https://github.com/openjdk/jcstress
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%B5%8B%E8%AF%95/  
+

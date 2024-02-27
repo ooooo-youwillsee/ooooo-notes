@@ -7,14 +7,14 @@ Redis 制定了 RESP（redis序列化协议）实现客户端和服务端的正�
 
 ### 1、发送命令格式
 
-CRLF 为 '\r\n'
+CRLF 为 &#39;\r\n&#39;
 ```shell script
-*<参数数量> CRLF
-$<参数 1 的字节数量> CRLF
-<参数 1> CRLF
+*&lt;参数数量&gt; CRLF
+$&lt;参数 1 的字节数量&gt; CRLF
+&lt;参数 1&gt; CRLF
 ...
-$<参数 N 的字节数量> CRLF
-<参数 N> CRLF
+$&lt;参数 N 的字节数量&gt; CRLF
+&lt;参数 N&gt; CRLF
 ```
 
 以 `set hello world` 命令为例：
@@ -30,11 +30,11 @@ world
 
 ### 2、返回结果格式
 
-- 状态回复，第一个字节为 "+"。如 `set`
-- 错误回复，第一个字节为 "-"。如 `错误命令`
-- 整数回复，第一个字节为 ":"。如 `incr`
-- 字符串回复，第一个字节为 "$"。如 `get`
-- 多条字符串回复，第一个字节为 "*"。如 `mget`
+- 状态回复，第一个字节为 &#34;&#43;&#34;。如 `set`
+- 错误回复，第一个字节为 &#34;-&#34;。如 `错误命令`
+- 整数回复，第一个字节为 &#34;:&#34;。如 `incr`
+- 字符串回复，第一个字节为 &#34;$&#34;。如 `get`
+- 多条字符串回复，第一个字节为 &#34;*&#34;。如 `mget`
 
 ## 2、Java 客户端 Jedis
 
@@ -70,7 +70,7 @@ Redis 为每个客户端分配了输入缓冲区，它的作用将客户端发�
 1. Redis 处理速度跟不上输入缓冲区的输入速度，可能存在 **bigKey**。
 2. Redis 发生了阻塞。
 
-Redis 为每个客户端分配了输出缓冲区，它的作用是保存命令执行的结果返回给客户端。通过配置文件中的 `client-output-buffer-limit <class> <hard limit> <soft limit> <soft seconds>` 来配置。不受 `maxmemory` 参数影响。
+Redis 为每个客户端分配了输出缓冲区，它的作用是保存命令执行的结果返回给客户端。通过配置文件中的 `client-output-buffer-limit &lt;class&gt; &lt;hard limit&gt; &lt;soft limit&gt; &lt;soft seconds&gt;` 来配置。不受 `maxmemory` 参数影响。
 
 - obl: 固定输出缓冲区大小
 - oll: 动态输出缓冲区大小，当固定缓冲区满了，就会使用动态缓冲区
@@ -192,7 +192,7 @@ Redis 为每个客户端分配了输出缓冲区，它的作用是保存命令�
 - 排查是否由客户端缓冲区应引发的问题，通过执行命令 `info clients`来查看。
 
 **处理方法**：
-- 通过命令 `redis-cli info list | grep -v "omemo=0"`， 找到非零的客户端连接，然后 kill 掉。
+- 通过命令 `redis-cli info list | grep -v &#34;omemo=0&#34;`， 找到非零的客户端连接，然后 kill 掉。
 - 可能就是运行命令 `monitor` 造成的，一般都建议在生厂环境中禁用 `monitor`。
 
 ### 2、客户端周期性超时
@@ -210,4 +210,10 @@ Redis 为每个客户端分配了输出缓冲区，它的作用是保存命令�
 
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/redis-development-and-operation-and-maintenance/04/  
 

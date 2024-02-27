@@ -39,7 +39,7 @@
 ```shell script
   TTL key
 ```
-\>0: 剩余过期时间
+\&gt;0: 剩余过期时间
 
 -1: 没有设置过期时间
 
@@ -222,7 +222,7 @@ field 个数比较多时，会阻塞 redis。
 ```shell script
   LPOP key # 左边弹出
   RPOP key # 右边弹出
-  LREM key count value ## 删除 count 个 value 值, count > 0,从左边删除；count < 0,从右边删除；count = 0, 删除所有
+  LREM key count value ## 删除 count 个 value 值, count &gt; 0,从左边删除；count &lt; 0,从右边删除；count = 0, 删除所有
   LTRIM key start stop # 只保留[start, stop]的元素
 ```
 
@@ -422,7 +422,7 @@ key 表示需要操作的 key。
 - 键过期
 ```shell script
   EXPIRE key seconds
-  # >0: 剩余过期时间
+  # &gt;0: 剩余过期时间
   # -1: 没有设置过期时间；
   # -2: 键不存在
 ```
@@ -441,7 +441,7 @@ key 表示需要操作的 key。
 
 迁移到 localhost:6380 的 db0 库上，timeout为 1000ms，命令为 `MIGRATE localhost 6380 hello 0 1000`。
 
-迁移多个键 k1, k2, k3，命令为 `MIGRATE localhost 6380 "" 0 1000 KEYS k1 k2 k3`。
+迁移多个键 k1, k2, k3，命令为 `MIGRATE localhost 6380 &#34;&#34; 0 1000 KEYS k1 k2 k3`。
 
 ### 2、遍历键
 
@@ -464,4 +464,10 @@ key 表示需要操作的 key。
 ### 3、数据库管理
 
 无，因为集群模式下，只能使用一个数据库，生产环境也是如此。
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/redis-development-and-operation-and-maintenance/02/  
 

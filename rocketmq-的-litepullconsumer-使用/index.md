@@ -11,15 +11,15 @@ public class RocketMQHandler extends AbstractMQHandler {
 
   private final RocketMQConfig config;
 
-  private final Supplier<DefaultMQProducer> producer;
+  private final Supplier&lt;DefaultMQProducer&gt; producer;
 
-  private final Supplier<DefaultLitePullConsumer> consumer;
+  private final Supplier&lt;DefaultLitePullConsumer&gt; consumer;
 
   public RocketMQHandler(RocketMQProperties properties, RocketMQConfig config) {
     this.config = config;
     // 这里要延迟初始化，否则启动 consumer 占用 consumerQueue
-    this.producer = SingletonSupplier.of(() -> createProducer(properties, config));
-    this.consumer = SingletonSupplier.of(() -> createConsumer(properties, config));
+    this.producer = SingletonSupplier.of(() -&gt; createProducer(properties, config));
+    this.consumer = SingletonSupplier.of(() -&gt; createConsumer(properties, config));
   }
 
   @SneakyThrows
@@ -27,7 +27,7 @@ public class RocketMQHandler extends AbstractMQHandler {
   public void send(String message) {
     Message m = new Message(config.getDestinationName(), message.getBytes(StandardCharsets.UTF_8));
     if (log.isTraceEnabled()) {
-      log.trace("{} send message: {}", RocketMQHandler.this.getClass().getSimpleName(), message);
+      log.trace(&#34;{} send message: {}&#34;, RocketMQHandler.this.getClass().getSimpleName(), message);
     }
     producer.get().send(m);
   }
@@ -45,12 +45,12 @@ public class RocketMQHandler extends AbstractMQHandler {
 
     @Override
     public void run() {
-      List<MessageExt> msgs = consumer.get().poll(PULL_PERIOD);
+      List&lt;MessageExt&gt; msgs = consumer.get().poll(PULL_PERIOD);
       if (CollectionUtils.isNotEmpty(msgs)) {
-        msgs.forEach(m -> {
+        msgs.forEach(m -&gt; {
           String message = new String(m.getBody(), StandardCharsets.UTF_8);
           if (log.isTraceEnabled()) {
-            log.trace("{} receive message: {}", RocketMQHandler.this.getClass().getSimpleName(), message);
+            log.trace(&#34;{} receive message: {}&#34;, RocketMQHandler.this.getClass().getSimpleName(), message);
           }
 
           listener.onMessage(message);
@@ -81,7 +81,7 @@ public class RocketMQHandler extends AbstractMQHandler {
         consumer.setMessageModel(MessageModel.BROADCASTING);
         break;
     }
-    consumer.subscribe(config.getDestinationName(), "*");
+    consumer.subscribe(config.getDestinationName(), &#34;*&#34;);
     consumer.start();
     return consumer;
   }
@@ -89,3 +89,9 @@ public class RocketMQHandler extends AbstractMQHandler {
 }
 
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/rocketmq-%E7%9A%84-litepullconsumer-%E4%BD%BF%E7%94%A8/  
+

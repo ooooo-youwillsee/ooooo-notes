@@ -45,3 +45,9 @@ catch ( IOException | XEception e) { // Multiple catch
 2. Java 每实例化一个 `Exception`，就会对当前栈进行快照。
 
 
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/java-core-36/02/  
+

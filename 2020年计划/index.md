@@ -3,9 +3,9 @@
 
 ## 0、持续学习者
 
-> Talk is cheap. Show me the code.
+&gt; Talk is cheap. Show me the code.
 
-<br/>
+&lt;br/&gt;
 
 * **英语比编程简单。**
 * **学习和实践要平衡。**
@@ -32,7 +32,7 @@
 3. 看 [Spring](https://docs.spring.io)。
 4. 看 [Friends](https://www.youtube.com/playlist?list=ELwQA2MMl54Cc)。 :question:
 
-目前状态: &nbsp;&nbsp; **扇贝阅读**。 :exclamation:
+目前状态: &amp;nbsp;&amp;nbsp; **扇贝阅读**。 :exclamation:
 
 
 ## 2、关于技术
@@ -76,7 +76,7 @@
    
    :zero::two:. [《玩转算法系列--玩转数据结构 Java 版》](https://coding.imooc.com/class/207.html)  :white_check_mark:
 
-   :zero::three:. [《算法与数据结构-综合提升 C++ 版》](https://coding.imooc.com/class/71.html)  :white_check_mark:
+   :zero::three:. [《算法与数据结构-综合提升 C&#43;&#43; 版》](https://coding.imooc.com/class/71.html)  :white_check_mark:
 
    :zero::four:. [《玩转 Spring 全家桶》](https://time.geekbang.org/course/intro/100023501)  :white_check_mark:
 
@@ -90,7 +90,7 @@
 
 ## 4、关于其他
 
-- 阅读，+笔记
+- 阅读，&#43;笔记
 
 :zero::one:. [《指数基金投资指南》](https://book.douban.com/subject/27204860/)  :white_check_mark:
 
@@ -123,4 +123,10 @@
 
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/2020%E5%B9%B4%E8%AE%A1%E5%88%92/  
 

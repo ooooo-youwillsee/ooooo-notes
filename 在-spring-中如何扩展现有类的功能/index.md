@@ -16,7 +16,7 @@ public class CompositePropertySources implements PropertySources {
 	
 	private final MutablePropertySources mutablePropertySources = new MutablePropertySources();
 	
-	public CompositePropertySources(List<AbstractSimplePropertySource> sources) {
+	public CompositePropertySources(List&lt;AbstractSimplePropertySource&gt; sources) {
 		if (sources == null) return;
 		AnnotationAwareOrderComparator.sort(sources);
 		for (AbstractSimplePropertySource source : sources) {
@@ -25,7 +25,7 @@ public class CompositePropertySources implements PropertySources {
 	}
 	
 	public boolean containsProperty(String name) {
-		return stream().anyMatch(p -> p.containsProperty(name));
+		return stream().anyMatch(p -&gt; p.containsProperty(name));
 	}
 	
 	public String getProperty(String name) {
@@ -34,7 +34,7 @@ public class CompositePropertySources implements PropertySources {
 	
 	public String getProperty(String propertyName, String defaultValue) {
 		String value = null;
-		for (PropertySource<?> ps : mutablePropertySources) {
+		for (PropertySource&lt;?&gt; ps : mutablePropertySources) {
 			value = (String) ps.getProperty(propertyName);
 			if (value != null) {
 				return value;
@@ -43,9 +43,9 @@ public class CompositePropertySources implements PropertySources {
 		return defaultValue;
 	}
 	
-	public Map<String, String> getProperties(String... propertyNames) {
+	public Map&lt;String, String&gt; getProperties(String... propertyNames) {
 		if (propertyNames != null) {
-			Map<String, String> map = new HashMap<>();
+			Map&lt;String, String&gt; map = new HashMap&lt;&gt;();
 			for (String key : propertyNames) {
 				map.put(key, getProperty(key, null));
 			}
@@ -128,15 +128,15 @@ public class CompositePropertySourcesBeanPostProcessor implements BeanPostProces
     }
   }
 
-  private static final Function<String, String[]> propertyNamesFunction = (propertyName) -> {
+  private static final Function&lt;String, String[]&gt; propertyNamesFunction = (propertyName) -&gt; {
     if (propertyName == null) {
       return new String[0];
     }
 
     propertyName = propertyName.trim();
 
-    if (propertyName.contains(".")) {
-      return new String[]{propertyName, propertyName.substring(propertyName.lastIndexOf(".") + 1)};
+    if (propertyName.contains(&#34;.&#34;)) {
+      return new String[]{propertyName, propertyName.substring(propertyName.lastIndexOf(&#34;.&#34;) &#43; 1)};
     }
 
     return new String[]{propertyName};
@@ -149,4 +149,10 @@ public class CompositePropertySourcesBeanPostProcessor implements BeanPostProces
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-compositePropertySourcesExt)
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-spring-%E4%B8%AD%E5%A6%82%E4%BD%95%E6%89%A9%E5%B1%95%E7%8E%B0%E6%9C%89%E7%B1%BB%E7%9A%84%E5%8A%9F%E8%83%BD/  
 

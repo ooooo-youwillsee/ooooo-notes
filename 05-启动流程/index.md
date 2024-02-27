@@ -1,9 +1,9 @@
 # 05 启动流程
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
-> 启动流程的方法有多个，这里以 `startProcessInstanceByKey` 为入口来分析
+&gt; 启动流程的方法有多个，这里以 `startProcessInstanceByKey` 为入口来分析
 
 ## 启动流程
 
@@ -13,7 +13,7 @@
 // 启动流程
 public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
     // 执行 StartProcessInstanceCmd
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processDefinitionKey, null, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd&lt;ProcessInstance&gt;(processDefinitionKey, null, null, null));
 }
 ```
 
@@ -42,7 +42,7 @@ public ProcessInstance execute(CommandContext commandContext) {
 // 创建和启动流程实例
 protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition,
                                                         String businessKey, String processInstanceName,
-                                                        Map<String, Object> variables, Map<String, Object> transientVariables, boolean startProcessInstance) {
+                                                        Map&lt;String, Object&gt; variables, Map&lt;String, Object&gt; transientVariables, boolean startProcessInstance) {
 
     // 获取主流程
     Process process = this.getActiveProcess(processDefinition);
@@ -61,7 +61,7 @@ protected ProcessInstance createAndStartProcessInstance(ProcessDefinition proces
 ```java
 public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
                                                                          String businessKey, String processInstanceName, FlowElement initialFlowElement,
-                                                                         Process process, Map<String, Object> variables, Map<String, Object> transientVariables, boolean startProcessInstance) {
+                                                                         Process process, Map&lt;String, Object&gt; variables, Map&lt;String, Object&gt; transientVariables, boolean startProcessInstance) {
 
     // 创建流程实例
     ExecutionEntity processInstance = createProcessInstanceWithInitialFlowElement(processDefinition,
@@ -124,7 +124,7 @@ public ExecutionEntity createProcessInstanceWithInitialFlowElement(ProcessDefini
 
 ```java
 // 启动流程实例
-public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables, FlowElement initialFlowElement, Map<String, Object> transientVariables) {
+public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map&lt;String, Object&gt; variables, FlowElement initialFlowElement, Map&lt;String, Object&gt; transientVariables) {
     Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
     createProcessVariables(processInstance, variables, transientVariables, process);
     recordStartProcessInstance(commandContext, initialFlowElement, processInstance);
@@ -144,4 +144,10 @@ public void startProcessInstance(ExecutionEntity processInstance, CommandContext
 ## 测试类
 
 `org.activiti.examples.bpmn.receivetask.ReceiveTaskTest#testWaitStateBehavior`
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/05-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/  
 

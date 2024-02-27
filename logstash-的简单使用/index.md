@@ -11,41 +11,41 @@ refer to [logstash document](https://www.elastic.co/guide/en/logstash/current/in
 ```
 input { 
     tcp {
-        port => 12345
-        codec => "json_lines"
+        port =&gt; 12345
+        codec =&gt; &#34;json_lines&#34;
     }
 }
 filter{
     grok {
-        match => ["message", "%{TIMESTAMP_ISO8601:logdate}"]
+        match =&gt; [&#34;message&#34;, &#34;%{TIMESTAMP_ISO8601:logdate}&#34;]
     }
 
     date {
-        match => ["logdate", "yyyy-MM-dd HH:mm:ss.SSS"]
-        target => "@timestamp"
+        match =&gt; [&#34;logdate&#34;, &#34;yyyy-MM-dd HH:mm:ss.SSS&#34;]
+        target =&gt; &#34;@timestamp&#34;
     }
 
     mutate {  
-        remove_field => ["logdate"]  
+        remove_field =&gt; [&#34;logdate&#34;]  
     } 
 
     ruby {   
-        code => "event.set('timestamp', event.get('@timestamp').time.localtime + 8*60*60)"   
+        code =&gt; &#34;event.set(&#39;timestamp&#39;, event.get(&#39;@timestamp&#39;).time.localtime &#43; 8*60*60)&#34;   
     }  
 
     ruby {  
-        code => "event.set('@timestamp',event.get('timestamp'))"  
+        code =&gt; &#34;event.set(&#39;@timestamp&#39;,event.get(&#39;timestamp&#39;))&#34;  
     } 
 
     mutate {  
-        remove_field => ["timestamp"]  
+        remove_field =&gt; [&#34;timestamp&#34;]  
     } 
 }
 output {
-  stdout { codec => rubydebug { metadata => true } }
+  stdout { codec =&gt; rubydebug { metadata =&gt; true } }
   file {
-    path => "./logs/%{+YYYY-MM-dd-HH}.log"
-    codec => line { format => "%{message}"}
+    path =&gt; &#34;./logs/%{&#43;YYYY-MM-dd-HH}.log&#34;
+    codec =&gt; line { format =&gt; &#34;%{message}&#34;}
   }
 }
 
@@ -53,7 +53,13 @@ output {
 
 notes:
 1. it will serve **TCP** connection on **localhost:12345**.
-2. uses codec named `json_lines`, json data format such as `{ "message" : "xxxx" }`.
+2. uses codec named `json_lines`, json data format such as `{ &#34;message&#34; : &#34;xxxx&#34; }`.
 3. matche **date** pattern in the log, then use it as its time.
 4. reset the field `@timestamp`, output to the local file.
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/logstash-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/  
 

@@ -51,3 +51,9 @@ Linux 还可以使用 zero copy。
 如果消息的副本数为 3，大约就是 30 台机器。
 
 
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/06/  
+

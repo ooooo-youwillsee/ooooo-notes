@@ -10,11 +10,11 @@
 * 测试类，参考 `ConcurrentStackUsingArrayTest`
 
 ```java
-public class ConcurrentStackUsingArray<E> {
+public class ConcurrentStackUsingArray&lt;E&gt; {
 
   private final AtomicInteger CTL = new AtomicInteger(0);
 
-  private final AtomicReference<E[]> arr = new AtomicReference<>((E[]) new Object[10]);
+  private final AtomicReference&lt;E[]&gt; arr = new AtomicReference&lt;&gt;((E[]) new Object[10]);
 
   private final AtomicInteger index = new AtomicInteger(0);
 
@@ -23,7 +23,7 @@ public class ConcurrentStackUsingArray<E> {
       Thread.yield();
     }
 
-    while (index.get() >= arr.get().length) {
+    while (index.get() &gt;= arr.get().length) {
       E[] oldArr = arr.get();
       E[] newArr = (E[]) new Object[oldArr.length * 2];
       System.arraycopy(oldArr, 0, newArr, 0, oldArr.length);
@@ -54,4 +54,10 @@ public class ConcurrentStackUsingArray<E> {
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/demo-java-concurrent)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E4%BD%BF%E7%94%A8-cas-%E6%9D%A5%E5%AE%9E%E7%8E%B0%E6%A0%882/  
 

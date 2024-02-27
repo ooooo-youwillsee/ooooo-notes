@@ -15,3 +15,9 @@
 
 [第六章 复制](./06)
 
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/redis-development-and-operation-and-maintenance/readme/  
+

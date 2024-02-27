@@ -132,8 +132,8 @@
 
 压缩算法的优劣有两个指标：压缩比和压缩/解压缩吞吐量；
 
-- 压缩比：zstd > LZ4 > GZIP > Snappy
-- 吞吐量：LZ4 > Snappy > zstd / GZIP
+- 压缩比：zstd &gt; LZ4 &gt; GZIP &gt; Snappy
+- 吞吐量：LZ4 &gt; Snappy &gt; zstd / GZIP
 
 ## 9、无消息丢失配置
 
@@ -143,9 +143,9 @@ kafka只对已提交的消息做有限度的持久化保证。
 - 设置acks = all；表明所有副本broker都要接收到消息，保证消息”已提交“；
 - 设置retries为一个较大的值；
 - 设置unclean.leader.election.enable = false；表示禁止落后的broker被选为leader。
-- 设置replication.factor >= 3；
-- 设置min.insync.replicas > 1；控制消息至少被写入多少个副本才算“已提交”；
-- 确保replication.factor > min.insync.replicas；推荐replication.factor = min.insync.replicas + 1；
+- 设置replication.factor &gt;= 3；
+- 设置min.insync.replicas &gt; 1；控制消息至少被写入多少个副本才算“已提交”；
+- 确保replication.factor &gt; min.insync.replicas；推荐replication.factor = min.insync.replicas &#43; 1；
 - 设置enable.auto.commit = false；确保消息消费完成再提交；
 
 ## 10、幂等性和事务性
@@ -156,7 +156,7 @@ kafka只对已提交的消息做有限度的持久化保证。
 
 ​	kafka事务一般为两种：1、 只有Producer生产消息 ；2、生产消费并存（consumer-transform-producer）；3、只有Consumer消费消息。
 
-- 幂等性Producer：只能保证单分区、单会话上的消息幂等性（设置幂等性：props.put("enable.idempotence", true)或props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true)）
+- 幂等性Producer：只能保证单分区、单会话上的消息幂等性（设置幂等性：props.put(&#34;enable.idempotence&#34;, true)或props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true)）
 
   事务提供的ACID特性：原子性（Atomicity）、一致性（Consistency）、隔离性（Isolation）、持久性（Durability）
 
@@ -210,7 +210,7 @@ kafka只对已提交的消息做有限度的持久化保证。
 
 ## 12、位移主题（_consumer_offsets）
 
-​	_consumer_offsets的主要作用就是保存Kafka消费者的位移消息。消息格式是KV对，Key保存的是<Group ID,主题名，分区号>；另外还有两种消息格式：1.用于保存Consumer Group信息的消息；2.用于删除Group过期位移甚至是删除Group的消息。
+​	_consumer_offsets的主要作用就是保存Kafka消费者的位移消息。消息格式是KV对，Key保存的是&lt;Group ID,主题名，分区号&gt;；另外还有两种消息格式：1.用于保存Consumer Group信息的消息；2.用于删除Group过期位移甚至是删除Group的消息。
 
 ​	当有第一个Consumer消费数据时，Kafka就会自动创建_consumer_offsets这个主题，默认有50个分区，3个副本。
 
@@ -224,18 +224,18 @@ kafka只对已提交的消息做有限度的持久化保证。
 
   ```java
   Properties props = new Properties();
-  props.put("bootstrap.servers","localhost:9092");
-  props.put("group.id","test");
-  props.put("enable.auto.commit","true");
-  props.put("auto.commit.interval.ms","2000");
-  props.put("key.deserializer","org.apache.kafka.common.serialization.String*Serializer");
-  props.put("value.deserializer","org.apache.kafka.common.serialization.String*Serializer");
-  KafkaConsumer<String,String> consumer = new KafkaConsumer<>(props);
-  consumer.subscribe(Arrays.asList("foo","bar"));
+  props.put(&#34;bootstrap.servers&#34;,&#34;localhost:9092&#34;);
+  props.put(&#34;group.id&#34;,&#34;test&#34;);
+  props.put(&#34;enable.auto.commit&#34;,&#34;true&#34;);
+  props.put(&#34;auto.commit.interval.ms&#34;,&#34;2000&#34;);
+  props.put(&#34;key.deserializer&#34;,&#34;org.apache.kafka.common.serialization.String*Serializer&#34;);
+  props.put(&#34;value.deserializer&#34;,&#34;org.apache.kafka.common.serialization.String*Serializer&#34;);
+  KafkaConsumer&lt;String,String&gt; consumer = new KafkaConsumer&lt;&gt;(props);
+  consumer.subscribe(Arrays.asList(&#34;foo&#34;,&#34;bar&#34;));
   while(true){
-      ConsumerRecords<String,String> records = consumer.poll(100);
-      for(ConsumerRecord<String,String> record : records){
-          System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), resord.value());
+      ConsumerRecords&lt;String,String&gt; records = consumer.poll(100);
+      for(ConsumerRecord&lt;String,String&gt; record : records){
+          System.out.printf(&#34;offset = %d, key = %s, value = %s%n&#34;, record.offset(), record.key(), resord.value());
       }
   }
   ```
@@ -250,7 +250,7 @@ kafka只对已提交的消息做有限度的持久化保证。
 
   ```java
   while(true){
-      ConsumerRecords<String,String> records = consumer.poll(Duration.ofSeconds(1));
+      ConsumerRecords&lt;String,String&gt; records = consumer.poll(Duration.ofSeconds(1));
       process(records);	//处理消息
       try{
           consumer.commitSync();
@@ -268,9 +268,9 @@ kafka只对已提交的消息做有限度的持久化保证。
 
   ```java
   while(true){
-      ConsumerRecords<String,String> records = consumer.poll(Duration.ofSeconds(1));
+      ConsumerRecords&lt;String,String&gt; records = consumer.poll(Duration.ofSeconds(1));
       process(records);	//处理消息
-          consumer.commitAsync((offsets,exception) -> {
+          consumer.commitAsync((offsets,exception) -&gt; {
               if(exception != null)
                   handle(exception);
           });
@@ -279,14 +279,14 @@ kafka只对已提交的消息做有限度的持久化保证。
 
   
 
-- 同步+异步提交
+- 同步&#43;异步提交
 
   手动提交中，commitSync()和commitAsync()结合使用会有很好的效果，利用commitSync()的自动重试避免瞬时错误，利用commitAsync()不会阻塞。
 
   ```java
   try {
    	while (true) {
-   		ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
+   		ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofSeconds(1));
    		process(records); // 处理消息
    		commitAysnc(); // 使用异步提交规避阻塞
    	}
@@ -306,17 +306,17 @@ kafka只对已提交的消息做有限度的持久化保证。
     通常poll的数据全部处理完后再提交位移，如果poll的总数很大，而处理过程中出现差错了，下一次会重复消费，就需要设置细粒度的提交位移。
 
     ```java
-    private Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
+    private Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets = new HashMap&lt;&gt;();
     int count = 0;
     ……
     while (true) {
-     	ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
-     	for (ConsumerRecord<String, String> record: records) {
+     	ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofSeconds(1));
+     	for (ConsumerRecord&lt;String, String&gt; record: records) {
      	process(record); // 处理消息
-    	offsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
+    	offsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() &#43; 1));
      	if（count % 100 == 0）
      	consumer.commitAsync(offsets, null); // 回调处理逻辑是
-     	count++;
+     	count&#43;&#43;;
     	}
     }
     ```
@@ -335,10 +335,10 @@ kafka只对已提交的消息做有限度的持久化保证。
 …
 Properties props = new Properties();
 …
-props.put("max.poll.interval.ms", 5000);
-consumer.subscribe(Arrays.asList("test-topic"));
+props.put(&#34;max.poll.interval.ms&#34;, 5000);
+consumer.subscribe(Arrays.asList(&#34;test-topic&#34;));
 while (true) {
- 	ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
+ 	ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofSeconds(1));
  	// 使用 Thread.sleep 模拟真实的消息处理逻辑
 	Thread.sleep(6000L);
  	consumer.commitSync();
@@ -388,7 +388,7 @@ while (true) {
    	private final KafkaConsumer consumer;
    	public void run() {
    		try {
-   			consumer.subscribe(Arrays.asList("topic"));
+   			consumer.subscribe(Arrays.asList(&#34;topic&#34;));
    			while (!closed.get()) {
   				ConsumerRecords records = consumer.poll(Duration.ofMillis(10000));
    				// 执行消息处理逻辑
@@ -428,7 +428,7 @@ while (true) {
 - 会使得整个消息消费链路被拉长，位移提交可能会出错，导致重复消费；
 
   ```java
-  private final KafkaConsumer<String, String> consumer;
+  private final KafkaConsumer&lt;String, String&gt; consumer;
   private ExecutorService executors;
   ...
   private int workerNum = ...;
@@ -437,12 +437,12 @@ while (true) {
       workerNum, 
       0L, 
       TimeUnit.MILLISECONDS,
-  	new ArrayBlockingQueue<>(1000), 
+  	new ArrayBlockingQueue&lt;&gt;(1000), 
   	new ThreadPoolExecutor.CallerRunsPolicy()
   );
   ...
   while (true) {
-  	ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
+  	ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofSeconds(1));
   	for (final ConsumerRecord record : records) {
   		executors.submit(new Worker(record)); 
       } 
@@ -464,4 +464,10 @@ while (true) {
 
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/java-core-36/04/  
 

@@ -10,7 +10,7 @@
 
 `lowlog-log-slower-than` = 0, 会记录所有命令。
 
-`lowlog-log-slower-than` < 0, 不会记录任何命令。
+`lowlog-log-slower-than` &lt; 0, 不会记录任何命令。
 
 配置方式：
 1. 修改配置文件 redis.conf。
@@ -42,7 +42,7 @@
 
 - -x 参数
 ```shell script
-echo "world" | redis-cli -x set hello # 设置key为 hello， value为 world
+echo &#34;world&#34; | redis-cli -x set hello # 设置key为 hello， value为 world
 ```
 
 - -c 参数
@@ -124,7 +124,7 @@ pipeline 执行速度一般比逐条执行快，客户端与服务端网路延�
 
 ## 4、事务与Lua
 
-> 为了保证多个命令组合的原子性，Redis 提供了简单事务功能和 lua 脚本。
+&gt; 为了保证多个命令组合的原子性，Redis 提供了简单事务功能和 lua 脚本。
 
 ### 1、事务
 
@@ -147,8 +147,8 @@ pipeline 执行速度一般比逐条执行快，客户端与服务端网路延�
 - eval
 ```shell script
   EVAL script numkeys key [key ...] arg [arg ...]
-  eval 'return "hello " .. KEYS[1] .. ARGV[1]' 1 world redis  # 例子
-  # 输出 "hello worldredis"
+  eval &#39;return &#34;hello &#34; .. KEYS[1] .. ARGV[1]&#39; 1 world redis  # 例子
+  # 输出 &#34;hello worldredis&#34;
 ```
 如果 Lua 脚本较长，可以使用 redis-cli --eval 选项来执行。
 
@@ -162,8 +162,8 @@ pipeline 执行速度一般比逐条执行快，客户端与服务端网路延�
 
 - lua 中使用 redis API
 ```shell script
-  redis.call("set", "a" , 1)
-  redis.call("get", "a" )
+  redis.call(&#34;set&#34;, &#34;a&#34; , 1)
+  redis.call(&#34;get&#34;, &#34;a&#34; )
 ```
 
 也可以使用 `redis.pcall` 命令，两者差别在于 pcall 命令会忽略错误继续执行，call 遇到错误停止。
@@ -306,4 +306,10 @@ Redis 提供了 GEO（地址位置）功能，支持存储地理位置信息。
 ```
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/redis-development-and-operation-and-maintenance/03/  
 

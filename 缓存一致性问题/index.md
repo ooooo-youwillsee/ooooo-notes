@@ -1,8 +1,8 @@
 # 缓存一致性问题
 
 
-> 当我们使用缓存时，必定会遇到**缓存一致性问题**，也就是在**读写请求**过程中**数据库**和**缓存**中的**数据不一致**。
-> 下面将分析**为什么**会造成不一致, 所有的代码参考**末尾**。
+&gt; 当我们使用缓存时，必定会遇到**缓存一致性问题**，也就是在**读写请求**过程中**数据库**和**缓存**中的**数据不一致**。
+&gt; 下面将分析**为什么**会造成不一致, 所有的代码参考**末尾**。
 
 ## 先更新数据库，后更新缓存
 
@@ -90,3 +90,9 @@ public void set2(Long id, String username) {
 ## 代码
 
 [demo-cache-consistency-question](https://github.com/ooooo-youwillsee/demo-cache-consistency-question)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98/  
+

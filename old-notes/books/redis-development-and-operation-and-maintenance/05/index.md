@@ -45,8 +45,8 @@
 
 ## 2、AOF
 
-> 以独立的日志记录每次写命令，重启时再重新执行 AOF 文件中的命令达到恢复数据的目的。
-> AOF 解决了数据持久化的实时性。
+&gt; 以独立的日志记录每次写命令，重启时再重新执行 AOF 文件中的命令达到恢复数据的目的。
+&gt; AOF 解决了数据持久化的实时性。
 
 ### 1、AOF 工作流程
 
@@ -69,10 +69,10 @@
 - AOF 采用文本协议格式，也就是说 AOF 文件中存储就是写入的命令，这样具有阅读性、便于修改。
 - AOF 把命令先写入 aof_buf 中，根据不同的同步策略可以在性能和安全上做出平衡，没有特殊要求，就设置为 `everysec`。
 
-> 三种策略；
-> 1. no: don't fsync, just let the OS flush the data when it wants. Faster.
-> 2. always: fsync after every write to the append only log. Slow, Safest.
-> 3. everysec: fsync only one time every second. Compromise.
+&gt; 三种策略；
+&gt; 1. no: don&#39;t fsync, just let the OS flush the data when it wants. Faster.
+&gt; 2. always: fsync after every write to the append only log. Slow, Safest.
+&gt; 3. everysec: fsync only one time every second. Compromise.
 
 ### 3、重写机制
 
@@ -85,17 +85,17 @@ AOF 文件可以变小的原因：
 - 手动执行命令 `bgrewriteaof`
 - 自动触发，根据配置参数 `auto-aof-rewrite-percentage 100` 和 `auto-aof-rewrite-min-size 64mb`。
 
-> 参数说明：
-> 1. This is how it works: Redis remembers the size of the AOF file after the
-> latest rewrite (if no rewrite has happened since the restart, the size of
-> the AOF at startup is used).
-> 2. This base size is compared to the current size. If the current size is
-> bigger than the specified percentage, the rewrite is triggered. Also
-> you need to specify a minimal size for the AOF file to be rewritten, this
-> is useful to avoid rewriting the AOF file even if the percentage increase
-> is reached but it is still pretty small
+&gt; 参数说明：
+&gt; 1. This is how it works: Redis remembers the size of the AOF file after the
+&gt; latest rewrite (if no rewrite has happened since the restart, the size of
+&gt; the AOF at startup is used).
+&gt; 2. This base size is compared to the current size. If the current size is
+&gt; bigger than the specified percentage, the rewrite is triggered. Also
+&gt; you need to specify a minimal size for the AOF file to be rewritten, this
+&gt; is useful to avoid rewriting the AOF file even if the percentage increase
+&gt; is reached but it is still pretty small
 
-**自动触发时机: aof_current_size > auto-aof-rewrite-min-size && (aof_current_size - aof_base_size) / aof_base_size > auto-aof-rewrite-percentage**
+**自动触发时机: aof_current_size &gt; auto-aof-rewrite-min-size &amp;&amp; (aof_current_size - aof_base_size) / aof_base_size &gt; auto-aof-rewrite-percentage**
 
 AOF 重写流程图如下：
 ![AOF 重写流程](./imgs/05_05.png)
@@ -113,7 +113,7 @@ AOF 重写流程图如下：
 
 ### 5、文件校验
 
-加载损坏的 AOF 文件会拒绝启动，可以先**备份文件**，然后再执行命令 `redis-check-aof [--fix] <file.aof>` 来进行修复。
+加载损坏的 AOF 文件会拒绝启动，可以先**备份文件**，然后再执行命令 `redis-check-aof [--fix] &lt;file.aof&gt;` 来进行修复。
 
 ## 3、问题定位与优化
 
@@ -143,4 +143,10 @@ AOF 持久化，常用的同步策略是 `everysec`，用于平衡性能和安�
 ## 4、多实例部署
 
 略
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/redis-development-and-operation-and-maintenance/05/  
 

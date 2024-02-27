@@ -3,7 +3,7 @@
 
 ## 1. 前置条件
 
-* 安装 `docker`，必须配置 `docker` 代理，否则 `build` 失败。 [参考]({{< ref "设置 docker 代理.md" >}})
+* 安装 `docker`，必须配置 `docker` 代理，否则 `build` 失败。 [参考]({{&lt; ref &#34;设置 docker 代理.md&#34; &gt;}})
 * 下载 `istio` 源码。
 * 安装 `go` 和 `dlv` 工具。[参考](https://github.com/go-delve/delve/tree/master/Documentation/installation)
 
@@ -11,7 +11,7 @@
 
 ```shell
 # docker 地址
-export HUB="docker.io/youwillsee"
+export HUB=&#34;docker.io/youwillsee&#34;
 
 # istio 的源码目录
 export ISTIO=/root/code/istio
@@ -39,8 +39,8 @@ make clean
 
 参考
 
-> 1. [istio-devlopment](https://github.com/istio/istio/wiki/Preparing-for-Development)
-> 2. [istio-code-base](https://github.com/istio/istio/wiki/Using-the-Code-Base)
+&gt; 1. [istio-devlopment](https://github.com/istio/istio/wiki/Preparing-for-Development)
+&gt; 2. [istio-code-base](https://github.com/istio/istio/wiki/Using-the-Code-Base)
 
 ## 4. dlv 连接
 
@@ -52,7 +52,7 @@ ps -ef | grep pilot-discovery
 dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient attach 172965
 
 # 使用 IDE 远程连接
-GOland -> go remote
+GOland -&gt; go remote
 ```
 
 ## 5. bind dlv to pilot (optional)
@@ -92,8 +92,14 @@ COPY --from=build-dlv /go/bin/dlv /
 
 USER 1337:1337
 
-ENTRYPOINT ["/dlv", "--listen=:1234", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/usr/local/bin/pilot-discovery", "--"]
+ENTRYPOINT [&#34;/dlv&#34;, &#34;--listen=:1234&#34;, &#34;--headless=true&#34;, &#34;--api-version=2&#34;, &#34;--accept-multiclient&#34;, &#34;exec&#34;, &#34;/usr/local/bin/pilot-discovery&#34;, &#34;--&#34;]
 
-#ENTRYPOINT ["/usr/local/bin/pilot-discovery"]
+#ENTRYPOINT [&#34;/usr/local/bin/pilot-discovery&#34;]
 
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E6%90%AD%E5%BB%BA-istio-%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/  
+

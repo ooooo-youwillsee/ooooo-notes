@@ -1,9 +1,9 @@
 # 03 producer 发送消息
 
 
-> rocketmq 基于 5.1.4 版本
+&gt; rocketmq 基于 5.1.4 版本
 
-> 在 `rocketmq` 中，消息分为多个类型，比如**普通消息**、**批量消息**、**延迟消息**、**事务消息**等，这一节主要介绍**普通消息**的逻辑，后面的章节会继续介绍**其他消息**。
+&gt; 在 `rocketmq` 中，消息分为多个类型，比如**普通消息**、**批量消息**、**延迟消息**、**事务消息**等，这一节主要介绍**普通消息**的逻辑，后面的章节会继续介绍**其他消息**。
 
 ## producer 发送消息
 
@@ -14,7 +14,7 @@
 public SendResult send(Message msg) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
     msg.setTopic(withNamespace(msg.getTopic()));
     // autoBatch 默认 false
-    if (this.getAutoBatch() && !(msg instanceof MessageBatch)) {
+    if (this.getAutoBatch() &amp;&amp; !(msg instanceof MessageBatch)) {
         // 通过累加器来实现批量消息，增大吞吐量
         return sendByAccumulator(msg, null, null);
     } else {
@@ -43,20 +43,20 @@ private SendResult sendDefaultImpl(
     long endTimestamp = beginTimestampFirst;
     // 获取 topic，如果没有，会从 namesrv 中同步 topic
     TopicPublishInfo topicPublishInfo = this.tryToFindTopicPublishInfo(msg.getTopic());
-    if (topicPublishInfo != null && topicPublishInfo.ok()) {
+    if (topicPublishInfo != null &amp;&amp; topicPublishInfo.ok()) {
         boolean callTimeout = false;
         MessageQueue mq = null;
         Exception exception = null;
         SendResult sendResult = null;
         // 同步调用，设置重试次数
-        int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 + this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
+        int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 &#43; this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
         int times = 0;
         String[] brokersSent = new String[timesTotal];
         boolean resetIndex = false;
         // 如果失败，重试
-        for (; times < timesTotal; times++) {
+        for (; times &lt; timesTotal; times&#43;&#43;) {
             String lastBrokerName = null == mq ? null : mq.getBrokerName();
-            if (times > 0) {
+            if (times &gt; 0) {
                 resetIndex = true;
             }
             // 根据策略来选择 queue, 实现方式有随机、可用性、延迟
@@ -252,7 +252,7 @@ private SendResult sendKernelImpl(final Message msg,
           ...
         }
     }
-    throw new MQClientException("The broker[" + brokerName + "] not exist", null);
+    throw new MQClientException(&#34;The broker[&#34; &#43; brokerName &#43; &#34;] not exist&#34;, null);
 }
 ```
 
@@ -278,7 +278,7 @@ public SendResult sendMessage(
     RemotingCommand request = null;
     // 获取消息类型
     String msgType = msg.getProperty(MessageConst.PROPERTY_MESSAGE_TYPE);
-    boolean isReply = msgType != null && msgType.equals(MixAll.REPLY_MESSAGE_FLAG);
+    boolean isReply = msgType != null &amp;&amp; msgType.equals(MixAll.REPLY_MESSAGE_FLAG);
     // reply 消息
     if (isReply) {
         if (sendSmartMsg) {
@@ -383,11 +383,11 @@ public RemotingCommand processRequest(ChannelHandlerContext ctx,
             if (requestHeader.isBatch()) {
                 // 处理批量消息
                 response = this.sendBatchMessage(ctx, request, sendMessageContext, requestHeader, mappingContext,
-                    (ctx1, response1) -> executeSendMessageHookAfter(response1, ctx1));
+                    (ctx1, response1) -&gt; executeSendMessageHookAfter(response1, ctx1));
             } else {
                 // 处理消息
                 response = this.sendMessage(ctx, request, sendMessageContext, requestHeader, mappingContext,
-                    (ctx12, response12) -> executeSendMessageHookAfter(response12, ctx12));
+                    (ctx12, response12) -&gt; executeSendMessageHookAfter(response12, ctx12));
             }
             return response;
     }
@@ -421,7 +421,7 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
     TopicConfig topicConfig = this.brokerController.getTopicConfigManager().selectTopicConfig(requestHeader.getTopic());
   
     // 随机选择一个 queue
-    if (queueIdInt < 0) {
+    if (queueIdInt &lt; 0) {
         queueIdInt = randomQueueId(topicConfig.getWriteQueueNums());
     }
   
@@ -429,7 +429,7 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
     msgInner.setTopic(requestHeader.getTopic());
     msgInner.setQueueId(queueIdInt);
   
-    Map<String, String> oriProps = MessageDecoder.string2messageProperties(requestHeader.getProperties());
+    Map&lt;String, String&gt; oriProps = MessageDecoder.string2messageProperties(requestHeader.getProperties());
     // 处理重试和死信消息
     if (!handleRetryAndDLQ(requestHeader, response, request, msgInner, topicConfig, oriProps)) {
         return response;
@@ -440,7 +440,7 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
   
     // 生成消息唯一ID
     String uniqKey = oriProps.get(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX);
-    if (uniqKey == null || uniqKey.length() <= 0) {
+    if (uniqKey == null || uniqKey.length() &lt;= 0) {
         uniqKey = MessageClientIDSetter.createUniqID();
         oriProps.put(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX, uniqKey);
     }
@@ -456,17 +456,17 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
   
     msgInner.setPropertiesString(MessageDecoder.messageProperties2String(msgInner.getProperties()));
   
-    // Map<String, String> oriProps = MessageDecoder.string2messageProperties(requestHeader.getProperties());
+    // Map&lt;String, String&gt; oriProps = MessageDecoder.string2messageProperties(requestHeader.getProperties());
     String traFlag = oriProps.get(MessageConst.PROPERTY_TRANSACTION_PREPARED);
     boolean sendTransactionPrepareMessage = false;
     // 检查事务消息
     if (Boolean.parseBoolean(traFlag)
-        && !(msgInner.getReconsumeTimes() > 0 && msgInner.getDelayTimeLevel() > 0)) { //For client under version 4.6.1
+        &amp;&amp; !(msgInner.getReconsumeTimes() &gt; 0 &amp;&amp; msgInner.getDelayTimeLevel() &gt; 0)) { //For client under version 4.6.1
         if (this.brokerController.getBrokerConfig().isRejectTransactionMessage()) {
             response.setCode(ResponseCode.NO_PERMISSION);
             response.setRemark(
-                "the broker[" + this.brokerController.getBrokerConfig().getBrokerIP1()
-                    + "] sending transaction message is forbidden");
+                &#34;the broker[&#34; &#43; this.brokerController.getBrokerConfig().getBrokerIP1()
+                    &#43; &#34;] sending transaction message is forbidden&#34;);
             return response;
         }
         sendTransactionPrepareMessage = true;
@@ -476,7 +476,7 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
   
     // 是否异步发送，无论是同步还是异步，处理逻辑都是一样的
     if (brokerController.getBrokerConfig().isAsyncSendEnable()) {
-        CompletableFuture<PutMessageResult> asyncPutMessageFuture;
+        CompletableFuture&lt;PutMessageResult&gt; asyncPutMessageFuture;
         if (sendTransactionPrepareMessage) {
             // 存储 prepare 事务消息
             asyncPutMessageFuture = this.brokerController.getTransactionalMessageService().asyncPrepareMessage(msgInner);
@@ -487,7 +487,7 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
   
         final int finalQueueIdInt = queueIdInt;
         final MessageExtBrokerInner finalMsgInner = msgInner;
-        asyncPutMessageFuture.thenAcceptAsync(putMessageResult -> {
+        asyncPutMessageFuture.thenAcceptAsync(putMessageResult -&gt; {
             RemotingCommand responseFuture =
                 // 处理存储结果，这里设置相应的 code 和 remark, 记录 metric  
                 handlePutMessageResult(putMessageResult, response, request, finalMsgInner, responseHeader, sendMessageContext,
@@ -521,4 +521,10 @@ public RemotingCommand sendMessage(final ChannelHandlerContext ctx,
 
 `org.apache.rocketmq.test.client.consumer.topic.OneConsumerMulTopicIT#testSynSendMessage`
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/03-producer-%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/  
 

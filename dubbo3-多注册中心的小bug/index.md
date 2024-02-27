@@ -28,3 +28,9 @@ dubbo:
 ## 3. github
 
 [dubbo issue](https://github.com/apache/dubbo/issues/12629)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/dubbo3-%E5%A4%9A%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%9A%84%E5%B0%8Fbug/  
+

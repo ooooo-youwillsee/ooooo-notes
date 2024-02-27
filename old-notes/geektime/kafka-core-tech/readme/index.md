@@ -8,3 +8,9 @@
 [02、Kafka 术语](./02)
 
 
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/readme/  
+

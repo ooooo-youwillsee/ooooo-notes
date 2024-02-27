@@ -1,9 +1,9 @@
 # 12 AP 协议 Distro
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> `nacos` 对于**临时实例**注册，采用的是 `AP` 协议，我们看看是怎么设计的。
+&gt; `nacos` 对于**临时实例**注册，采用的是 `AP` 协议，我们看看是怎么设计的。
 
 ## DistroProtocol 初始化
 
@@ -36,7 +36,7 @@ private void startDistroTask() {
 
 ## DistroVerifyTimedTask 同步节点数据来续约
 
-{{< image src="./DistroVerifyTimedTask.png" caption="DistroVerifyTimedTask" >}}
+{{&lt; image src=&#34;./DistroVerifyTimedTask.png&#34; caption=&#34;DistroVerifyTimedTask&#34; &gt;}}
 
 源码位置: `com.alibaba.nacos.core.distributed.distro.task.verify.DistroVerifyTimedTask`
 
@@ -52,29 +52,29 @@ public class DistroVerifyTimedTask implements Runnable {
     public void run() {
         try {
             // 获取其他节点列表
-            List<Member> targetServer = serverMemberManager.allMembersWithoutSelf();
+            List&lt;Member&gt; targetServer = serverMemberManager.allMembersWithoutSelf();
             if (Loggers.DISTRO.isDebugEnabled()) {
-                Loggers.DISTRO.debug("server list is: {}", targetServer);
+                Loggers.DISTRO.debug(&#34;server list is: {}&#34;, targetServer);
             }
             // 根据 type 来同步数据
             for (String each : distroComponentHolder.getDataStorageTypes()) {
                 verifyForDataStorage(each, targetServer);
             }
         } catch (Exception e) {
-            Loggers.DISTRO.error("[DISTRO-FAILED] verify task failed.", e);
+            Loggers.DISTRO.error(&#34;[DISTRO-FAILED] verify task failed.&#34;, e);
         }
     }
     
-    private void verifyForDataStorage(String type, List<Member> targetServer) {
+    private void verifyForDataStorage(String type, List&lt;Member&gt; targetServer) {
         // DistroDataStorage 数据存储，目前只有一个实现类 DistroClientDataProcessor
         DistroDataStorage dataStorage = distroComponentHolder.findDataStorage(type);
         if (!dataStorage.isFinishInitial()) {
-            Loggers.DISTRO.warn("data storage {} has not finished initial step, do not send verify data",
+            Loggers.DISTRO.warn(&#34;data storage {} has not finished initial step, do not send verify data&#34;,
                     dataStorage.getClass().getSimpleName());
             return;
         }
         // 获取当前节点的数据，很重要
-        List<DistroData> verifyData = dataStorage.getVerifyData();
+        List&lt;DistroData&gt; verifyData = dataStorage.getVerifyData();
         if (null == verifyData || verifyData.isEmpty()) {
             return;
         }
@@ -85,7 +85,7 @@ public class DistroVerifyTimedTask implements Runnable {
                 continue;
             }
             // 同步数据, 执行 DistroVerifyExecuteTask
-            executeTaskExecuteEngine.addTask(member.getAddress() + type,
+            executeTaskExecuteEngine.addTask(member.getAddress() &#43; type,
                     new DistroVerifyExecuteTask(agent, verifyData, member.getAddress(), type));
         }
     }
@@ -96,8 +96,8 @@ public class DistroVerifyTimedTask implements Runnable {
 
 ```java
 // 获取当前节点的数据
-public List<DistroData> getVerifyData() {
-    List<DistroData> result = null;
+public List&lt;DistroData&gt; getVerifyData() {
+    List&lt;DistroData&gt; result = null;
     for (String each : clientManager.allClientId()) {
         Client client = clientManager.getClient(each);
         if (null == client || !client.isEphemeral()) {
@@ -113,7 +113,7 @@ public List<DistroData> getVerifyData() {
                     ApplicationUtils.getBean(Serializer.class).serialize(verifyData));
             data.setType(DataOperation.VERIFY);
             if (result == null) {
-                result = new LinkedList<>();
+                result = new LinkedList&lt;&gt;();
             }
             result.add(data);
         }
@@ -138,7 +138,7 @@ public void run() {
             }
         } catch (Exception e) {
             Loggers.DISTRO
-                    .error("[DISTRO-FAILED] verify data for type {} to {} failed.", resourceType, targetServer, e);
+                    .error(&#34;[DISTRO-FAILED] verify data for type {} to {} failed.&#34;, resourceType, targetServer, e);
         }
     }
 }
@@ -167,10 +167,10 @@ public DistroDataResponse handle(DistroDataRequest request, RequestMeta meta) th
                 return new DistroDataResponse();
         }
     } catch (Exception e) {
-        Loggers.DISTRO.error("[DISTRO-FAILED] distro handle with exception", e);
+        Loggers.DISTRO.error(&#34;[DISTRO-FAILED] distro handle with exception&#34;, e);
         DistroDataResponse result = new DistroDataResponse();
         result.setErrorCode(ResponseCode.FAIL.getCode());
-        result.setMessage("handle distro request with exception");
+        result.setMessage(&#34;handle distro request with exception&#34;);
         return result;
     }
 }
@@ -181,7 +181,7 @@ private DistroDataResponse handleVerify(DistroData distroData, RequestMeta meta)
     // 对于临时数据，最终会调用 EphemeralIpPortClientManager 的 verifyClient 方法
     if (!distroProtocol.onVerify(distroData, meta.getClientIp())) {
         // 验证不通过，返回错误码, 这个很重要
-        result.setErrorInfo(ResponseCode.FAIL.getCode(), "[DISTRO-FAILED] distro data verify failed");
+        result.setErrorInfo(ResponseCode.FAIL.getCode(), &#34;[DISTRO-FAILED] distro data verify failed&#34;);
     }
     return result;
 }
@@ -203,7 +203,7 @@ public boolean verifyClient(DistroClientVerifyInfo verifyData) {
                     .dispatchAndExecuteTask(clientId, new ClientBeatUpdateTask(client));
             return true;
         } else {
-            Loggers.DISTRO.info("[DISTRO-VERIFY-FAILED] IpPortBasedClient[{}] revision local={}, remote={}",
+            Loggers.DISTRO.info(&#34;[DISTRO-VERIFY-FAILED] IpPortBasedClient[{}] revision local={}, remote={}&#34;,
                     client.getClientId(), client.getRevision(), verifyData.getRevision());
         }
     }
@@ -225,7 +225,7 @@ public void onResponse(Response response) {
         distroCallback.onSuccess();
     } else {
         // 错误响应，发送 ClientVerifyFailedEvent 事件, 会单独推送这个 clientId 的数据
-        Loggers.DISTRO.info("Target {} verify client {} failed, sync new client", targetServer, clientId);
+        Loggers.DISTRO.info(&#34;Target {} verify client {} failed, sync new client&#34;, targetServer, clientId);
         NotifyCenter.publishEvent(new ClientEvent.ClientVerifyFailedEvent(clientId, targetServer));
         NamingTpsMonitor.distroVerifyFail(member.getAddress(), member.getIp());
         distroCallback.onFailed(null);
@@ -246,11 +246,11 @@ public void run() {
             GlobalExecutor.submitLoadDataTask(this, distroConfig.getLoadDataRetryDelayMillis());
         } else {
             loadCallback.onSuccess();
-            Loggers.DISTRO.info("[DISTRO-INIT] load snapshot data success");
+            Loggers.DISTRO.info(&#34;[DISTRO-INIT] load snapshot data success&#34;);
         }
     } catch (Exception e) {
         loadCallback.onFailed(e);
-        Loggers.DISTRO.error("[DISTRO-INIT] load snapshot data failed. ", e);
+        Loggers.DISTRO.error(&#34;[DISTRO-INIT] load snapshot data failed. &#34;, e);
     }
 }
 
@@ -258,11 +258,11 @@ public void run() {
 private void load() throws Exception {
     // 检查节点列表
     while (memberManager.allMembersWithoutSelf().isEmpty()) {
-        Loggers.DISTRO.info("[DISTRO-INIT] waiting server list init...");
+        Loggers.DISTRO.info(&#34;[DISTRO-INIT] waiting server list init...&#34;);
         TimeUnit.SECONDS.sleep(1);
     }
     while (distroComponentHolder.getDataStorageTypes().isEmpty()) {
-        Loggers.DISTRO.info("[DISTRO-INIT] waiting distro data storage register...");
+        Loggers.DISTRO.info(&#34;[DISTRO-INIT] waiting distro data storage register...&#34;);
         TimeUnit.SECONDS.sleep(1);
     }
     // 从远端加载快照数据, 用于服务快速启动
@@ -289,7 +289,7 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
     String urlString = req.getRequestURI();
     
     if (StringUtils.isNotBlank(req.getQueryString())) {
-        urlString += "?" + req.getQueryString();
+        urlString &#43;= &#34;?&#34; &#43; req.getQueryString();
     }
     
     try {
@@ -298,7 +298,7 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
         
         String path = new URI(req.getRequestURI()).getPath();
         if (method == null) {
-            throw new NoSuchMethodException(req.getMethod() + " " + path);
+            throw new NoSuchMethodException(req.getMethod() &#43; &#34; &#34; &#43; path);
         }
         
         // 方法是否有 @CanDistro 注解，没有就直接放行，不处理
@@ -319,19 +319,19 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
         String userAgent = req.getHeader(HttpHeaderConsts.USER_AGENT_HEADER);
         
         // 判断必须是 client 的请求，不能是 server 之间的请求
-        if (StringUtils.isNotBlank(userAgent) && userAgent.contains(UtilsAndCommons.NACOS_SERVER_HEADER)) {
+        if (StringUtils.isNotBlank(userAgent) &amp;&amp; userAgent.contains(UtilsAndCommons.NACOS_SERVER_HEADER)) {
             // This request is sent from peer server, should not be redirected again:
-            Loggers.SRV_LOG.error("receive invalid redirect request from peer {}", req.getRemoteAddr());
+            Loggers.SRV_LOG.error(&#34;receive invalid redirect request from peer {}&#34;, req.getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "receive invalid redirect request from peer " + req.getRemoteAddr());
+                    &#34;receive invalid redirect request from peer &#34; &#43; req.getRemoteAddr());
             return;
         }
         
         // 获取转发节点, 根据 ip:port 的 hash 值对 serverList.size() 取余来计算
         final String targetServer = distroMapper.mapSrv(distroTag);
         
-        List<String> headerList = new ArrayList<>(16);
-        Enumeration<String> headers = req.getHeaderNames();
+        List&lt;String&gt; headerList = new ArrayList&lt;&gt;(16);
+        Enumeration&lt;String&gt; headers = req.getHeaderNames();
         while (headers.hasMoreElements()) {
             String headerName = headers.nextElement();
             headerList.add(headerName);
@@ -339,28 +339,28 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
         }
         
         final String body = IoUtils.toString(req.getInputStream(), StandardCharsets.UTF_8.name());
-        final Map<String, String> paramsValue = HttpClient.translateParameterMap(req.getParameterMap());
+        final Map&lt;String, String&gt; paramsValue = HttpClient.translateParameterMap(req.getParameterMap());
         
         // 用 HttpClient 来转发请求到对应的节点上
-        RestResult<String> result = HttpClient
-                .request(HTTP_PREFIX + targetServer + req.getRequestURI(), headerList, paramsValue, body,
+        RestResult&lt;String&gt; result = HttpClient
+                .request(HTTP_PREFIX &#43; targetServer &#43; req.getRequestURI(), headerList, paramsValue, body,
                         PROXY_CONNECT_TIMEOUT, PROXY_READ_TIMEOUT, StandardCharsets.UTF_8.name(), req.getMethod());
         String data = result.ok() ? result.getData() : result.getMessage();
         try {
             // 响应客户端请求
             WebUtils.response(resp, data, result.getCode());
         } catch (Exception ignore) {
-            Loggers.SRV_LOG.warn("[DISTRO-FILTER] request failed: " + distroMapper.mapSrv(distroTag) + urlString);
+            Loggers.SRV_LOG.warn(&#34;[DISTRO-FILTER] request failed: &#34; &#43; distroMapper.mapSrv(distroTag) &#43; urlString);
         }
     } catch (AccessControlException e) {
-        resp.sendError(HttpServletResponse.SC_FORBIDDEN, "access denied: " + ExceptionUtil.getAllExceptionMsg(e));
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN, &#34;access denied: &#34; &#43; ExceptionUtil.getAllExceptionMsg(e));
     } catch (NoSuchMethodException e) {
         resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED,
-                "no such api:" + req.getMethod() + ":" + req.getRequestURI());
+                &#34;no such api:&#34; &#43; req.getMethod() &#43; &#34;:&#34; &#43; req.getRequestURI());
     } catch (Exception e) {
-        Loggers.SRV_LOG.warn("[DISTRO-FILTER] Server failed: ", e);
+        Loggers.SRV_LOG.warn(&#34;[DISTRO-FILTER] Server failed: &#34;, e);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "Server failed, " + ExceptionUtil.getAllExceptionMsg(e));
+                &#34;Server failed, &#34; &#43; ExceptionUtil.getAllExceptionMsg(e));
     }
     
 }
@@ -371,7 +371,7 @@ public void doFilter(ServletRequest servletRequest, ServletResponse servletRespo
 ```java
 // 当前节点是否响应该请求
 public boolean responsible(String responsibleTag) {
-    final List<String> servers = healthyList;
+    final List&lt;String&gt; servers = healthyList;
     
     if (!switchDomain.isDistroEnabled() || EnvUtil.getStandaloneMode()) {
         return true;
@@ -386,16 +386,22 @@ public boolean responsible(String responsibleTag) {
     String localAddress = EnvUtil.getLocalAddress();
     int index = servers.indexOf(localAddress);
     int lastIndex = servers.lastIndexOf(localAddress);
-    if (lastIndex < 0 || index < 0) {
+    if (lastIndex &lt; 0 || index &lt; 0) {
         return true;
     }
     
     // 获取 hash 值，然后取余
     int target = distroHash(responsibleTag) % servers.size();
-    return target >= index && target <= lastIndex;
+    return target &gt;= index &amp;&amp; target &lt;= lastIndex;
 }
 ```
 
 ## 测试类
 
 `com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/12-ap-%E5%8D%8F%E8%AE%AE-distro/  
+

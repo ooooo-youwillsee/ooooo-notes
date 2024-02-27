@@ -11,7 +11,7 @@
 public class UserService {
 
   public String getUsername(String id) {
-    return "username" + id;
+    return &#34;username&#34; &#43; id;
   }
 
 }
@@ -36,15 +36,15 @@ public class UserServiceTest {
   public void beforeEach() {
     methodType = MethodType.methodType(String.class, String.class);
     lookup = MethodHandles.lookup();
-    methodHandle = lookup.findVirtual(UserService.class, "getUsername", methodType);
+    methodHandle = lookup.findVirtual(UserService.class, &#34;getUsername&#34;, methodType);
   }
 
   @SneakyThrows
   @Test
   public void invokeWithArguments() {
     UserService userService = new UserService();
-    Object obj = methodHandle.bindTo(userService).invokeWithArguments("1");
-    assertEquals("username1", obj);
+    Object obj = methodHandle.bindTo(userService).invokeWithArguments(&#34;1&#34;);
+    assertEquals(&#34;username1&#34;, obj);
 
   }
 
@@ -52,8 +52,8 @@ public class UserServiceTest {
   @Test
   public void invoke() {
     UserService userService = new UserService();
-    Object obj = methodHandle.invoke(userService, "1");
-    assertEquals("username1", obj);
+    Object obj = methodHandle.invoke(userService, &#34;1&#34;);
+    assertEquals(&#34;username1&#34;, obj);
   }
 
   /**
@@ -63,8 +63,8 @@ public class UserServiceTest {
   @Test
   public void invokeExact() {
     UserService userService = new UserService();
-    String s = (String) methodHandle.invokeExact(userService, "1");
-    assertEquals("username1", s);
+    String s = (String) methodHandle.invokeExact(userService, &#34;1&#34;);
+    assertEquals(&#34;username1&#34;, s);
   }
 
 }
@@ -73,4 +73,10 @@ public class UserServiceTest {
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-methodHandler)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-java-%E4%B8%AD-invoke-%E5%8C%85/  
 

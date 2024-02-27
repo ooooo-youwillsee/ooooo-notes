@@ -20,7 +20,7 @@
 
 5. `advertised.listeners`: Broker 用于对外发布的监听器。
 
-监听器配置，由三元组 <协议名称，主机名，端口号> 构成，例如你自己定义的协议名字 `CONTROLLER://localhost:9092`。
+监听器配置，由三元组 &lt;协议名称，主机名，端口号&gt; 构成，例如你自己定义的协议名字 `CONTROLLER://localhost:9092`。
 
 一旦你自己定义了协议名称，你必须还要指定 `listener.security.protocol.map` 参数告诉这个协议底层使用了哪种安全协议，比如指定 `listener.security.protocol.map=CONTROLLER:PLAINTEXT` 表示 `CONTROLLER` 这个自定义协议底层使用明文不加密传输数据。
 
@@ -44,7 +44,13 @@ Unclean Leader 选举，指的是落后太多的副本参与选举，可能会�
 
 12. `message.max.bytes`: 最大消息大小。实际上，1MB 的消息很常见。
 
-<br/>
+&lt;br/&gt;
 
 **注意：上述的参数都不能使用默认值。**
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/07/  
 

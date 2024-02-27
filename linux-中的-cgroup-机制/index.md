@@ -25,14 +25,14 @@ do
         :
 done
 
-# lunch loop.sh, generate pid -> 2584068
-nohup sh loop.sh &
+# lunch loop.sh, generate pid -&gt; 2584068
+nohup sh loop.sh &amp;
 
 # echo pid to cgroup.procs
-echo 2584068 > test/cgroup.procs
+echo 2584068 &gt; test/cgroup.procs
 
 # set cpu, at lease 0.1
-echo 1000 10000 > test/cpu.max
+echo 1000 10000 &gt; test/cpu.max
 
 # check 
 top 
@@ -43,4 +43,10 @@ rmdir test
 ```
 
 参考：
-> 1. [博客](https://zorrozou.github.io/docs/%E8%AF%A6%E8%A7%A3Cgroup%20V2.html)
+&gt; 1. [博客](https://zorrozou.github.io/docs/%E8%AF%A6%E8%A7%A3Cgroup%20V2.html)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/linux-%E4%B8%AD%E7%9A%84-cgroup-%E6%9C%BA%E5%88%B6/  
+

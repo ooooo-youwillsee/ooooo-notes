@@ -22,7 +22,7 @@ spring:
 public Response request(Request request, long timeouts) throws NacosException {
     Payload grpcRequest = GrpcUtils.convert(request);
     // 发送请求
-    ListenableFuture<Payload> requestFuture = grpcFutureServiceStub.request(grpcRequest);
+    ListenableFuture&lt;Payload&gt; requestFuture = grpcFutureServiceStub.request(grpcRequest);
     Payload grpcResponse;
     try {
         grpcResponse = requestFuture.get(timeouts, TimeUnit.MILLISECONDS);
@@ -43,7 +43,7 @@ public Connection connectToServer(ServerInfo serverInfo) {
             this.grpcExecutor = createGrpcExecutor(serverInfo.getServerIp());
         }
         // 这里就是计算端口的逻辑， serverPort 默认为 8848， rpcPortOffset 为 1000
-        int port = serverInfo.getServerPort() + rpcPortOffset();
+        int port = serverInfo.getServerPort() &#43; rpcPortOffset();
         ManagedChannel managedChannel = createNewManagedChannel(serverInfo.getServerIp(), port);
         // 新建
         RequestGrpc.RequestFutureStub newChannelStubTemp = createNewChannelStub(managedChannel);
@@ -61,7 +61,7 @@ public Connection connectToServer(ServerInfo serverInfo) {
             grpcConn.setConnectionId(((ServerCheckResponse) response).getConnectionId());
             
             //create stream request and bind connection event to this connection.
-            StreamObserver<Payload> payloadStreamObserver = bindRequestStream(biRequestStreamStub, grpcConn);
+            StreamObserver&lt;Payload&gt; payloadStreamObserver = bindRequestStream(biRequestStreamStub, grpcConn);
             
             // stream observer to send response to server
             grpcConn.setPayloadStreamObserver(payloadStreamObserver);
@@ -80,7 +80,7 @@ public Connection connectToServer(ServerInfo serverInfo) {
         }
         return null;
     } catch (Exception e) {
-        LOGGER.error("[{}]Fail to connect to server!,error={}", GrpcClient.this.getName(), e);
+        LOGGER.error(&#34;[{}]Fail to connect to server!,error={}&#34;, GrpcClient.this.getName(), e);
     }
     return null;
 }
@@ -88,4 +88,10 @@ public Connection connectToServer(ServerInfo serverInfo) {
 
 ## 3. 参考
 
-> [官方文档-端口说明](https://nacos.io/zh-cn/docs/v2/upgrading/2.0.0-compatibility.html)
+&gt; [官方文档-端口说明](https://nacos.io/zh-cn/docs/v2/upgrading/2.0.0-compatibility.html)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/nacos-%E9%9B%86%E7%BE%A4%E7%94%A8-nginx-%E4%BB%A3%E7%90%86%E9%97%AE%E9%A2%98/  
+

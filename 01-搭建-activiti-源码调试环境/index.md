@@ -1,7 +1,7 @@
 # 01 搭建 activiti 源码调试环境
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
 ## 下载源码和编译
 
@@ -18,3 +18,9 @@ mvn clean package -DskipTests
 大多数情况下，推荐你使用**测试类**来调试代码。 在模块 `activiti-core/activiti-engine` 下，`src/test/resources/activiti.cfg.xml` 中可以配置数据库，也建议使用**MySQL数据库**。
 
 如果你能成功运行 `org.activiti.examples.bpmn.receivetask.ReceiveTaskTest#testWaitStateBehavior`, 说明你的环境没有问题了。
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/01-%E6%90%AD%E5%BB%BA-activiti-%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/  
+

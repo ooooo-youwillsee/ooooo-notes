@@ -8,13 +8,13 @@
 `docker-compose.yml` 配置如下，**客户端端口:9094**
 
 ```yaml
-version: "3"
+version: &#34;3&#34;
 services:
   kafka:
-    image: 'bitnami/kafka:latest'
+    image: &#39;bitnami/kafka:latest&#39;
     ports:
-      - '9092:9092'
-      - '9094:9094'
+      - &#39;9092:9092&#39;
+      - &#39;9094:9094&#39;
     environment:
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
@@ -42,7 +42,7 @@ spring:
     bootstrap-servers: localhost:9094
     properties:
       security.protocol: SASL_PLAINTEXT
-      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username='user' password='password';
+      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username=&#39;user&#39; password=&#39;password&#39;;
       sasl.mechanism: SCRAM-SHA-512
 
 ```
@@ -50,5 +50,11 @@ spring:
 
 ## 3. 参考
 
-> [docker kafka](https://hub.docker.com/r/bitnami/kafka)
-> [kafka sasl](https://docs.confluent.io/platform/current/kafka/authentication_sasl/authentication_sasl_scram.html#sasl-scram-overview) 
+&gt; [docker kafka](https://hub.docker.com/r/bitnami/kafka)
+&gt; [kafka sasl](https://docs.confluent.io/platform/current/kafka/authentication_sasl/authentication_sasl_scram.html#sasl-scram-overview) 
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/kafka-%E7%9A%84-sasl-%E8%AE%A4%E8%AF%81/  
+

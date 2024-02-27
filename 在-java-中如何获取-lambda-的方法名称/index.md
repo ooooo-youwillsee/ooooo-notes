@@ -19,11 +19,11 @@ public class User {
 }
 
 // 使用的方式
-// user -> user.getUsername() 等价于 User::getUsername 
-Function<User, String> getUsername1 = User::getUsername
+// user -&gt; user.getUsername() 等价于 User::getUsername 
+Function&lt;User, String&gt; getUsername1 = User::getUsername
 ```
 
-比如我现在要使用 `user -> user.getUsername()`， 这样的 lambda 表达式来获取一个 `User` 对象的 `username` 属性值。
+比如我现在要使用 `user -&gt; user.getUsername()`， 这样的 lambda 表达式来获取一个 `User` 对象的 `username` 属性值。
 
 我现在可以这样来获取 `username` 这个方法名称。
 
@@ -31,15 +31,15 @@ Function<User, String> getUsername1 = User::getUsername
 public class LambdaUtils {
 
 	// 正常情况，要做缓存
-	public static <T> String resolveMethod(SFunction<T, ?> func) {
+	public static &lt;T&gt; String resolveMethod(SFunction&lt;T, ?&gt; func) {
 		SerializedLambda serializedLambda = resovle(func);
 		String methodName = serializedLambda.getImplMethodName();
 		return methodName;
 	}
 
 	@SneakyThrows
-	public static SerializedLambda resovle(SFunction<?, ?> func) {
-		Method method = func.getClass().getDeclaredMethod("writeReplace");
+	public static SerializedLambda resovle(SFunction&lt;?, ?&gt; func) {
+		Method method = func.getClass().getDeclaredMethod(&#34;writeReplace&#34;);
 		method.setAccessible(true);
 		return (SerializedLambda) method.invoke(func);
 	}
@@ -57,4 +57,10 @@ public class LambdaUtils {
 
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96-lambda-%E7%9A%84%E6%96%B9%E6%B3%95%E5%90%8D%E7%A7%B0/  
 

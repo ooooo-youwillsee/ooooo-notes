@@ -4,9 +4,9 @@
 
 ## 0、持续学习者
 
-> Talk is cheap. Show me the code.
+&gt; Talk is cheap. Show me the code.
 
-<br/>
+&lt;br/&gt;
 
 * **英语比编程简单。**
 * **学习和实践要平衡。**
@@ -16,13 +16,13 @@
 * **学英语很重要，学英语很重要，学英语很重要。**
 
 说明：
-<indent :c="1"/>:o: **进行中**
-<indent :c="1"/>:white_check_mark: **已完成**
-<indent :c="1"/>:x: **已废弃**
-<indent :c="1"/>:question: **有必要**
-<indent :c="1"/>:exclamation: **重要性**
-<indent :c="1"/>:memo: **记笔记**
-<indent :c="1"/>:pen: **写代码**
+&lt;indent :c=&#34;1&#34;/&gt;:o: **进行中**
+&lt;indent :c=&#34;1&#34;/&gt;:white_check_mark: **已完成**
+&lt;indent :c=&#34;1&#34;/&gt;:x: **已废弃**
+&lt;indent :c=&#34;1&#34;/&gt;:question: **有必要**
+&lt;indent :c=&#34;1&#34;/&gt;:exclamation: **重要性**
+&lt;indent :c=&#34;1&#34;/&gt;:memo: **记笔记**
+&lt;indent :c=&#34;1&#34;/&gt;:pen: **写代码**
 
 ## 1、关于英语
 
@@ -35,7 +35,7 @@
 4. 学习《**赖世雄美语音标**》
 5. 学习《**新概念英语二**》
 
-目前状态: &nbsp;&nbsp; **《**新概念英语二**》**。
+目前状态: &amp;nbsp;&amp;nbsp; **《**新概念英语二**》**。
 
 ## 2、关于技术
 
@@ -85,11 +85,11 @@
 
 :two::two:. [《Java 异步编程实战》](https://book.douban.com/subject/34920246/) :question:
 
-:two::three:. [《Effective C++》](https://book.douban.com/subject/1842426/)
+:two::three:. [《Effective C&#43;&#43;》](https://book.douban.com/subject/1842426/)
 
-:two::four:. [More Effective C++](https://book.douban.com/subject/5908727/)
+:two::four:. [More Effective C&#43;&#43;](https://book.douban.com/subject/5908727/)
 
-:two::five:. [深度探索C++对象模型](https://book.douban.com/subject/10427315/)
+:two::five:. [深度探索C&#43;&#43;对象模型](https://book.douban.com/subject/10427315/)
 
 :two::six:. [《深入浅出 Docker》](https://book.douban.com/subject/30486354/) :white_check_mark:
 
@@ -133,7 +133,7 @@
 
 :zero::one:. [《深入拆解 Java 虚拟机》](https://time.geekbang.org/column/intro/100010301)
 
-:zero::two:. 通读 [Spring 官网](https://spring.io/)，+实践+代码+笔记。
+:zero::two:. 通读 [Spring 官网](https://spring.io/)，&#43;实践&#43;代码&#43;笔记。
 
 :zero::one: [ spring-cloud-netflix-eureka-clients ](https://cloud.spring.io/spring-cloud-static/spring-cloud-netflix/2.2.2.RELEASE/reference/html/#service-discovery-eureka-clients)
 
@@ -141,7 +141,7 @@
 
 :zero::three: [ spring-cloud-task](https://docs.spring.io/spring-cloud-task/docs/current/reference/html/) :white_check_mark:
 
-:zero::three:. 学习 Go 语言，通读 [Go 官网](https://golang.org/doc/)，+实践+代码+笔记。
+:zero::three:. 学习 Go 语言，通读 [Go 官网](https://golang.org/doc/)，&#43;实践&#43;代码&#43;笔记。
 
 :zero::one:. [《A Tour of Go》](https://tours.golang.org/)  :white_check_mark:
 
@@ -230,7 +230,7 @@
 
 ### 2、选读  :tada:
 
-:zero::one:. [《C++ Prime（第5版）》](https://book.douban.com/subject/30437872/) :x:
+:zero::one:. [《C&#43;&#43; Prime（第5版）》](https://book.douban.com/subject/30437872/) :x:
 
 :zero::two:. [《算法 4》](https://book.douban.com/subject/19952400/)
 
@@ -301,4 +301,10 @@
 2. 年初定的计划在实际执行过程中，两次改变了**学习重点**， 1. mq 源码 2. k8s 源码。
 3. 认真思考指定 2022 的计划
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/2021%E5%B9%B4%E8%AE%A1%E5%88%92/  
 

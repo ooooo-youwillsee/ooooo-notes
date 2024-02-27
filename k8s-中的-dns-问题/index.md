@@ -35,7 +35,7 @@ cat /etc/hosts
 kubectl get cm coredns -n kube-system -oyaml
 
 # 自定义配置，如添加 hosts 配置
-kubectl apply -f - <<EOF
+kubectl apply -f - &lt;&lt;EOF
 apiVersion: v1
 data:
   Corefile: |
@@ -75,3 +75,9 @@ EOF
 `tekton`的 `pod` `dns` 显示错误，重新设置主机的 `/etc/resolv.conf`, 重启 `kubelet`， 重启 `tekton`.
 
 ![k8s-dns-show-error-in-pod](/ooooo-notes/images/k8s-dns-show-error-in-pod.png)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/k8s-%E4%B8%AD%E7%9A%84-dns-%E9%97%AE%E9%A2%98/  
+

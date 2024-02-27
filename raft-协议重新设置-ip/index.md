@@ -10,8 +10,8 @@ raft 节点在机器ip变动之后，可能出现选主不成功的问题。
 ```java
   @Test
   public void test() throws IOException {
-    String[] groupIds = {"naming_instance_metadata", "naming_persistent_service_v2", "naming_service_metadata"};
-    String logPath = "/Users/ooooo/nacos/data/protocol/raft/%s/log";
+    String[] groupIds = {&#34;naming_instance_metadata&#34;, &#34;naming_persistent_service_v2&#34;, &#34;naming_service_metadata&#34;};
+    String logPath = &#34;/Users/ooooo/nacos/data/protocol/raft/%s/log&#34;;
 
     // 遍历 groupId
     for (String groupId : groupIds) {
@@ -31,7 +31,7 @@ raft 节点在机器ip变动之后，可能出现选主不成功的问题。
         // 新增配置
         LogEntry logEntry = new LogEntry();
         logEntry.setType(EnumOutter.EntryType.ENTRY_TYPE_CONFIGURATION);
-        logEntry.setPeers(Collections.singletonList(PeerId.parsePeer("127.0.0.1:7848")));
+        logEntry.setPeers(Collections.singletonList(PeerId.parsePeer(&#34;127.0.0.1:7848&#34;)));
         // 添加到日志中
         boolean b = logStorage.appendEntry(logEntry);
         System.out.println(b);
@@ -39,3 +39,9 @@ raft 节点在机器ip变动之后，可能出现选主不成功的问题。
     }
   }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/raft-%E5%8D%8F%E8%AE%AE%E9%87%8D%E6%96%B0%E8%AE%BE%E7%BD%AE-ip/  
+

@@ -1,7 +1,7 @@
 # 07 导出服务（接口级别）
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
 **接口级别导出**是 `dubbo 2.x` 版本的方式，其主流程和之前的章节【导出服务】没有差别，主要区别在于**注册中心的逻辑不一样**。
 
@@ -12,7 +12,7 @@
 
 ```java
 @Override
-public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
+public &lt;T&gt; Exporter&lt;T&gt; export(final Invoker&lt;T&gt; originInvoker) throws RpcException {
     ...
     // 获取 registry，比如 ZookeeperRegistry (接口级注册)
     final Registry registry = getRegistry(registryUrl);
@@ -20,13 +20,13 @@ public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcExceptio
 
     // decide if we need to delay publish (provider itself and registry should both need to register)
     // 如果是接口级别，register 为 true
-    boolean register = providerUrl.getParameter(REGISTER_KEY, true) && registryUrl.getParameter(REGISTER_KEY, true);
+    boolean register = providerUrl.getParameter(REGISTER_KEY, true) &amp;&amp; registryUrl.getParameter(REGISTER_KEY, true);
     if (register) {
         // 注册 providerUrl，最终调用 ZookeeperRegistry#registry 方法
         register(registry, registeredProviderUrl);
     }
     ...
-    return new DestroyableExporter<>(exporter);
+    return new DestroyableExporter&lt;&gt;(exporter);
 }
 ```
 
@@ -52,17 +52,17 @@ public void register(URL url) {
 
         // If the startup detection is opened, the Exception is thrown directly.
         boolean check = getUrl().getParameter(Constants.CHECK_KEY, true)
-            && url.getParameter(Constants.CHECK_KEY, true)
-            && (url.getPort() != 0);
+            &amp;&amp; url.getParameter(Constants.CHECK_KEY, true)
+            &amp;&amp; (url.getPort() != 0);
         boolean skipFailback = t instanceof SkipFailbackWrapperException;
         // 检查 check 参数，如果是 true，表示第一次一定要注册成功
         if (check || skipFailback) {
             if (skipFailback) {
                 t = t.getCause();
             }
-            throw new IllegalStateException("Failed to register " + url + " to registry " + getUrl().getAddress() + ", cause: " + t.getMessage(), t);
+            throw new IllegalStateException(&#34;Failed to register &#34; &#43; url &#43; &#34; to registry &#34; &#43; getUrl().getAddress() &#43; &#34;, cause: &#34; &#43; t.getMessage(), t);
         } else {
-            logger.error(INTERNAL_ERROR, "unknown error in registry module", "", "Failed to register " + url + ", waiting for retry, cause: " + t.getMessage(), t);
+            logger.error(INTERNAL_ERROR, &#34;unknown error in registry module&#34;, &#34;&#34;, &#34;Failed to register &#34; &#43; url &#43; &#34;, waiting for retry, cause: &#34; &#43; t.getMessage(), t);
         }
 
         // Record a failed registration request to a failed list, retry regularly
@@ -82,7 +82,13 @@ public void doRegister(URL url) {
         // 创建 zookeeper 临时节点， 路径为 /dubbo/${interfaceName}/providers/
         zkClient.create(toUrlPath(url), url.getParameter(DYNAMIC_KEY, true), true);
     } catch (Throwable e) {
-        throw new RpcException("Failed to register " + url + " to zookeeper " + getUrl() + ", cause: " + e.getMessage(), e);
+        throw new RpcException(&#34;Failed to register &#34; &#43; url &#43; &#34; to zookeeper &#34; &#43; getUrl() &#43; &#34;, cause: &#34; &#43; e.getMessage(), e);
     }
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/07-%E5%AF%BC%E5%87%BA%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%8F%A3%E7%BA%A7%E5%88%AB/  
+

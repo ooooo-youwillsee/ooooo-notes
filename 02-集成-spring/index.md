@@ -1,7 +1,7 @@
 # 02 集成 spring
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
 在大多数情况下，`activiti` 都会与 `spring boot` 框架一起使用，所以这一节就来介绍 `activiti` 是如何集成 `spring` 的。
 
@@ -13,15 +13,15 @@ java
 
 ```java
 
-@ConfigurationProperties("spring.activiti")
+@ConfigurationProperties(&#34;spring.activiti&#34;)
 public class ActivitiProperties {
 
     private boolean checkProcessDefinitions = true;
     // 开启定时器
     private boolean asyncExecutorActivate = true;
-    private String deploymentName = "SpringAutoDeployment";
+    private String deploymentName = &#34;SpringAutoDeployment&#34;;
     // 邮件相关的配置
-    private String mailServerHost = "localhost";
+    private String mailServerHost = &#34;localhost&#34;;
     private int mailServerPort = 1025;
     private String mailServerUserName;
     private String mailServerPassword;
@@ -29,21 +29,21 @@ public class ActivitiProperties {
     private boolean mailServerUseSsl;
     private boolean mailServerUseTls;
     // 数据库相关配置
-    private String databaseSchemaUpdate = "true";
+    private String databaseSchemaUpdate = &#34;true&#34;;
     private String databaseSchema;
     private boolean dbHistoryUsed = false;
     // 本地测试，建议设置为 full
     private HistoryLevel historyLevel = HistoryLevel.NONE;
     // 流程定义的路径
-    private String processDefinitionLocationPrefix = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "**/processes/";
-    private List<String> processDefinitionLocationSuffixes = asList("**.bpmn20.xml", "**.bpmn");
+    private String processDefinitionLocationPrefix = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX &#43; &#34;**/processes/&#34;;
+    private List&lt;String&gt; processDefinitionLocationSuffixes = asList(&#34;**.bpmn20.xml&#34;, &#34;**.bpmn&#34;);
     // 自定义的 mapper 文件
-    private List<String> customMybatisMappers;
-    private List<String> customMybatisXMLMappers;
+    private List&lt;String&gt; customMybatisMappers;
+    private List&lt;String&gt; customMybatisXMLMappers;
     private boolean useStrongUuids = true;
     private boolean copyVariablesToLocalForTasks = true;
     // 有不同的部署策略
-    private String deploymentMode = "default";
+    private String deploymentMode = &#34;default&#34;;
     private boolean serializePOJOsInVariablesToJson = true;
     private String javaClassFieldForJackson = JsonTypeInfo.Id.CLASS.getDefaultPropertyName()
 }
@@ -59,8 +59,8 @@ public class ActivitiProperties {
 // ProcessEngineConfigurationConfigurer: 配置流程引擎，我们可以实现这个接口来自定义配置
 // 它的父类 AbstractProcessEngineAutoConfiguration，里面定义了一些常用的 service 类，比如 RuntimeService
 @AutoConfiguration
-@AutoConfigureAfter(name = {"org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
-        "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"})
+@AutoConfigureAfter(name = {&#34;org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration&#34;,
+        &#34;org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration&#34;})
 @EnableConfigurationProperties({ActivitiProperties.class, AsyncExecutorProperties.class})
 public class ProcessEngineAutoConfiguration extends AbstractProcessEngineAutoConfiguration {
 
@@ -75,10 +75,10 @@ public class ProcessEngineAutoConfiguration extends AbstractProcessEngineAutoCon
             SpringAsyncExecutor springAsyncExecutor,
             ActivitiProperties activitiProperties,
             ResourceFinder resourceFinder,
-            List<ResourceFinderDescriptor> resourceFinderDescriptors,
+            List&lt;ResourceFinderDescriptor&gt; resourceFinderDescriptors,
             ApplicationUpgradeContextService applicationUpgradeContextService,
-            @Autowired(required = false) List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers,
-            @Autowired(required = false) List<ProcessEngineConfigurator> processEngineConfigurators) throws IOException {
+            @Autowired(required = false) List&lt;ProcessEngineConfigurationConfigurer&gt; processEngineConfigurationConfigurers,
+            @Autowired(required = false) List&lt;ProcessEngineConfigurator&gt; processEngineConfigurators) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration(applicationUpgradeContextService);
         conf.setConfigurators(processEngineConfigurators);
@@ -95,7 +95,7 @@ public class ProcessEngineAutoConfiguration extends AbstractProcessEngineAutoCon
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public ProcessEngineConfigurationConfigurer asyncExecutorPropertiesConfigurer(AsyncExecutorProperties properties) {
-        return (configuration) -> {
+        return (configuration) -&gt; {
             configuration.setAsyncExecutorMessageQueueMode(properties.isMessageQueueMode());
             ...
             configuration.setAsyncFailedJobWaitTime(properties.getRetryWaitTimeInMillis());
@@ -189,3 +189,9 @@ public void deployResources(final String deploymentNameHint,
 ## 测试类
 
 启动示例程序 `activiti-examples/activiti-api-basic-full-example-bean`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/02-%E9%9B%86%E6%88%90-spring/  
+

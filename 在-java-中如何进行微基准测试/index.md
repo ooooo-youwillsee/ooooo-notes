@@ -33,8 +33,8 @@ public class TestStringBenchmark {
   @Benchmark
   public String stringBuilder() {
     StringBuilder sb = new StringBuilder();
-    sb.append("hello");
-    sb.append("world");
+    sb.append(&#34;hello&#34;);
+    sb.append(&#34;world&#34;);
     return sb.toString();
   }
 
@@ -42,14 +42,14 @@ public class TestStringBenchmark {
   @Benchmark
   public String stringBuffer() {
     StringBuffer sb = new StringBuffer();
-    sb.append("hello");
-    sb.append("world");
+    sb.append(&#34;hello&#34;);
+    sb.append(&#34;world&#34;);
     return sb.toString();
   }
 
   @Benchmark
   public String stringConcat() {
-    return "hello" + "world";
+    return &#34;hello&#34; &#43; &#34;world&#34;;
   }
 
 }
@@ -62,4 +62,10 @@ public class TestStringBenchmark {
 
 ## 3. 参考
 
-> 强烈建议大家看官方代码, 地址: https://github.com/openjdk/jmh
+&gt; 强烈建议大家看官方代码, 地址: https://github.com/openjdk/jmh
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%BE%AE%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95/  
+

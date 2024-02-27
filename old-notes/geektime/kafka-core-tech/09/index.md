@@ -12,7 +12,7 @@ Kafka 的三级结构：
 
 ## 2、分区策略
 
-> 所谓分区策略是决定生产者将消息发送到哪个分区的算法。
+&gt; 所谓分区策略是决定生产者将消息发送到哪个分区的算法。
 
 ### 1、自定义分区策略
 
@@ -35,7 +35,7 @@ int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] va
 
 要实现随机策略版的 partition 方法(自定义分区策略)，如下：
 ```java
-List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
+List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(topic);
 return ThreadLocalRandom.current().nextInt(partitions.size());
 ```
 
@@ -45,7 +45,7 @@ return ThreadLocalRandom.current().nextInt(partitions.size());
 
 实现这个策略的 partition 方法(自定义分区策略)，如下：
 ```java
-List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
+List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(topic);
 return Math.abs(key.hashCode()) % partitions.size();
 ```
 
@@ -57,11 +57,17 @@ return Math.abs(key.hashCode()) % partitions.size();
 
 比如根据 Broker 所在的 IP 地址实现定制化的分区策略，如下：
 ```java
-List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
-return partitions.stream().filter(p -> isSouth(p.leader().host())).map(PartitionInfo::partition).findAny().get();
+List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(topic);
+return partitions.stream().filter(p -&gt; isSouth(p.leader().host())).map(PartitionInfo::partition).findAny().get();
 ```
 
 我们可以从所有分区中找出那些 Leader 副本在南方的所有分区，然后随机挑选一个进行消息发送。
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/09/  
 

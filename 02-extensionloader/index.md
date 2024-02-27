@@ -1,9 +1,9 @@
 # 02 ExtensionLoader
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
-> 在 dubbo 中，ExtensionLoader 是很重要的类，实现了 dubbo 的扩展机制，主要有三个方法，getExtension、getActivateExtension、getAdaptiveExtension。
+&gt; 在 dubbo 中，ExtensionLoader 是很重要的类，实现了 dubbo 的扩展机制，主要有三个方法，getExtension、getActivateExtension、getAdaptiveExtension。
 
 ## getExtension 方法
 
@@ -14,7 +14,7 @@
 public T getExtension(String name) {
     T extension = getExtension(name, true);
     if (extension == null) {
-        throw new IllegalArgumentException("Not find extension: " + name);
+        throw new IllegalArgumentException(&#34;Not find extension: &#34; &#43; name);
     }
     return extension;
 }
@@ -23,17 +23,17 @@ public T getExtension(String name) {
 public T getExtension(String name, boolean wrap) {
     checkDestroyed();
     if (StringUtils.isEmpty(name)) {
-        throw new IllegalArgumentException("Extension name == null");
+        throw new IllegalArgumentException(&#34;Extension name == null&#34;);
     }
     // 获取默认扩展
-    if ("true".equals(name)) {
+    if (&#34;true&#34;.equals(name)) {
         return getDefaultExtension();
     }
     String cacheKey = name;
     if (!wrap) {
-        cacheKey += "_origin";
+        cacheKey &#43;= &#34;_origin&#34;;
     }
-    final Holder<Object> holder = getOrCreateHolder(cacheKey);
+    final Holder&lt;Object&gt; holder = getOrCreateHolder(cacheKey);
     Object instance = holder.get();
     if (instance == null) {
         synchronized (holder) {
@@ -55,7 +55,7 @@ public T getExtension(String name, boolean wrap) {
 // 创建 extension
 private T createExtension(String name, boolean wrap) {
     // 获取扩展的 class, 读取 META-INF/dubbo/internal, META-INF/services, META-INF/dubbo 目录下
-    Class<?> clazz = getExtensionClasses().get(name);
+    Class&lt;?&gt; clazz = getExtensionClasses().get(name);
     if (clazz == null || unacceptableExceptions.contains(name)) {
         throw findException(name);
     }
@@ -73,7 +73,7 @@ private T createExtension(String name, boolean wrap) {
         }
 
         if (wrap) {
-            List<Class<?>> wrapperClassesList = new ArrayList<>();
+            List&lt;Class&lt;?&gt;&gt; wrapperClassesList = new ArrayList&lt;&gt;();
             if (cachedWrapperClasses != null) {
                 wrapperClassesList.addAll(cachedWrapperClasses);
                 wrapperClassesList.sort(WrapperComparator.COMPARATOR);
@@ -82,11 +82,11 @@ private T createExtension(String name, boolean wrap) {
 
             if (CollectionUtils.isNotEmpty(wrapperClassesList)) {
                 // 遍历包装类
-                for (Class<?> wrapperClass : wrapperClassesList) {
+                for (Class&lt;?&gt; wrapperClass : wrapperClassesList) {
                     Wrapper wrapper = wrapperClass.getAnnotation(Wrapper.class);
                     boolean match = (wrapper == null) || ((ArrayUtils.isEmpty(
                         wrapper.matches()) || ArrayUtils.contains(wrapper.matches(),
-                        name)) && !ArrayUtils.contains(wrapper.mismatches(), name));
+                        name)) &amp;&amp; !ArrayUtils.contains(wrapper.mismatches(), name));
                     if (match) {
                         // 注入类
                         instance = injectExtension(
@@ -103,7 +103,7 @@ private T createExtension(String name, boolean wrap) {
         return instance;
     } catch (Throwable t) {
         throw new IllegalStateException(
-            "Extension instance (name: " + name + ", class: " + type + ") couldn't be instantiated: " + t.getMessage(),
+            &#34;Extension instance (name: &#34; &#43; name &#43; &#34;, class: &#34; &#43; type &#43; &#34;) couldn&#39;t be instantiated: &#34; &#43; t.getMessage(),
             t);
     }
 }
@@ -113,9 +113,9 @@ private T createExtension(String name, boolean wrap) {
 
 ```java
 // 获取扩展的 class, 读取 META-INF/dubbo/internal, META-INF/services, META-INF/dubbo 目录下
-private Map<String, Class<?>> getExtensionClasses() {
+private Map&lt;String, Class&lt;?&gt;&gt; getExtensionClasses() {
     // 单例延迟加载
-    Map<String, Class<?>> classes = cachedClasses.get();
+    Map&lt;String, Class&lt;?&gt;&gt; classes = cachedClasses.get();
     if (classes == null) {
         synchronized (cachedClasses) {
             classes = cachedClasses.get();
@@ -124,11 +124,11 @@ private Map<String, Class<?>> getExtensionClasses() {
                     // 加载 extension class
                     classes = loadExtensionClasses();
                 } catch (InterruptedException e) {
-                    logger.error(COMMON_ERROR_LOAD_EXTENSION, "", "",
-                        "Exception occurred when loading extension class (interface: " + type + ")",
+                    logger.error(COMMON_ERROR_LOAD_EXTENSION, &#34;&#34;, &#34;&#34;,
+                        &#34;Exception occurred when loading extension class (interface: &#34; &#43; type &#43; &#34;)&#34;,
                         e);
                     throw new IllegalStateException(
-                        "Exception occurred when loading extension class (interface: " + type + ")",
+                        &#34;Exception occurred when loading extension class (interface: &#34; &#43; type &#43; &#34;)&#34;,
                         e);
                 }
                 cachedClasses.set(classes);
@@ -143,11 +143,11 @@ private Map<String, Class<?>> getExtensionClasses() {
 
 ```java
 // 加载 extension class
-private Map<String, Class<?>> loadExtensionClasses() throws InterruptedException {
+private Map&lt;String, Class&lt;?&gt;&gt; loadExtensionClasses() throws InterruptedException {
     checkDestroyed();
     cacheDefaultExtensionName();
 
-    Map<String, Class<?>> extensionClasses = new HashMap<>();
+    Map&lt;String, Class&lt;?&gt;&gt; extensionClasses = new HashMap&lt;&gt;();
 
     // 遍历 strategies
     for (LoadingStrategy strategy : strategies) {
@@ -168,12 +168,12 @@ private Map<String, Class<?>> loadExtensionClasses() throws InterruptedException
 
 ```java
 // loadClass 
-private void loadClass(ClassLoader classLoader, Map<String, Class<?>> extensionClasses,
-                       java.net.URL resourceURL, Class<?> clazz, String name,
+private void loadClass(ClassLoader classLoader, Map&lt;String, Class&lt;?&gt;&gt; extensionClasses,
+                       java.net.URL resourceURL, Class&lt;?&gt; clazz, String name,
                        boolean overridden) {
     if (!type.isAssignableFrom(clazz)) {
         throw new IllegalStateException(
-            "Error occurred when loading extension class (interface: " + type + ", class line: " + clazz.getName() + "), class " + clazz.getName() + " is not subtype of interface.");
+            &#34;Error occurred when loading extension class (interface: &#34; &#43; type &#43; &#34;, class line: &#34; &#43; clazz.getName() &#43; &#34;), class &#34; &#43; clazz.getName() &#43; &#34; is not subtype of interface.&#34;);
     }
 
     boolean isActive = loadClassIfActive(classLoader, clazz);
@@ -193,7 +193,7 @@ private void loadClass(ClassLoader classLoader, Map<String, Class<?>> extensionC
             name = findAnnotationName(clazz);
             if (name.length() == 0) {
                 throw new IllegalStateException(
-                    "No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
+                    &#34;No such extension name for the class &#34; &#43; clazz.getName() &#43; &#34; in the config &#34; &#43; resourceURL);
             }
         }
 
@@ -216,7 +216,7 @@ private void loadClass(ClassLoader classLoader, Map<String, Class<?>> extensionC
 
 ```java
 // 获取 Activate Extension
-public List<T> getActivateExtension(URL url, String key, String group) {
+public List&lt;T&gt; getActivateExtension(URL url, String key, String group) {
     String value = url.getParameter(key);
     // 获取 Activate
     return getActivateExtension(url,
@@ -228,16 +228,16 @@ public List<T> getActivateExtension(URL url, String key, String group) {
 
 ```java
 // 获取 Activate
-public List<T> getActivateExtension(URL url, String[] values, String group) {
+public List&lt;T&gt; getActivateExtension(URL url, String[] values, String group) {
     checkDestroyed();
-    // solve the bug of using @SPI's wrapper method to report a null pointer exception.
-    Map<Class<?>, T> activateExtensionsMap = new TreeMap<>(activateComparator);
-    List<String> names = values == null ?
-        new ArrayList<>(0) :
+    // solve the bug of using @SPI&#39;s wrapper method to report a null pointer exception.
+    Map&lt;Class&lt;?&gt;, T&gt; activateExtensionsMap = new TreeMap&lt;&gt;(activateComparator);
+    List&lt;String&gt; names = values == null ?
+        new ArrayList&lt;&gt;(0) :
         Arrays.stream(values).map(StringUtils::trim).collect(Collectors.toList());
-    Set<String> namesSet = new HashSet<>(names);
+    Set&lt;String&gt; namesSet = new HashSet&lt;&gt;(names);
     // 判断是否移除默认的
-    if (!namesSet.contains(REMOVE_VALUE_PREFIX + DEFAULT_KEY)) {
+    if (!namesSet.contains(REMOVE_VALUE_PREFIX &#43; DEFAULT_KEY)) {
         if (cachedActivateGroups.size() == 0) {
             synchronized (cachedActivateGroups) {
                 // cache all extensions
@@ -245,7 +245,7 @@ public List<T> getActivateExtension(URL url, String[] values, String group) {
                     // 确保 extension 已经加载，这个方法上面已经分析过了
                     getExtensionClasses();
                     // 遍历所有的 activate class
-                    for (Map.Entry<String, Object> entry : cachedActivates.entrySet()) {
+                    for (Map.Entry&lt;String, Object&gt; entry : cachedActivates.entrySet()) {
                         String name = entry.getKey();
                         Object activate = entry.getValue();
 
@@ -262,12 +262,12 @@ public List<T> getActivateExtension(URL url, String[] values, String group) {
                             continue;
                         }
                         cachedActivateGroups.put(name,
-                            new HashSet<>(Arrays.asList(activateGroup)));
+                            new HashSet&lt;&gt;(Arrays.asList(activateGroup)));
                         String[][] keyPairs = new String[activateValue.length][];
-                        for (int i = 0; i < activateValue.length; i++) {
-                            if (activateValue[i].contains(":")) {
+                        for (int i = 0; i &lt; activateValue.length; i&#43;&#43;) {
+                            if (activateValue[i].contains(&#34;:&#34;)) {
                                 keyPairs[i] = new String[2];
-                                String[] arr = activateValue[i].split(":");
+                                String[] arr = activateValue[i].split(&#34;:&#34;);
                                 keyPairs[i][0] = arr[0];
                                 keyPairs[i][1] = arr[1];
                             } else {
@@ -283,10 +283,10 @@ public List<T> getActivateExtension(URL url, String[] values, String group) {
         }
 
         // traverse all cached extensions
-        cachedActivateGroups.forEach((name, activateGroup) -> {
+        cachedActivateGroups.forEach((name, activateGroup) -&gt; {
             // 判断 group 和 name 是否匹配
-            if (isMatchGroup(group, activateGroup) && !namesSet.contains(
-                name) && !namesSet.contains(REMOVE_VALUE_PREFIX + name) && isActive(
+            if (isMatchGroup(group, activateGroup) &amp;&amp; !namesSet.contains(
+                name) &amp;&amp; !namesSet.contains(REMOVE_VALUE_PREFIX &#43; name) &amp;&amp; isActive(
                 cachedActivateValues.get(name), url)) {
 
                 // 保存默认的 activate
@@ -299,11 +299,11 @@ public List<T> getActivateExtension(URL url, String[] values, String group) {
     if (namesSet.contains(DEFAULT_KEY)) {
         // will affect order
         // `ext1,default,ext2` means ext1 will happens before all of the default extensions while ext2 will after them
-        ArrayList<T> extensionsResult = new ArrayList<>(
-            activateExtensionsMap.size() + names.size());
+        ArrayList&lt;T&gt; extensionsResult = new ArrayList&lt;&gt;(
+            activateExtensionsMap.size() &#43; names.size());
         for (String name : names) {
             if (name.startsWith(REMOVE_VALUE_PREFIX) || namesSet.contains(
-                REMOVE_VALUE_PREFIX + name)) {
+                REMOVE_VALUE_PREFIX &#43; name)) {
                 continue;
             }
             if (DEFAULT_KEY.equals(name)) {
@@ -319,7 +319,7 @@ public List<T> getActivateExtension(URL url, String[] values, String group) {
         // add extensions, will be sorted by its order
         for (String name : names) {
             if (name.startsWith(REMOVE_VALUE_PREFIX) || namesSet.contains(
-                REMOVE_VALUE_PREFIX + name)) {
+                REMOVE_VALUE_PREFIX &#43; name)) {
                 continue;
             }
             if (DEFAULT_KEY.equals(name)) {
@@ -329,7 +329,7 @@ public List<T> getActivateExtension(URL url, String[] values, String group) {
                 activateExtensionsMap.put(getExtensionClass(name), getExtension(name));
             }
         }
-        return new ArrayList<>(activateExtensionsMap.values());
+        return new ArrayList&lt;&gt;(activateExtensionsMap.values());
     }
 }
 ```
@@ -346,7 +346,7 @@ public T getAdaptiveExtension() {
     if (instance == null) {
         if (createAdaptiveInstanceError != null) {
             throw new IllegalStateException(
-                "Failed to create adaptive instance: " + createAdaptiveInstanceError.toString(),
+                &#34;Failed to create adaptive instance: &#34; &#43; createAdaptiveInstanceError.toString(),
                 createAdaptiveInstanceError);
         }
 
@@ -360,7 +360,7 @@ public T getAdaptiveExtension() {
                 } catch (Throwable t) {
                     createAdaptiveInstanceError = t;
                     throw new IllegalStateException(
-                        "Failed to create adaptive instance: " + t.toString(), t);
+                        &#34;Failed to create adaptive instance: &#34; &#43; t.toString(), t);
                 }
             }
         }
@@ -385,7 +385,7 @@ private T createAdaptiveExtension() {
         return instance;
     } catch (Exception e) {
         throw new IllegalStateException(
-            "Can't create adaptive extension " + type + ", cause: " + e.getMessage(), e);
+            &#34;Can&#39;t create adaptive extension &#34; &#43; type &#43; &#34;, cause: &#34; &#43; e.getMessage(), e);
     }
 }
 ```
@@ -394,12 +394,12 @@ private T createAdaptiveExtension() {
 
 ```java
 // 动态创建
-private Class<?> createAdaptiveExtensionClass() {
-    // Adaptive Classes' ClassLoader should be the same with Real SPI interface classes' ClassLoader
+private Class&lt;?&gt; createAdaptiveExtensionClass() {
+    // Adaptive Classes&#39; ClassLoader should be the same with Real SPI interface classes&#39; ClassLoader
     ClassLoader classLoader = type.getClassLoader();
     try {
         if (NativeUtils.isNative()) {
-            return classLoader.loadClass(type.getName() + "$Adaptive");
+            return classLoader.loadClass(type.getName() &#43; &#34;$Adaptive&#34;);
         }
     } catch (Throwable ignore) {
 
@@ -424,3 +424,9 @@ private Class<?> createAdaptiveExtensionClass() {
 `org.apache.dubbo.common.extension.ExtensionLoader_Adaptive_Test#test_getAdaptiveExtension_customizeAdaptiveKey`
 
 `org.apache.dubbo.common.extension.ExtensionLoader_Adaptive_Test#test_getAdaptiveExtension_protocolKey`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/02-extensionloader/  
+

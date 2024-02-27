@@ -1,9 +1,9 @@
 # 07 常用的 ActivityBehavior
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
-> 通过在【agenda流转节点】章节，我们知道了每一个节点的**行为**由对应的 `behavior` 来决定，所以有必要看看**常用的 behavior 实现**。
+&gt; 通过在【agenda流转节点】章节，我们知道了每一个节点的**行为**由对应的 `behavior` 来决定，所以有必要看看**常用的 behavior 实现**。
 
 ## StartEvent
 
@@ -96,7 +96,7 @@ public void execute(DelegateExecution execution) {
 
 可以运行 `org.activiti.examples.bpmn.event.timer.BoundaryTimerEventTest#testInterruptingTimerDuration` 来调试
 
-> 这个比较复杂，涉及到工作流的定时器，以后会继续解析
+&gt; 这个比较复杂，涉及到工作流的定时器，以后会继续解析
 
 ```java
 @Override
@@ -104,7 +104,7 @@ public void execute(DelegateExecution execution) {
     ExecutionEntity executionEntity = (ExecutionEntity) execution;
     // 判断是否为边界事件
     if (!(execution.getCurrentFlowElement() instanceof BoundaryEvent)) {
-        throw new ActivitiException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event");
+        throw new ActivitiException(&#34;Programmatic error: &#34; &#43; this.getClass() &#43; &#34; should not be used for anything else than a boundary event&#34;);
     }
   
     JobManager jobManager = Context.getCommandContext().getJobManager();
@@ -130,3 +130,9 @@ public void execute(DelegateExecution execution) {
     Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/07-%E5%B8%B8%E7%94%A8%E7%9A%84-activitybehavior/  
+

@@ -1,7 +1,7 @@
 # 03 启动流程
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
 ## 入口程序
 
@@ -9,7 +9,7 @@
 // registry、protocol、reference、service 都会调用 configManager#addConfig，很重要。
 DubboBootstrap bootstrap = DubboBootstrap.getInstance();
     // 设置应用配置
-    bootstrap.application(new ApplicationConfig("dubbo-demo-api-consumer"))
+    bootstrap.application(new ApplicationConfig(&#34;dubbo-demo-api-consumer&#34;))
         // 注册中心
         .registry(registryConfig)
         // 协议配置
@@ -25,14 +25,14 @@ DubboBootstrap bootstrap = DubboBootstrap.getInstance();
 源码位置: `org.apache.dubbo.config.context.AbstractConfigManager#addConfig`
 
 ```java
-public final <T extends AbstractConfig> T addConfig(AbstractConfig config) {
+public final &lt;T extends AbstractConfig&gt; T addConfig(AbstractConfig config) {
     if (config == null) {
         return null;
     }
     // ignore MethodConfig
     // 不支持
     if (!isSupportConfigType(config.getClass())) {
-        throw new IllegalArgumentException("Unsupported config type: " + config);
+        throw new IllegalArgumentException(&#34;Unsupported config type: &#34; &#43; config);
     }
 
     if (config.getScopeModel() != scopeModel) {
@@ -40,7 +40,7 @@ public final <T extends AbstractConfig> T addConfig(AbstractConfig config) {
     }
 
     // 获取 tagName, 然后添加
-    Map<String, AbstractConfig> configsMap = configsCache.computeIfAbsent(getTagName(config.getClass()), type -> new ConcurrentHashMap<>());
+    Map&lt;String, AbstractConfig&gt; configsMap = configsCache.computeIfAbsent(getTagName(config.getClass()), type -&gt; new ConcurrentHashMap&lt;&gt;());
 
     // fast check duplicated equivalent config before write lock
     if (!(config instanceof ReferenceConfigBase || config instanceof ServiceConfigBase)) {
@@ -69,7 +69,7 @@ public DubboBootstrap start(boolean wait) {
         try {
             future.get();
         } catch (Exception e) {
-            throw new IllegalStateException("await dubbo application start finish failure", e);
+            throw new IllegalStateException(&#34;await dubbo application start finish failure&#34;, e);
         }
     }
     return this;
@@ -84,7 +84,7 @@ public Future start() {
     synchronized (startLock) {
         // 判断状态
         if (isStopping() || isStopped() || isFailed()) {
-            throw new IllegalStateException(getIdentifier() + " is stopping or stopped, can not start again");
+            throw new IllegalStateException(getIdentifier() &#43; &#34; is stopping or stopped, can not start again&#34;);
         }
 
         try {
@@ -105,12 +105,12 @@ public Future start() {
             }
 
             // if is started and no new module, just return
-            if (isStarted() && !hasPendingModule) {
+            if (isStarted() &amp;&amp; !hasPendingModule) {
                 return CompletableFuture.completedFuture(false);
             }
 
-            // pending -> starting : first start app
-            // started -> starting : re-start app
+            // pending -&gt; starting : first start app
+            // started -&gt; starting : re-start app
             // 改变状态为正在启动, 执行回调函数 DeployListener
             onStarting();
 
@@ -119,7 +119,7 @@ public Future start() {
             // 启动
             doStart();
         } catch (Throwable e) {
-            onFailed(getIdentifier() + " start failure", e);
+            onFailed(getIdentifier() &#43; &#34; start failure&#34;, e);
             throw e;
         }
 
@@ -170,7 +170,7 @@ public void initialize() {
         initialized = true;
 
         if (logger.isInfoEnabled()) {
-            logger.info(getIdentifier() + " has been initialized!");
+            logger.info(getIdentifier() &#43; &#34; has been initialized!&#34;);
         }
     }
 }
@@ -207,7 +207,7 @@ private void startModules() {
 // 启动模块
 @Override
 public Future start() throws IllegalStateException {
-    // initialize，maybe deadlock applicationDeployer lock & moduleDeployer lock
+    // initialize，maybe deadlock applicationDeployer lock &amp; moduleDeployer lock
     // 初始化, 上面已经说过了
     applicationDeployer.initialize();
     // 启动，加锁
@@ -217,7 +217,7 @@ public Future start() throws IllegalStateException {
 private synchronized Future startSync() throws IllegalStateException {
     // 判断状态
     if (isStopping() || isStopped() || isFailed()) {
-        throw new IllegalStateException(getIdentifier() + " is stopping or stopped, can not start again");
+        throw new IllegalStateException(getIdentifier() &#43; &#34; is stopping or stopped, can not start again&#34;);
     }
 
     try {
@@ -247,7 +247,7 @@ private synchronized Future startSync() throws IllegalStateException {
 
         // if no async export/refer services, just set started
         // 下面的逻辑分为同步和异步处理, 逻辑都是一样的
-        if (asyncExportingFutures.isEmpty() && asyncReferringFutures.isEmpty()) {
+        if (asyncExportingFutures.isEmpty() &amp;&amp; asyncReferringFutures.isEmpty()) {
             // publish module started event
             // 变更状态为已启动，暴露 metadataService, 这个很重要
             onModuleStarted();
@@ -264,7 +264,7 @@ private synchronized Future startSync() throws IllegalStateException {
             // 完成启动
             completeStartFuture(true);
         } else {
-            frameworkExecutorRepository.getSharedExecutor().submit(() -> {
+            frameworkExecutorRepository.getSharedExecutor().submit(() -&gt; {
                 try {
                     // wait for export finish
                     waitExportFinish();
@@ -280,8 +280,8 @@ private synchronized Future startSync() throws IllegalStateException {
                     // check reference config
                     checkReferences();
                 } catch (Throwable e) {
-                    logger.warn(CONFIG_FAILED_WAIT_EXPORT_REFER, "", "", "wait for export/refer services occurred an exception", e);
-                    onModuleFailed(getIdentifier() + " start failed: " + e, e);
+                    logger.warn(CONFIG_FAILED_WAIT_EXPORT_REFER, &#34;&#34;, &#34;&#34;, &#34;wait for export/refer services occurred an exception&#34;, e);
+                    onModuleFailed(getIdentifier() &#43; &#34; start failed: &#34; &#43; e, e);
                 } finally {
                     // complete module start future after application state changed
                     completeStartFuture(true);
@@ -290,10 +290,16 @@ private synchronized Future startSync() throws IllegalStateException {
         }
 
     } catch (Throwable e) {
-        onModuleFailed(getIdentifier() + " start failed: " + e, e);
+        onModuleFailed(getIdentifier() &#43; &#34; start failed: &#34; &#43; e, e);
         throw e;
     }
 
     return startFuture;
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/03-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/  
+

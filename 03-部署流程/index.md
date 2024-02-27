@@ -1,7 +1,7 @@
 # 03 部署流程
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
 ## 部署流程
 
@@ -16,7 +16,7 @@ public Deployment deploy() {
 // org.activiti.engine.impl.RepositoryServiceImpl#deploy
 public Deployment deploy(DeploymentBuilderImpl deploymentBuilder) {
     // 执行 DeployCmd, 最终会执行 DeployCmd#execute 方法
-    return commandExecutor.execute(new DeployCmd<Deployment>(deploymentBuilder));
+    return commandExecutor.execute(new DeployCmd&lt;Deployment&gt;(deploymentBuilder));
 }
 ```
 
@@ -44,7 +44,7 @@ protected Deployment executeDeploy(CommandContext commandContext) {
             if (deploymentsDiffer(newDeployment, existingDeployment)) {
                 applyUpgradeLogic(newDeployment, existingDeployment);
             } else {
-                LOGGER.info("An existing deployment of version {} matching the current one was found, no need to deploy again.",
+                LOGGER.info(&#34;An existing deployment of version {} matching the current one was found, no need to deploy again.&#34;,
                     existingDeployment.getVersion());
                 return existingDeployment;
             }
@@ -55,7 +55,7 @@ protected Deployment executeDeploy(CommandContext commandContext) {
     persistDeploymentInDatabase(commandContext, newDeployment);
 
     ...
-    LOGGER.info("Launching new deployment with version: " + newDeployment.getVersion());
+    LOGGER.info(&#34;Launching new deployment with version: &#34; &#43; newDeployment.getVersion());
     // 部署流程
     commandContext.getProcessEngineConfiguration().getDeploymentManager().deploy(newDeployment, deploymentSettings);
 
@@ -68,7 +68,7 @@ protected Deployment executeDeploy(CommandContext commandContext) {
 
 ```java
 // 部署流程
-public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+public void deploy(DeploymentEntity deployment, Map&lt;String, Object&gt; deploymentSettings) {
     // deployers 默认只有一个实现 BpmnDeployer
     for (Deployer deployer : deployers) {
         deployer.deploy(deployment, deploymentSettings);
@@ -82,8 +82,8 @@ public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSe
 // 部署流程
 @Override
 public void deploy(DeploymentEntity deployment,
-                   Map<String, Object> deploymentSettings) {
-    log.debug("Processing deployment {}",
+                   Map&lt;String, Object&gt; deploymentSettings) {
+    log.debug(&#34;Processing deployment {}&#34;,
               deployment.getName());
 
     // The ParsedDeployment represents the deployment, the process definitions, and the BPMN
@@ -99,7 +99,7 @@ public void deploy(DeploymentEntity deployment,
     ...
     // 设置一些属性，然后会持久化到数据库中
     if (deployment.isNew()) {
-        Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapOfNewProcessDefinitionToPreviousVersion =
+        Map&lt;ProcessDefinitionEntity, ProcessDefinitionEntity&gt; mapOfNewProcessDefinitionToPreviousVersion =
                 getPreviousVersionsOfProcessDefinitions(parsedDeployment);
         setProcessDefinitionVersionsAndIds(parsedDeployment,
                                            mapOfNewProcessDefinitionToPreviousVersion);
@@ -128,3 +128,9 @@ public void deploy(DeploymentEntity deployment,
 ## 测试类
 
 `org.activiti.examples.processdefinitions.ProcessDefinitionsTest#testProcessDefinitionDescription`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/03-%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B/  
+

@@ -1,9 +1,9 @@
 # 04 配置加载
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
-> 在 `dubbo` 中支持**配置中心**，如果没有配置，则会检查**注册中心**能否当作**配置中心**。
+&gt; 在 `dubbo` 中支持**配置中心**，如果没有配置，则会检查**注册中心**能否当作**配置中心**。
 
 ## 启动配置中心
 
@@ -31,7 +31,7 @@ private void startConfigCenter() {
     useRegistryAsConfigCenterIfNecessary();
 
     // check Config Center
-    Collection<ConfigCenterConfig> configCenters = configManager.getConfigCenters();
+    Collection&lt;ConfigCenterConfig&gt; configCenters = configManager.getConfigCenters();
     if (CollectionUtils.isEmpty(configCenters)) {
         // 没有配置中心，new 一个空的
         ConfigCenterConfig configCenterConfig = new ConfigCenterConfig();
@@ -77,29 +77,29 @@ private void startConfigCenter() {
 源码位置: `org.apache.dubbo.config.context.AbstractConfigManager#loadConfigsOfTypeFromProps`
 
 ```java
-public <T extends AbstractConfig> List<T> loadConfigsOfTypeFromProps(Class<T> cls) {
-    List<T> tmpConfigs = new ArrayList<>();
+public &lt;T extends AbstractConfig&gt; List&lt;T&gt; loadConfigsOfTypeFromProps(Class&lt;T&gt; cls) {
+    List&lt;T&gt; tmpConfigs = new ArrayList&lt;&gt;();
     // dubbo.properties 文件配置
     PropertiesConfiguration properties = environment.getPropertiesConfiguration();
 
     // load multiple configs with id
-    Set<String> configIds = this.getConfigIdsFromProps(cls);
+    Set&lt;String&gt; configIds = this.getConfigIdsFromProps(cls);
     // 加载多配置，比如 key: dubbo.protocols.id-xxx.name 
-    configIds.forEach(id -> {
+    configIds.forEach(id -&gt; {
         if (!this.getConfig(cls, id).isPresent()) {
             T config;
             try {
                 config = createConfig(cls, scopeModel);
                 config.setId(id);
             } catch (Exception e) {
-                throw new IllegalStateException("create config instance failed, id: " + id + ", type:" + cls.getSimpleName());
+                throw new IllegalStateException(&#34;create config instance failed, id: &#34; &#43; id &#43; &#34;, type:&#34; &#43; cls.getSimpleName());
             }
 
             String key = null;
             boolean addDefaultNameConfig = false;
             try {
                 // add default name config (same as id), e.g. dubbo.protocols.rest.port=1234
-                key = DUBBO + "." + AbstractConfig.getPluralTagName(cls) + "." + id + ".name";
+                key = DUBBO &#43; &#34;.&#34; &#43; AbstractConfig.getPluralTagName(cls) &#43; &#34;.&#34; &#43; id &#43; &#34;.name&#34;;
                 if (properties.getProperty(key) == null) {
                     properties.setProperty(key, id);
                     addDefaultNameConfig = true;
@@ -109,10 +109,10 @@ public <T extends AbstractConfig> List<T> loadConfigsOfTypeFromProps(Class<T> cl
                 this.addConfig(config);
                 tmpConfigs.add(config);
             } catch (Exception e) {
-                logger.error(COMMON_PROPERTY_TYPE_MISMATCH, "", "", "load config failed, id: " + id + ", type:" + cls.getSimpleName(), e);
-                throw new IllegalStateException("load config failed, id: " + id + ", type:" + cls.getSimpleName());
+                logger.error(COMMON_PROPERTY_TYPE_MISMATCH, &#34;&#34;, &#34;&#34;, &#34;load config failed, id: &#34; &#43; id &#43; &#34;, type:&#34; &#43; cls.getSimpleName(), e);
+                throw new IllegalStateException(&#34;load config failed, id: &#34; &#43; id &#43; &#34;, type:&#34; &#43; cls.getSimpleName());
             } finally {
-                if (addDefaultNameConfig && key != null) {
+                if (addDefaultNameConfig &amp;&amp; key != null) {
                     properties.remove(key);
                 }
             }
@@ -124,14 +124,14 @@ public <T extends AbstractConfig> List<T> loadConfigsOfTypeFromProps(Class<T> cl
     if (this.getConfigs(cls).isEmpty()) {
         // load single config
         // configurationMaps 中包含多个配置，比如环境变量，dubbo.properies 文件配置，系统参数等
-        List<Map<String, String>> configurationMaps = environment.getConfigurationMaps();
+        List&lt;Map&lt;String, String&gt;&gt; configurationMaps = environment.getConfigurationMaps();
         if (ConfigurationUtils.hasSubProperties(configurationMaps, AbstractConfig.getTypePrefix(cls))) {
             T config;
             try {
                 config = createConfig(cls, scopeModel);
                 config.refresh();
             } catch (Exception e) {
-                throw new IllegalStateException("create default config instance failed, type:" + cls.getSimpleName());
+                throw new IllegalStateException(&#34;create default config instance failed, type:&#34; &#43; cls.getSimpleName());
             }
 
             this.addConfig(config);
@@ -166,7 +166,7 @@ private DynamicConfiguration prepareEnvironment(ConfigCenterConfig configCenter)
             // 获取配置内容, 全局级别的
             String configContent = dynamicConfiguration.getProperties(configCenter.getConfigFile(), configCenter.getGroup());
             if (StringUtils.isNotEmpty(configContent)) {
-                logger.info(String.format("Got global remote configuration from config center with key-%s and group-%s: \n %s", configCenter.getConfigFile(), configCenter.getGroup(), configContent));
+                logger.info(String.format(&#34;Got global remote configuration from config center with key-%s and group-%s: \n %s&#34;, configCenter.getConfigFile(), configCenter.getGroup(), configContent));
             }
             String appGroup = getApplication().getName();
             String appConfigContent = null;
@@ -176,13 +176,13 @@ private DynamicConfiguration prepareEnvironment(ConfigCenterConfig configCenter)
                 // 获取配置内容, 应用级别的
                 appConfigContent = dynamicConfiguration.getProperties(appConfigFile, appGroup);
                 if (StringUtils.isNotEmpty(appConfigContent)) {
-                    logger.info(String.format("Got application specific remote configuration from config center with key %s and group %s: \n %s", appConfigFile, appGroup, appConfigContent));
+                    logger.info(String.format(&#34;Got application specific remote configuration from config center with key %s and group %s: \n %s&#34;, appConfigFile, appGroup, appConfigContent));
                 }
             }
             try {
                 // 解析配置
-                Map<String, String> configMap = parseProperties(configContent);
-                Map<String, String> appConfigMap = parseProperties(appConfigContent);
+                Map&lt;String, String&gt; configMap = parseProperties(configContent);
+                Map&lt;String, String&gt; appConfigMap = parseProperties(appConfigContent);
 
                 // 更新配置
                 environment.updateExternalConfigMap(configMap);
@@ -190,7 +190,7 @@ private DynamicConfiguration prepareEnvironment(ConfigCenterConfig configCenter)
 
                 ...
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to parse configurations from Config Center.", e);
+                throw new IllegalStateException(&#34;Failed to parse configurations from Config Center.&#34;, e);
             }
         }
         return dynamicConfiguration;
@@ -214,11 +214,11 @@ public void initialize() throws IllegalStateException {
         // 环境变量
         this.environmentConfiguration = new EnvironmentConfiguration();
         // 配置中心的全局配置
-        this.externalConfiguration = new InmemoryConfiguration("ExternalConfig");
+        this.externalConfiguration = new InmemoryConfiguration(&#34;ExternalConfig&#34;);
         // 配置中心的应用配置
-        this.appExternalConfiguration = new InmemoryConfiguration("AppExternalConfig");
+        this.appExternalConfiguration = new InmemoryConfiguration(&#34;AppExternalConfig&#34;);
         // 本地的应用配置
-        this.appConfiguration = new InmemoryConfiguration("AppConfig");
+        this.appConfiguration = new InmemoryConfiguration(&#34;AppConfig&#34;);
         
         loadMigrationRule();
     }
@@ -252,7 +252,7 @@ public void refresh() {
 }
 
 // ConfigUtils#getProperties
-public static Properties getProperties(Set<ClassLoader> classLoaders) {
+public static Properties getProperties(Set&lt;ClassLoader&gt; classLoaders) {
     String path = System.getProperty(CommonConstants.DUBBO_PROPERTIES_KEY);
     if (StringUtils.isEmpty(path)) {
         path = System.getenv(CommonConstants.DUBBO_PROPERTIES_KEY);
@@ -272,3 +272,9 @@ public static Properties getProperties(Set<ClassLoader> classLoaders) {
 `org.apache.dubbo.configcenter.support.nacos.NacosDynamicConfigurationTest#testGetConfig`: 需要启动一个 `nacos` 服务
 
 `org.apache.dubbo.configcenter.support.zookeeper.ZookeeperDynamicConfigurationTest#testGetConfig`: 需要启动一个 `zk` 服务
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/04-%E9%85%8D%E7%BD%AE%E5%8A%A0%E8%BD%BD/  
+

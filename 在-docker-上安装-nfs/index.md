@@ -44,3 +44,9 @@ mount 172.17.0.2:/home/ooooo/shared/nfs /home/ooooo/nfs-mount
 ### 5. 参考
 
 [docker images](https://hub.docker.com/r/erichough/nfs-server)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-docker-%E4%B8%8A%E5%AE%89%E8%A3%85-nfs/  
+

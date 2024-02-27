@@ -1,9 +1,9 @@
 # 13 集成 k8s
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
-> 如果我们将 `dubbo` 应用部署在 `k8s` 环境中，我们就可以使用 `k8s` 作为**注册中心**。
+&gt; 如果我们将 `dubbo` 应用部署在 `k8s` 环境中，我们就可以使用 `k8s` 作为**注册中心**。
 
 ##  服务调用流程
 
@@ -26,7 +26,7 @@ public KubernetesServiceDiscovery(ApplicationModel applicationModel, URL registr
     // 初始化 k8s client
     this.kubernetesClient = new KubernetesClientBuilder().withConfig(config).build();
     // HostName 一般默认就是 podName
-    this.currentHostname = System.getenv("HOSTNAME");
+    this.currentHostname = System.getenv(&#34;HOSTNAME&#34;);
     this.registryURL = registryURL;
     this.namespace = config.getNamespace();
     // 默认需要注册
@@ -60,7 +60,7 @@ public void doRegister(ServiceInstance serviceInstance) throws RuntimeException 
                 .inNamespace(namespace)
                 // 选择当前 pod
                 .withName(currentHostname)
-                .edit(pod ->
+                .edit(pod -&gt;
                         new PodBuilder(pod)
                                 .editOrNewMetadata()
                                 // 添加到注解
@@ -68,8 +68,8 @@ public void doRegister(ServiceInstance serviceInstance) throws RuntimeException 
                                 .endMetadata()
                                 .build());
         if (logger.isInfoEnabled()) {
-            logger.info("Write Current Service Instance Metadata to Kubernetes pod. " +
-                    "Current pod name: " + currentHostname);
+            logger.info(&#34;Write Current Service Instance Metadata to Kubernetes pod. &#34; &#43;
+                    &#34;Current pod name: &#34; &#43; currentHostname);
         }
     }
 }
@@ -93,14 +93,14 @@ public void doUpdate(ServiceInstance oldServiceInstance, ServiceInstance newServ
 
 ```java
 @Override
-public List<ServiceInstance> getInstances(String serviceName) throws NullPointerException {
+public List&lt;ServiceInstance&gt; getInstances(String serviceName) throws NullPointerException {
     Endpoints endpoints = null;
     // 从 informer 中获取
-    SharedIndexInformer<Endpoints> endInformer = ENDPOINTS_INFORMER.get(serviceName);
+    SharedIndexInformer&lt;Endpoints&gt; endInformer = ENDPOINTS_INFORMER.get(serviceName);
     if (endInformer != null) {
         // get endpoints directly from informer local store
-        List<Endpoints> endpointsList = endInformer.getStore().list();
-        if (endpointsList.size() > 0) {
+        List&lt;Endpoints&gt; endpointsList = endInformer.getStore().list();
+        if (endpointsList.size() &gt; 0) {
             endpoints = endpointsList.get(0);
         }
     }
@@ -121,13 +121,13 @@ public List<ServiceInstance> getInstances(String serviceName) throws NullPointer
 
 ```java
 // 方法的逻辑：查询出所有的 pod 和 endpoint，以 endpoint 为准，然后对比，挑选出可用的 pod，最终包装为 serviceInstance
-private List<ServiceInstance> toServiceInstance(Endpoints endpoints, String serviceName) {
-    Map<String, String> serviceSelector = getServiceSelector(serviceName);
+private List&lt;ServiceInstance&gt; toServiceInstance(Endpoints endpoints, String serviceName) {
+    Map&lt;String, String&gt; serviceSelector = getServiceSelector(serviceName);
     if (serviceSelector == null) {
-        return new LinkedList<>();
+        return new LinkedList&lt;&gt;();
     }
     // 获取 pod
-    Map<String, Pod> pods = kubernetesClient
+    Map&lt;String, Pod&gt; pods = kubernetesClient
             .pods()
             .inNamespace(namespace)
             .withLabels(serviceSelector)
@@ -136,11 +136,11 @@ private List<ServiceInstance> toServiceInstance(Endpoints endpoints, String serv
             .stream()
             .collect(
                     Collectors.toMap(
-                            pod -> pod.getMetadata().getName(),
-                            pod -> pod));
+                            pod -&gt; pod.getMetadata().getName(),
+                            pod -&gt; pod));
 
-    List<ServiceInstance> instances = new LinkedList<>();
-    Set<Integer> instancePorts = new HashSet<>();
+    List&lt;ServiceInstance&gt; instances = new LinkedList&lt;&gt;();
+    Set&lt;Integer&gt; instancePorts = new HashSet&lt;&gt;();
 
     // 获取 port
     for (EndpointSubset endpointSubset : endpoints.getSubsets()) {
@@ -157,12 +157,12 @@ private List<ServiceInstance> toServiceInstance(Endpoints endpoints, String serv
             String ip = address.getIp();
             // 如果 pod 为 null，说明这个 pod 删除了
             if (pod == null) {
-                logger.warn(REGISTRY_UNABLE_MATCH_KUBERNETES, "", "", "Unable to match Kubernetes Endpoint address with Pod. " +
-                    "EndpointAddress Hostname: " + address.getTargetRef().getName());
+                logger.warn(REGISTRY_UNABLE_MATCH_KUBERNETES, &#34;&#34;, &#34;&#34;, &#34;Unable to match Kubernetes Endpoint address with Pod. &#34; &#43;
+                    &#34;EndpointAddress Hostname: &#34; &#43; address.getTargetRef().getName());
                 continue;
             }
             // 遍历所有 port，新建 ServiceInstance
-            instancePorts.forEach(port -> {
+            instancePorts.forEach(port -&gt; {
                 ServiceInstance serviceInstance = new DefaultServiceInstance(serviceName, ip, port, ScopeModelUtil.getApplicationModel(getUrl().getScopeModel()));
 
                 // 从 pod 上获取之前的元数据信息
@@ -179,4 +179,10 @@ private List<ServiceInstance> toServiceInstance(Endpoints endpoints, String serv
     return instances;
 }
 ```
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/13-%E9%9B%86%E6%88%90-k8s/  
 

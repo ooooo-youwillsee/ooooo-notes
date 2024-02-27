@@ -28,7 +28,7 @@ public class SemaphoreOnLock {
   public void acquire() {
     lock.lock();
     try {
-      while (permit <= 0) {
+      while (permit &lt;= 0) {
         condition.await();
       }
       permit--;
@@ -42,7 +42,7 @@ public class SemaphoreOnLock {
   public void release() {
     lock.lock();
     try {
-      permit++;
+      permit&#43;&#43;;
       condition.signal();
     } finally {
       lock.unlock();
@@ -56,4 +56,10 @@ public class SemaphoreOnLock {
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/demo-java-concurrent)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E4%BD%BF%E7%94%A8-lock-%E6%9D%A5%E5%AE%9E%E7%8E%B0-semaphore/  
 

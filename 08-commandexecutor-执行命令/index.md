@@ -1,9 +1,9 @@
 # 08 CommandExecutor 执行命令
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
-> 从之前的分析可以发现，工作流的**每个操作**都是一个 `Command`, 所以有必要看看**内部的实现机制**。
+&gt; 从之前的分析可以发现，工作流的**每个操作**都是一个 `Command`, 所以有必要看看**内部的实现机制**。
 
 ## Command 类
 
@@ -11,7 +11,7 @@
 
 ```java
 // 接口非常简单，执行过程的参数都从 commandContext 中获取
-public interface Command<T> {
+public interface Command&lt;T&gt; {
 
     T execute(CommandContext commandContext);
 
@@ -35,12 +35,12 @@ public interface CommandExecutor {
     /**
      * Execute a command with the specified {@link CommandConfig}.
      */
-    <T> T execute(CommandConfig config, Command<T> command);
+    &lt;T&gt; T execute(CommandConfig config, Command&lt;T&gt; command);
   
     /**
      * Execute a command with the default {@link CommandConfig}.
      */
-    <T> T execute(Command<T> command);
+    &lt;T&gt; T execute(Command&lt;T&gt; command);
 
 }
 ```
@@ -64,7 +64,7 @@ public class CommandConfig {
 ```java
 // 执行命令
 @Override
-public <T> T execute(CommandConfig config, Command<T> command) {
+public &lt;T&gt; T execute(CommandConfig config, Command&lt;T&gt; command) {
     // 开始执行第一个拦截器
     return first.execute(config, command);
 }
@@ -72,7 +72,7 @@ public <T> T execute(CommandConfig config, Command<T> command) {
 
 运行 `org.activiti.examples.bpmn.receivetask.ReceiveTaskTest#testWaitStateBehavior`
 
-{{< image src="./commandExecutor.png" caption="CommandInterceptor 顺序" >}}
+{{&lt; image src=&#34;./commandExecutor.png&#34; caption=&#34;CommandInterceptor 顺序&#34; &gt;}}
 
 从上图可以看出，有四个拦截器，`LogInterceptor`、`CommandContextInterceptor`、`TransactionContextInterceptor`、`CommandInvoker`。
 
@@ -82,7 +82,7 @@ public <T> T execute(CommandConfig config, Command<T> command) {
 
 ```java
 // 这个拦截器用来创建 context
-public <T> T execute(CommandConfig config, Command<T> command) {
+public &lt;T&gt; T execute(CommandConfig config, Command&lt;T&gt; command) {
     CommandContext context = Context.getCommandContext();
   
     boolean contextReused = false;
@@ -92,7 +92,7 @@ public <T> T execute(CommandConfig config, Command<T> command) {
     if (!config.isContextReusePossible() || context == null || context.getException() != null) {
         context = commandContextFactory.createCommandContext(command);
     } else {
-        log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
+        log.debug(&#34;Valid context found. Reusing it for the current command &#39;{}&#39;&#34;, command.getClass().getCanonicalName());
         // 设置复用
         contextReused = true;
         context.setReused(true);
@@ -136,7 +136,7 @@ public <T> T execute(CommandConfig config, Command<T> command) {
 ```java
 // 这个拦截器用来创建 transactionContext
 // 与 spring 集成时，会有另外一个拦截器 SpringTransactionInterceptor 来开启事务
-public <T> T execute(CommandConfig config, Command<T> command) {
+public &lt;T&gt; T execute(CommandConfig config, Command&lt;T&gt; command) {
 
     CommandContext commandContext = Context.getCommandContext();
     // Storing it in a variable, to reference later (it can change during command execution)
@@ -144,7 +144,7 @@ public <T> T execute(CommandConfig config, Command<T> command) {
   
     try {
   
-        if (transactionContextFactory != null && !isReused) {
+        if (transactionContextFactory != null &amp;&amp; !isReused) {
             // 创建 transactionContext
             TransactionContext transactionContext = transactionContextFactory.openTransactionContext(commandContext);
             Context.setTransactionContext(transactionContext);
@@ -155,7 +155,7 @@ public <T> T execute(CommandConfig config, Command<T> command) {
         return next.execute(config, command);
   
     } finally {
-        if (transactionContextFactory != null && !isReused) {
+        if (transactionContextFactory != null &amp;&amp; !isReused) {
             Context.removeTransactionContext();
         }
     }
@@ -171,15 +171,15 @@ public <T> T execute(CommandConfig config, Command<T> command) {
 ```java
 // 与 spring 集成时，这个拦截器会自动激活，负责开始事务
 // 这个拦截器在 CommandContextInterceptor 之前
-public <T> T execute(final CommandConfig config, final Command<T> command) {
-    LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
+public &lt;T&gt; T execute(final CommandConfig config, final Command&lt;T&gt; command) {
+    LOGGER.debug(&#34;Running command with propagation {}&#34;, config.getTransactionPropagation());
   
     TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
     // 设置事务传播行为
     transactionTemplate.setPropagationBehavior(getPropagation(config));
     
     // 开启事务
-    T result = transactionTemplate.execute(new TransactionCallback<T>() {
+    T result = transactionTemplate.execute(new TransactionCallback&lt;T&gt;() {
         public T doInTransaction(TransactionStatus status) {
             return next.execute(config, command);
         }
@@ -195,7 +195,7 @@ public <T> T execute(final CommandConfig config, final Command<T> command) {
 
 ```java
 // 这个拦截器负责执行命令
-public <T> T execute(final CommandConfig config, final Command<T> command) {
+public &lt;T&gt; T execute(final CommandConfig config, final Command&lt;T&gt; command) {
     final CommandContext commandContext = Context.getCommandContext();
   
     // Execute the command.
@@ -238,4 +238,10 @@ protected void executeOperations(final CommandContext commandContext) {
 
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/08-commandexecutor-%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4/  
 

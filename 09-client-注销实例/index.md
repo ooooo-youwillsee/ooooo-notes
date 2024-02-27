@@ -1,9 +1,9 @@
 # 09 client 注销实例
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
+&gt; 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
 
 ## 注销实例的主流程
 
@@ -43,7 +43,7 @@ private NamingClientProxy getExecuteClientProxy(Instance instance) {
 @Override
 public void deregisterService(String serviceName, String groupName, Instance instance) throws NacosException {
     NAMING_LOGGER
-            .info("[DEREGISTER-SERVICE] {} deregistering service {} with instance: {}", namespaceId, serviceName,
+            .info(&#34;[DEREGISTER-SERVICE] {} deregistering service {} with instance: {}&#34;, namespaceId, serviceName,
                     instance);
     // 标记 instance 要注销，可以在 redoService 定时任务重试
     redoService.instanceDeregister(serviceName, groupName);
@@ -112,12 +112,12 @@ private InstanceResponse deregisterInstance(Service service, InstanceRequest req
 @Override
 public void deregisterService(String serviceName, String groupName, Instance instance) throws NacosException {
     NAMING_LOGGER
-            .info("[DEREGISTER-SERVICE] {} deregistering service {} with instance: {}", namespaceId, serviceName,
+            .info(&#34;[DEREGISTER-SERVICE] {} deregistering service {} with instance: {}&#34;, namespaceId, serviceName,
                     instance);
     if (instance.isEphemeral()) {
         return;
     }
-    final Map<String, String> params = new HashMap<>(16);
+    final Map&lt;String, String&gt; params = new HashMap&lt;&gt;(16);
     params.put(CommonParams.NAMESPACE_ID, namespaceId);
     params.put(CommonParams.SERVICE_NAME, NamingUtils.getGroupedName(serviceName, groupName));
     params.put(CommonParams.CLUSTER_NAME, instance.getClusterName());
@@ -132,3 +132,9 @@ public void deregisterService(String serviceName, String groupName, Instance ins
 ## 测试类
 
 `com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/09-client-%E6%B3%A8%E9%94%80%E5%AE%9E%E4%BE%8B/  
+

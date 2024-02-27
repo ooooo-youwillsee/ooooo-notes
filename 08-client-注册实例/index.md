@@ -1,9 +1,9 @@
 # 08 client 注册实例
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
+&gt; 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
 
 ## 注册实例的主流程
 
@@ -43,7 +43,7 @@ private NamingClientProxy getExecuteClientProxy(Instance instance) {
 ```java
 @Override
 public void registerService(String serviceName, String groupName, Instance instance) throws NacosException {
-    NAMING_LOGGER.info("[REGISTER-SERVICE] {} registering service {} with instance {}", namespaceId, serviceName,
+    NAMING_LOGGER.info(&#34;[REGISTER-SERVICE] {} registering service {} with instance {}&#34;, namespaceId, serviceName,
             instance);
     // 标记这个 instance 要注册，在连接断开之后通过 redoService 的定时任务重新注册
     redoService.cacheInstanceForRedo(serviceName, groupName, instance);
@@ -106,14 +106,14 @@ private InstanceResponse registerInstance(Service service, InstanceRequest reque
 // NamingHttpClientProxy 注册实例
 // 发送 http 请求, 会被 com.alibaba.nacos.naming.controllers.InstanceController#register 处理, 这个逻辑在【注册实例】章节分析过了
 public void registerService(String serviceName, String groupName, Instance instance) throws NacosException {
-    NAMING_LOGGER.info("[REGISTER-SERVICE] {} registering service {} with instance: {}", namespaceId, serviceName,
+    NAMING_LOGGER.info(&#34;[REGISTER-SERVICE] {} registering service {} with instance: {}&#34;, namespaceId, serviceName,
             instance);
     String groupedServiceName = NamingUtils.getGroupedName(serviceName, groupName);
     if (instance.isEphemeral()) {
         throw new UnsupportedOperationException(
-                "Do not support register ephemeral instances by HTTP, please use gRPC replaced.");
+                &#34;Do not support register ephemeral instances by HTTP, please use gRPC replaced.&#34;);
     }
-    final Map<String, String> params = new HashMap<>(32);
+    final Map&lt;String, String&gt; params = new HashMap&lt;&gt;(32);
     params.put(CommonParams.NAMESPACE_ID, namespaceId);
     params.put(CommonParams.SERVICE_NAME, groupedServiceName);
     params.put(CommonParams.GROUP_NAME, groupName);
@@ -151,7 +151,7 @@ public NamingGrpcRedoService(NamingGrpcClientProxy clientProxy) {
 public void run() {
     // 判断是否已连接，通过 NamingGrpcRedoService#onConnected 来改变状态
     if (!redoService.isConnected()) {
-        LogUtils.NAMING_LOGGER.warn("Grpc Connection is disconnect, skip current redo task");
+        LogUtils.NAMING_LOGGER.warn(&#34;Grpc Connection is disconnect, skip current redo task&#34;);
         return;
     }
     // 因为 grpc 连接可能会断，所以需要重新注册实例和订阅服务
@@ -161,7 +161,7 @@ public void run() {
         // 重新订阅服务
         redoForSubscribes();
     } catch (Exception e) {
-        LogUtils.NAMING_LOGGER.warn("Redo task run with unexpected exception: ", e);
+        LogUtils.NAMING_LOGGER.warn(&#34;Redo task run with unexpected exception: &#34;, e);
     }
 }
 ```
@@ -169,3 +169,9 @@ public void run() {
 ## 测试类
 
 `com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/08-client-%E6%B3%A8%E5%86%8C%E5%AE%9E%E4%BE%8B/  
+

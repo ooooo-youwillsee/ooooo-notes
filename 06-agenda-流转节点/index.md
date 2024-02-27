@@ -1,9 +1,9 @@
 # 06 Agenda 流转节点
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
-> `Agenda` 类是工作流框架中**非常重要**的类，它控制着**节点怎么流转**。这部分的代码比较复杂，建议多**调试**几遍。下面的代码实际上是**一个闭环**，从开始的代码，经过流转一个节点，又回到了开始的代码。
+&gt; `Agenda` 类是工作流框架中**非常重要**的类，它控制着**节点怎么流转**。这部分的代码比较复杂，建议多**调试**几遍。下面的代码实际上是**一个闭环**，从开始的代码，经过流转一个节点，又回到了开始的代码。
 
 ## 流转节点
 
@@ -33,7 +33,7 @@ public void run() {
         // 处理连线
         continueThroughSequenceFlow((SequenceFlow) currentFlowElement);
     } else {
-        throw new ActivitiException("Programmatic error: no current flow element found or invalid type: " + currentFlowElement + ". Halting.");
+        throw new ActivitiException(&#34;Programmatic error: no current flow element found or invalid type: &#34; &#43; currentFlowElement &#43; &#34;. Halting.&#34;);
     }
 }
 ```
@@ -44,10 +44,10 @@ public void run() {
 // 处理节点
 protected void continueThroughFlowNode(FlowNode flowNode) {
 
-    // Check if it's the initial flow element. If so, we must fire the execution listeners for the process too
+    // Check if it&#39;s the initial flow element. If so, we must fire the execution listeners for the process too
     if (flowNode.getIncomingFlows() != null
-            && flowNode.getIncomingFlows().size() == 0
-            && flowNode.getSubProcess() == null) {
+            &amp;&amp; flowNode.getIncomingFlows().size() == 0
+            &amp;&amp; flowNode.getSubProcess() == null) {
         // 发布 StartExecution 事件
         executeProcessStartExecutionListeners();
     }
@@ -74,7 +74,7 @@ protected void executeSynchronous(FlowNode flowNode) {
     // 会插入到历史节点表 ACT_HI_ACTINST
     commandContext.getHistoryManager().recordActivityStart(execution);
   
-    // Execution listener: event 'start'
+    // Execution listener: event &#39;start&#39;
     // 执行监听器，默认为空
     if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
         executeExecutionListeners(flowNode,
@@ -82,8 +82,8 @@ protected void executeSynchronous(FlowNode flowNode) {
     }
     
     // Execute any boundary events, sub process boundary events will be executed from the activity behavior
-    if (!inCompensation && flowNode instanceof Activity) { // Only activities can have boundary events
-        List<BoundaryEvent> boundaryEvents = ((Activity) flowNode).getBoundaryEvents();
+    if (!inCompensation &amp;&amp; flowNode instanceof Activity) { // Only activities can have boundary events
+        List&lt;BoundaryEvent&gt; boundaryEvents = ((Activity) flowNode).getBoundaryEvents();
         if (CollectionUtil.isNotEmpty(boundaryEvents)) {
             // 执行 BoundaryEvent，这个很重要，会在以后的章节解析
             // 这里会新增一条 ACT_RU_EXECUTION 表的数据
@@ -101,7 +101,7 @@ protected void executeSynchronous(FlowNode flowNode) {
         executeActivityBehavior(activityBehavior,
                                 flowNode);
     } else {
-        logger.debug("No activityBehavior on activity '{}' with execution {}",
+        logger.debug(&#34;No activityBehavior on activity &#39;{}&#39; with execution {}&#34;,
                      flowNode.getId(),
                      execution.getId());
         // behavior 为 null，会流转到下个节点
@@ -174,21 +174,21 @@ protected void leaveFlowNode(FlowNode flowNode) {
     }
 
     // Determine which sequence flows can be used for leaving
-    List<SequenceFlow> outgoingSequenceFlows = new ArrayList<SequenceFlow>();
+    List&lt;SequenceFlow&gt; outgoingSequenceFlows = new ArrayList&lt;SequenceFlow&gt;();
     // 计算每个连线的条件表达式
     for (SequenceFlow sequenceFlow : flowNode.getOutgoingFlows()) {
 
         String skipExpressionString = sequenceFlow.getSkipExpression();
         if (!SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpressionString)) {
             if (!evaluateConditions
-                    || (evaluateConditions && ConditionUtil.hasTrueCondition(sequenceFlow,
-                                                                             execution) && (defaultSequenceFlowId == null || !defaultSequenceFlowId.equals(sequenceFlow.getId())))) {
+                    || (evaluateConditions &amp;&amp; ConditionUtil.hasTrueCondition(sequenceFlow,
+                                                                             execution) &amp;&amp; (defaultSequenceFlowId == null || !defaultSequenceFlowId.equals(sequenceFlow.getId())))) {
                 outgoingSequenceFlows.add(sequenceFlow);
             }
         } else if (flowNode.getOutgoingFlows().size() == 1 || SkipExpressionUtil.shouldSkipFlowElement(commandContext,
                                                                                                        execution,
                                                                                                        skipExpressionString)) {
-            // The 'skip' for a sequence flow means that we skip the condition, not the sequence flow.
+            // The &#39;skip&#39; for a sequence flow means that we skip the condition, not the sequence flow.
             outgoingSequenceFlows.add(sequenceFlow);
         }
     }
@@ -197,19 +197,19 @@ protected void leaveFlowNode(FlowNode flowNode) {
     // No outgoing found. Ending the execution
     if (outgoingSequenceFlows.size() == 0) {
         if (flowNode.getOutgoingFlows() == null || flowNode.getOutgoingFlows().size() == 0) {
-            logger.debug("No outgoing sequence flow found for flow node '{}'.",
+            logger.debug(&#34;No outgoing sequence flow found for flow node &#39;{}&#39;.&#34;,
                          flowNode.getId());
             // 没有连线，直接结束当前流程
             Context.getAgenda().planEndExecutionOperation(execution);
         } else {
-            throw new ActivitiException("No outgoing sequence flow of element '" + flowNode.getId() + "' could be selected for continuing the process");
+            throw new ActivitiException(&#34;No outgoing sequence flow of element &#39;&#34; &#43; flowNode.getId() &#43; &#34;&#39; could be selected for continuing the process&#34;);
         }
     } else {
          ...
         // Executions for all the other one
         // 工作流框架支持多节点并行，所有这里会存在多个连线
-        if (outgoingSequenceFlows.size() > 1) {
-            for (int i = 1; i < outgoingSequenceFlows.size(); i++) {
+        if (outgoingSequenceFlows.size() &gt; 1) {
+            for (int i = 1; i &lt; outgoingSequenceFlows.size(); i&#43;&#43;) {
                 ExecutionEntity parent = execution.getParentId() != null ? execution.getParent() : execution;
                 ExecutionEntity outgoingExecutionEntity = commandContext.getExecutionEntityManager().createChildExecution(parent);
 
@@ -242,7 +242,7 @@ protected void continueThroughSequenceFlow(SequenceFlow sequenceFlow) {
     FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
     execution.setCurrentFlowElement(targetFlowElement);
   
-    logger.debug("Sequence flow '{}' encountered. Continuing process by following it using execution {}",
+    logger.debug(&#34;Sequence flow &#39;{}&#39; encountered. Continuing process by following it using execution {}&#34;,
                  sequenceFlow.getId(),
                  execution.getId());
     // 继续执行 ContinueProcessOperation，这里就回到了第一个方法调用的逻辑
@@ -256,4 +256,10 @@ protected void continueThroughSequenceFlow(SequenceFlow sequenceFlow) {
 
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/06-agenda-%E6%B5%81%E8%BD%AC%E8%8A%82%E7%82%B9/  
 

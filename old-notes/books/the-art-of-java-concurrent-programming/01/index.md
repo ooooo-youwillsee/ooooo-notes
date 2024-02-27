@@ -2,7 +2,7 @@
 
 ## 1、上下文切换
 
-> CPU 通过时间片分配算法来循环执行任务，当前任务执行完一个时间片后会切换到下一个任务。但是在切换前会保存上一个任务的状态，以便下次切换回这个任务时，再次加载该任务状态。**这就是上下文切换**。
+&gt; CPU 通过时间片分配算法来循环执行任务，当前任务执行完一个时间片后会切换到下一个任务。但是在切换前会保存上一个任务的状态，以便下次切换回这个任务时，再次加载该任务状态。**这就是上下文切换**。
 
 创建过多的线程，会使**上下文切换**频繁，执行效率也可能不如单线程。
 
@@ -19,11 +19,11 @@
 **减少上下文切换示例**
 1. jstack 命令来 dump 线程
 ```shell script
-jstack 31177 > /home/xxx/dump-31177 
+jstack 31177 &gt; /home/xxx/dump-31177 
 ```
 2. 统计线程都处于什么状态
 ```shell script
-grep java.lang.Thread.State dump-31177 | awk '{print $2$3$4$5}' | sort | uniq -c
+grep java.lang.Thread.State dump-31177 | awk &#39;{print $2$3$4$5}&#39; | sort | uniq -c
 ```
 3. 查看这些 waiting 的线程，根据需要合理配置线程数。
 
@@ -34,20 +34,20 @@ grep java.lang.Thread.State dump-31177 | awk '{print $2$3$4$5}' | sort | uniq -c
   public static void main(String[] args) {
     Object lockA = new Object();
     Object lockB = new Object();
-    Thread t1 = new Thread(() -> {
+    Thread t1 = new Thread(() -&gt; {
       synchronized (lockA) {
-        System.out.println("get lockA");
+        System.out.println(&#34;get lockA&#34;);
         timeSleep(2);
         synchronized (lockB) {
-          System.out.println("get lockB");
+          System.out.println(&#34;get lockB&#34;);
         }
       }
     });
-    Thread t2 = new Thread(() -> {
+    Thread t2 = new Thread(() -&gt; {
       synchronized (lockB) {
-        System.out.println("get lockB");
+        System.out.println(&#34;get lockB&#34;);
         synchronized (lockA) {
-          System.out.println("get lockA");
+          System.out.println(&#34;get lockA&#34;);
         }
       }
     });
@@ -71,4 +71,10 @@ grep java.lang.Thread.State dump-31177 | awk '{print $2$3$4$5}' | sort | uniq -c
 ## 4、总结
 
 强烈建议使用 JDK 并发包提供的并发容器和工具类来解决并发问题。 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/the-art-of-java-concurrent-programming/01/  
 

@@ -33,3 +33,9 @@ sudo netplan apply
 reboot 
 
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/ubuntu-add-static-ip/  
+

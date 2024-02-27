@@ -1,8 +1,8 @@
 # 调试 deployment-controller 的源码
 
 
-> 1. `deployment` 资源是我们经常需要使用的，也是我们最应该熟悉的源码.
-> 2. 对于调试源码，我使用是 `deployment_controller_test.go` 测试类， `TestSyncDeploymentCreatesReplicaSet` 方法.
+&gt; 1. `deployment` 资源是我们经常需要使用的，也是我们最应该熟悉的源码.
+&gt; 2. 对于调试源码，我使用是 `deployment_controller_test.go` 测试类， `TestSyncDeploymentCreatesReplicaSet` 方法.
 
 ## TestSyncDeploymentCreatesReplicaSet 测试方法的结构
 
@@ -16,10 +16,10 @@ f := newFixture(t)
 
 创建一个 fixture 对象， 里面有 **objects** 属性，这个用来**模拟 clientSet**, 也就是**请求 etcd 的接口**，后面将会详细描述。
 
-2. 创建一个 **Deployment** 对象， 标签为 "foo": "bar"
+2. 创建一个 **Deployment** 对象， 标签为 &#34;foo&#34;: &#34;bar&#34;
 
 ```go
-d := newDeployment("foo", 1, nil, nil, nil, map[string]string{"foo": "bar"})
+d := newDeployment(&#34;foo&#34;, 1, nil, nil, nil, map[string]string{&#34;foo&#34;: &#34;bar&#34;})
 ```
 
 3. 添加缓存对象，用于后续的**List**接口
@@ -32,7 +32,7 @@ f.objects = append(f.objects, d)
 4. 创建一个 **ReplicaSet** 对象
 
 ```go
-rs := newReplicaSet(d, "deploymentrs-4186632231", 1)
+rs := newReplicaSet(d, &#34;deploymentrs-4186632231&#34;, 1)
 ```
 
 5. 希望的测试结果
@@ -65,16 +65,16 @@ func GetKey(obj interface{}, t *testing.T) string {
 	}
 	// 取出指针类型中 value，获取 Name 属性
 	val := reflect.ValueOf(obj).Elem()
-	name := val.FieldByName("Name").String()
+	name := val.FieldByName(&#34;Name&#34;).String()
 	if len(name) == 0 {
-		t.Errorf("Unexpected object %v", obj)
+		t.Errorf(&#34;Unexpected object %v&#34;, obj)
 	}
 
 	// 获取key, 结果就是 {namespace}/{name}
 	key, err := keyFunc(obj)
 	if err != nil {
-		t.Errorf("Unexpected error getting key for %T %v: %v", val.Interface(), name, err)
-		return ""
+		t.Errorf(&#34;Unexpected error getting key for %T %v: %v&#34;, val.Interface(), name, err)
+		return &#34;&#34;
 	}
 	return key
 }
@@ -103,7 +103,7 @@ func (f *fixture) newController() (*DeploymentController, informers.SharedInform
 		return nil, nil, err
 	}
 	// 模拟一个 recorder
-	c.eventRecorder = &record.FakeRecorder{}
+	c.eventRecorder = &amp;record.FakeRecorder{}
 	// 所有状态默认为 synced
 	c.dListerSynced = alwaysReady
 	c.rsListerSynced = alwaysReady
@@ -140,11 +140,11 @@ func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 	}
 
 	// 创建一个 clientSet
-	cs := &Clientset{tracker: o}
+	cs := &amp;Clientset{tracker: o}
 	// 下面三个都是依赖 tracker 来实现的， 通过不同的 Action, 比如 ListActionImpl、GetActionImpl 等
-	cs.discovery = &fakediscovery.FakeDiscovery{Fake: &cs.Fake}
-	cs.AddReactor("*", "*", testing.ObjectReaction(o))
-	cs.AddWatchReactor("*", func(action testing.Action) (handled bool, ret watch.Interface, err error) {
+	cs.discovery = &amp;fakediscovery.FakeDiscovery{Fake: &amp;cs.Fake}
+	cs.AddReactor(&#34;*&#34;, &#34;*&#34;, testing.ObjectReaction(o))
+	cs.AddWatchReactor(&#34;*&#34;, func(action testing.Action) (handled bool, ret watch.Interface, err error) {
 		gvr := action.GetResource()
 		ns := action.GetNamespace()
 		watch, err := o.Watch(gvr, ns)
@@ -179,9 +179,9 @@ func (t *tracker) Add(obj runtime.Object) error {
 		// objects via Add(). Instead, it should trigger the Create() function
 		// of the tracker, where an arbitrary gvr can be specified.
 		gvr, _ := meta.UnsafeGuessKindToResource(gvk)
-		// Resource doesn't have the concept of "__internal" version, just set it to "".
+		// Resource doesn&#39;t have the concept of &#34;__internal&#34; version, just set it to &#34;&#34;.
 		if gvr.Version == runtime.APIVersionInternal {
-			gvr.Version = ""
+			gvr.Version = &#34;&#34;
 		}
 
 		// 添加这个
@@ -202,7 +202,7 @@ func (t *tracker) add(gvr schema.GroupVersionResource, obj runtime.Object, ns st
 	gr := gvr.GroupResource()
 
 	// To avoid the object from being accidentally modified by caller
-	// after it's been added to the tracker, we always store the deep
+	// after it&#39;s been added to the tracker, we always store the deep
 	// copy.
 	obj = obj.DeepCopyObject()
 
@@ -219,7 +219,7 @@ func (t *tracker) add(gvr schema.GroupVersionResource, obj runtime.Object, ns st
 		if replaceExisting {
 			for _, w := range t.getWatches(gvr, ns) {
 				// To avoid the object from being accidentally modified by watcher
-				// 最终操作： f.result <- Event{Modified, obj}
+				// 最终操作： f.result &lt;- Event{Modified, obj}
 				w.Modify(obj.DeepCopyObject())
 			}
 			// 覆盖原先的对象
@@ -238,7 +238,7 @@ func (t *tracker) add(gvr schema.GroupVersionResource, obj runtime.Object, ns st
 	t.objects[gvr][namespacedName] = obj
 
 	// 实现 objectTracker, 每添加一个新的对象，就会向 chan 中放入这个新对象
-	// 最终操作： f.result <- Event{Added, obj)
+	// 最终操作： f.result &lt;- Event{Added, obj)
 	for _, w := range t.getWatches(gvr, ns) {
 		// To avoid the object from being accidentally modified by watcher
 		w.Add(obj.DeepCopyObject())
@@ -247,4 +247,10 @@ func (t *tracker) add(gvr schema.GroupVersionResource, obj runtime.Object, ns st
 	return nil
 }
 ```
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E8%B0%83%E8%AF%95-deployment-controller-%E7%9A%84%E6%BA%90%E7%A0%81/  
 

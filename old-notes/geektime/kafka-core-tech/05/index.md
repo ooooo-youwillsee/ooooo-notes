@@ -2,7 +2,7 @@
 
 ## 1、Kafka 的版本
 
-> [scala-version] - [kafka-version].tar.gz
+&gt; [scala-version] - [kafka-version].tar.gz
 
 - `0.10.0.0` **引进 Kafka Stream**
 - `0.11.0.0` **添加幂等性 Producer 和事务 API，并对 Kafka 消息格式进行重构**
@@ -12,4 +12,10 @@
 如果只使用 Kafka 的消息引擎功能， 最少 `0.10.2.2`， 可以使用新版的 Consumer API。
 
 如果使用 Kafka Stream，最少 `2.0.0`。
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/05/  
 

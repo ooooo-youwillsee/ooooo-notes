@@ -7,8 +7,8 @@
 
 ```groovy
 dependencies {
-  api('p6spy:p6spy')
-  api('com.h2database:h2')
+  api(&#39;p6spy:p6spy&#39;)
+  api(&#39;com.h2database:h2&#39;)
 }
 
 ```
@@ -39,4 +39,10 @@ url: jdbc:h2:tcp://localhost/~/test
 
 ## 4. 参考
 
-> 1. [官方文档](http://www.h2database.com/html/tutorial.html#using_server)
+&gt; 1. [官方文档](http://www.h2database.com/html/tutorial.html#using_server)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/h2-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BD%BF%E7%94%A8/  
+

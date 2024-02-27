@@ -45,14 +45,14 @@ public class SimulatedCAS {
 * 每次操作都是**先 get 来获取 top 对象，然后再 compareAndSet top**
 
 ```java
-public class ConcurrentStack<E> {
+public class ConcurrentStack&lt;E&gt; {
 
-  private final AtomicReference<Node<E>> top = new AtomicReference<>();
+  private final AtomicReference&lt;Node&lt;E&gt;&gt; top = new AtomicReference&lt;&gt;();
 
 
   public void push(E e) {
-    Node<E> newHead = new Node<>(e);
-    Node<E> oldHead;
+    Node&lt;E&gt; newHead = new Node&lt;&gt;(e);
+    Node&lt;E&gt; oldHead;
     do {
       oldHead = top.get();
       newHead.next = oldHead;
@@ -60,8 +60,8 @@ public class ConcurrentStack<E> {
   }
 
   public E pop() {
-    Node<E> oldHead;
-    Node<E> newHead;
+    Node&lt;E&gt; oldHead;
+    Node&lt;E&gt; newHead;
     do {
       oldHead = top.get();
       if (oldHead == null) {
@@ -75,11 +75,11 @@ public class ConcurrentStack<E> {
     return oldHead.e;
   }
 
-  private static class Node<E> {
+  private static class Node&lt;E&gt; {
 
     private final E e;
 
-    private Node<E> next;
+    private Node&lt;E&gt; next;
 
     public Node(E e) {
       this.e = e;
@@ -92,4 +92,10 @@ public class ConcurrentStack<E> {
 ## 3. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/demo-java-concurrent)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E4%BD%BF%E7%94%A8-cas-%E6%9D%A5%E5%AE%9E%E7%8E%B0%E6%A0%88/  
 

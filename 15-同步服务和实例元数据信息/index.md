@@ -1,7 +1,7 @@
 # 15 同步服务和实例元数据信息
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 在 `nacos` 中，手动创建 `service`，更新 `service`，删除 `service`，更新 `instance`，都是通过 `raft` 协议来实现的，所以来简单介绍下。
 
@@ -16,7 +16,7 @@ public void create(Service service, ServiceMetadata metadata) throws NacosExcept
     // 检查 service
     if (ServiceManager.getInstance().containSingleton(service)) {
         throw new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SERVICE_ALREADY_EXIST,
-                String.format("specified service %s already exists!", service.getGroupedServiceName()));
+                String.format(&#34;specified service %s already exists!&#34;, service.getGroupedServiceName()));
     }
     // raft 协议更新服务元数据
     metadataOperateService.updateServiceMetadata(service, metadata);
@@ -28,7 +28,7 @@ public void update(Service service, ServiceMetadata metadata) throws NacosExcept
     // 检查 service
     if (!ServiceManager.getInstance().containSingleton(service)) {
         throw new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SERVICE_NOT_EXIST,
-                String.format("service %s not found!", service.getGroupedServiceName()));
+                String.format(&#34;service %s not found!&#34;, service.getGroupedServiceName()));
     }
     // raft 协议更新服务元数据
     metadataOperateService.updateServiceMetadata(service, metadata);
@@ -48,7 +48,7 @@ public void delete(String namespaceId, String serviceName) throws NacosException
 ```java
 // 更新服务元数据
 public void updateServiceMetadata(Service service, ServiceMetadata serviceMetadata) {
-    MetadataOperation<ServiceMetadata> operation = buildMetadataOperation(service);
+    MetadataOperation&lt;ServiceMetadata&gt; operation = buildMetadataOperation(service);
     operation.setMetadata(serviceMetadata);
     // 构建 WriteRequest, 这里的 group 是 naming_service_metadata
     WriteRequest operationLog = WriteRequest.newBuilder().setGroup(Constants.SERVICE_METADATA)
@@ -63,14 +63,14 @@ public void delete(Service service) throws NacosException {
     // 检查 service
     if (!ServiceManager.getInstance().containSingleton(service)) {
         throw new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SERVICE_NOT_EXIST,
-                String.format("service %s not found!", service.getGroupedServiceName()));
+                String.format(&#34;service %s not found!&#34;, service.getGroupedServiceName()));
     }
     
     // 删除 service，必须先注销所有的 instance
     if (!serviceStorage.getPushData(service).getHosts().isEmpty()) {
         throw new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SERVICE_DELETE_FAILURE,
-                "Service " + service.getGroupedServiceName()
-                        + " is not empty, can't be delete. Please unregister instance first");
+                &#34;Service &#34; &#43; service.getGroupedServiceName()
+                        &#43; &#34; is not empty, can&#39;t be delete. Please unregister instance first&#34;);
     }
     // 删除服务元数据
     metadataOperateService.deleteServiceMetadata(service);
@@ -86,10 +86,10 @@ private void submitMetadataOperation(WriteRequest operationLog) {
         Response response = cpProtocol.write(operationLog);
         if (!response.getSuccess()) {
             throw new NacosRuntimeException(NacosException.SERVER_ERROR,
-                    "do metadata operation failed " + response.getErrMsg());
+                    &#34;do metadata operation failed &#34; &#43; response.getErrMsg());
         }
     } catch (Exception e) {
-        throw new NacosRuntimeException(NacosException.SERVER_ERROR, "do metadata operation failed", e);
+        throw new NacosRuntimeException(NacosException.SERVER_ERROR, &#34;do metadata operation failed&#34;, e);
     }
 }
 ```
@@ -101,7 +101,7 @@ private void submitMetadataOperation(WriteRequest operationLog) {
 public Response onApply(WriteRequest request) {
     readLock.lock();
     try {
-        MetadataOperation<ServiceMetadata> op = serializer.deserialize(request.getData().toByteArray(), processType);
+        MetadataOperation&lt;ServiceMetadata&gt; op = serializer.deserialize(request.getData().toByteArray(), processType);
         switch (DataOperation.valueOf(request.getOperation())) {
             case ADD:
                 addClusterMetadataToService(op);
@@ -114,11 +114,11 @@ public Response onApply(WriteRequest request) {
                 break;
             default:
                 return Response.newBuilder().setSuccess(false)
-                        .setErrMsg("Unsupported operation " + request.getOperation()).build();
+                        .setErrMsg(&#34;Unsupported operation &#34; &#43; request.getOperation()).build();
         }
         return Response.newBuilder().setSuccess(true).build();
     } catch (Exception e) {
-        Loggers.RAFT.error("onApply {} service metadata operation failed. ", request.getOperation(), e);
+        Loggers.RAFT.error(&#34;onApply {} service metadata operation failed. &#34;, request.getOperation(), e);
         String errorMessage = null == e.getMessage() ? e.getClass().getName() : e.getMessage();
         return Response.newBuilder().setSuccess(false).setErrMsg(errorMessage).build();
     } finally {
@@ -141,7 +141,7 @@ public void updateInstance(String namespaceId, String serviceName, Instance inst
     // 检查 service
     if (!ServiceManager.getInstance().containSingleton(service)) {
         throw new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.INSTANCE_ERROR,
-                "service not found, namespace: " + namespaceId + ", service: " + service);
+                &#34;service not found, namespace: &#34; &#43; namespaceId &#43; &#34;, service: &#34; &#43; service);
     }
     String metadataId = InstancePublishInfo
             .genMetadataId(instance.getIp(), instance.getPort(), instance.getClusterName());
@@ -155,7 +155,7 @@ public void updateInstance(String namespaceId, String serviceName, Instance inst
 ```java
 // 更新实例元数据 
 public void updateInstanceMetadata(Service service, String metadataId, InstanceMetadata instanceMetadata) {
-    MetadataOperation<InstanceMetadata> operation = buildMetadataOperation(service);
+    MetadataOperation&lt;InstanceMetadata&gt; operation = buildMetadataOperation(service);
     operation.setTag(metadataId);
     operation.setMetadata(instanceMetadata);
     // 构造 WriteRequest 请求，注意这里的 group 为 naming_instance_metadata
@@ -177,10 +177,10 @@ private void submitMetadataOperation(WriteRequest operationLog) {
         Response response = cpProtocol.write(operationLog);
         if (!response.getSuccess()) {
             throw new NacosRuntimeException(NacosException.SERVER_ERROR,
-                    "do metadata operation failed " + response.getErrMsg());
+                    &#34;do metadata operation failed &#34; &#43; response.getErrMsg());
         }
     } catch (Exception e) {
-        throw new NacosRuntimeException(NacosException.SERVER_ERROR, "do metadata operation failed", e);
+        throw new NacosRuntimeException(NacosException.SERVER_ERROR, &#34;do metadata operation failed&#34;, e);
     }
 }
 ```
@@ -192,7 +192,7 @@ private void submitMetadataOperation(WriteRequest operationLog) {
 public Response onApply(WriteRequest request) {
     readLock.lock();
     try {
-        MetadataOperation<InstanceMetadata> op = serializer.deserialize(request.getData().toByteArray(), processType);
+        MetadataOperation&lt;InstanceMetadata&gt; op = serializer.deserialize(request.getData().toByteArray(), processType);
         switch (DataOperation.valueOf(request.getOperation())) {
             case ADD:
             case CHANGE:
@@ -203,11 +203,11 @@ public Response onApply(WriteRequest request) {
                 break;
             default:
                 return Response.newBuilder().setSuccess(false)
-                        .setErrMsg("Unsupported operation " + request.getOperation()).build();
+                        .setErrMsg(&#34;Unsupported operation &#34; &#43; request.getOperation()).build();
         }
         return Response.newBuilder().setSuccess(true).build();
     } catch (Exception e) {
-        Loggers.RAFT.error("onApply {} instance metadata operation failed. ", request.getOperation(), e);
+        Loggers.RAFT.error(&#34;onApply {} instance metadata operation failed. &#34;, request.getOperation(), e);
         String errorMessage = null == e.getMessage() ? e.getClass().getName() : e.getMessage();
         return Response.newBuilder().setSuccess(false).setErrMsg(errorMessage).build();
     } finally {
@@ -219,3 +219,9 @@ public Response onApply(WriteRequest request) {
 ## 测试类
 
 `com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#createService`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/15-%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%AE%9E%E4%BE%8B%E5%85%83%E6%95%B0%E6%8D%AE%E4%BF%A1%E6%81%AF/  
+

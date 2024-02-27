@@ -55,7 +55,7 @@ mysql -h$ip -P$port -u$user -p
 例如，对于下面的语句，有两种查询逻辑：
 
 ```shell script
-mysql> select * from t1 join t2 using(ID)  where t1.c=10 and t2.d=20;
+mysql&gt; select * from t1 join t2 using(ID)  where t1.c=10 and t2.d=20;
 ```
 
 - 先从 t1 里面取出 c = 10 的记录的ID值，再根据 ID 值关联到 t2，再判断 t2 里面 d 的值是否等于 20。
@@ -72,4 +72,10 @@ mysql> select * from t1 join t2 using(ID)  where t1.c=10 and t2.d=20;
 分析器阶段
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/mysql-45/01/  
 

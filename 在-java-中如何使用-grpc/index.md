@@ -12,11 +12,11 @@
 * 有两个方法 `SayHello`, `SayHi`.
 
 ```
-syntax = "proto3";
+syntax = &#34;proto3&#34;;
 
 option java_multiple_files = true;
-option java_package = "com.ooooo.grpc.helloworld";
-option java_outer_classname = "HelloWorldProto";
+option java_package = &#34;com.ooooo.grpc.helloworld&#34;;
+option java_outer_classname = &#34;HelloWorldProto&#34;;
 
 package helloworld;
 
@@ -27,7 +27,7 @@ service Greeter {
   rpc SayHi (HelloRequest) returns (HelloReply) {}
 }
 
-// The request message containing the user's name.
+// The request message containing the user&#39;s name.
 message HelloRequest {
   string name = 1;
 }
@@ -41,8 +41,8 @@ message HelloReply {
 
 在这里，我很推荐大家看下，`protobuf 是怎么编码的`。
 
-> proto3, 官方地址： https://developers.google.com/protocol-buffers/docs/proto3
-> proto3 encoding, 官方地址： https://developers.google.com/protocol-buffers/docs/encoding
+&gt; proto3, 官方地址： https://developers.google.com/protocol-buffers/docs/proto3
+&gt; proto3 encoding, 官方地址： https://developers.google.com/protocol-buffers/docs/encoding
 
 
 编写完 `.proto` 文件，执行 `gradle` 的 `generateProto` 任务, 就会生成相应的 java 代码。
@@ -62,4 +62,10 @@ message HelloReply {
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-grpc)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-grpc/  
 

@@ -25,7 +25,7 @@ bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic my-topic 
 
 ## 2、JVM 参数
 
-Java7 中，如果 Broker 所在机器的 CPU 资源非常充裕，则建议开启 CMS 垃圾回收器, `-XX:+UseCurrentMarkSweepGC`。否则，使用吞吐量收集器。开启方法是指定` -XX:+UseParallelGC`。
+Java7 中，如果 Broker 所在机器的 CPU 资源非常充裕，则建议开启 CMS 垃圾回收器, `-XX:&#43;UseCurrentMarkSweepGC`。否则，使用吞吐量收集器。开启方法是指定` -XX:&#43;UseParallelGC`。
 
 Java8 中，建议使用 G1 垃圾回收器。
 
@@ -38,7 +38,7 @@ Java8 中，建议使用 G1 垃圾回收器。
 比如你可以这样启动 Kafka：
 ```shell script
 export KAFKA_HEAP_OPTS=--Xms6g  --Xmx6g
-export KAFKA_JVM_PERFORMANCE_OPTS= -server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -Djava.awt.headless=true
+export KAFKA_JVM_PERFORMANCE_OPTS= -server -XX:&#43;UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:&#43;ExplicitGCInvokesConcurrent -Djava.awt.headless=true
 bin/kafka-server-start.sh config/server.properties
 ```
 
@@ -60,9 +60,15 @@ XFS 的性能要强于 ext4。
 
 - 提交时间
 
-向 Kafka 发送数据并不是真要等数据被写入磁盘才会认为成功，而是只要数据被写入到操作系统的页缓存（Page Cache）上就可以了，随后操作系统根据 LRU 算法会定期将页缓存上的"脏"数据落盘到物理磁盘上。这个定期就是由提交时间来确定的，默认是 5 秒。由于 Kafka 的多副本的冗余机制，可以稍微拉大提交间隔来提高性能。
+向 Kafka 发送数据并不是真要等数据被写入磁盘才会认为成功，而是只要数据被写入到操作系统的页缓存（Page Cache）上就可以了，随后操作系统根据 LRU 算法会定期将页缓存上的&#34;脏&#34;数据落盘到物理磁盘上。这个定期就是由提交时间来确定的，默认是 5 秒。由于 Kafka 的多副本的冗余机制，可以稍微拉大提交间隔来提高性能。
 
 
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/08/  
 

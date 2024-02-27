@@ -23,9 +23,9 @@ goreleaser release --snapshot --clean
 # Make sure to check the documentation at https://goreleaser.com
 before:
   hooks:
-    # You may remove this if you don't use go modules.
+    # You may remove this if you don&#39;t use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
+    # you may remove this if you don&#39;t need go generate
 #    - go generate ./...
 builds:
   - id: http-tunnel-client
@@ -55,7 +55,7 @@ builds:
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
-    name_template: >-
+    name_template: &gt;-
       {{ .ProjectName }}_
       {{- .Version }}_
       {{- title .Os }}_
@@ -66,18 +66,18 @@ archives:
       - goos: windows
         format: zip
 checksum:
-  name_template: 'checksums.txt'
+  name_template: &#39;checksums.txt&#39;
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  name_template: &#34;{{ incpatch .Version }}-next&#34;
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - &#39;^docs:&#39;
+      - &#39;^test:&#39;
 
 # The lines beneath this are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/use them.
+# Feel free to remove those if you don&#39;t want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 ```
@@ -92,7 +92,7 @@ name: goreleaser
 on:
   push:
     tags:
-      - '*.*.*'
+      - &#39;*.*.*&#39;
   # Trigger the workflow by mannually
   workflow_dispatch:
 
@@ -108,7 +108,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: &#39;1.20&#39;
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
@@ -124,4 +124,10 @@ jobs:
 **read write permisson**
 
 ![github token](/ooooo-notes/images/goreleaser-github-token.png)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/github-%E4%B8%8A%E4%BD%BF%E7%94%A8-goreleaser/  
 

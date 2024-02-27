@@ -1,7 +1,7 @@
 # 12 集成 spring
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
 `dubbo` 集成 `spring` 的实现方式：
 
@@ -15,7 +15,7 @@
 对一个 `HelloService`, 会注册**两个** `beanDefinition`，分别为
 
 - `HelloService`
-- `ServiceBean<HelloService>`
+- `ServiceBean&lt;HelloService&gt;`
 
 源码位置: `org.apache.dubbo.config.spring.beans.factory.annotation.ServiceAnnotationPostProcessor#postProcessBeanFactory`
 
@@ -26,7 +26,7 @@ public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) 
     String[] beanNames = beanFactory.getBeanDefinitionNames();
     for (String beanName : beanNames) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-        Map<String, Object> annotationAttributes = getServiceAnnotationAttributes(beanDefinition);
+        Map&lt;String, Object&gt; annotationAttributes = getServiceAnnotationAttributes(beanDefinition);
         if (annotationAttributes != null) {
             // process @DubboService at java-config @bean method
             processAnnotatedBeanDefinition(beanName, (AnnotatedBeanDefinition) beanDefinition, annotationAttributes);
@@ -43,7 +43,7 @@ public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) 
 源码位置: `org.apache.dubbo.config.spring.beans.factory.annotation.ServiceAnnotationPostProcessor#scanServiceBeans`
 
 ```java
-private void scanServiceBeans(Set<String> packagesToScan, BeanDefinitionRegistry registry) {
+private void scanServiceBeans(Set&lt;String&gt; packagesToScan, BeanDefinitionRegistry registry) {
     // 标记已扫描
     scanned = true;
     if (CollectionUtils.isEmpty(packagesToScan)) {
@@ -57,7 +57,7 @@ private void scanServiceBeans(Set<String> packagesToScan, BeanDefinitionRegistry
     BeanNameGenerator beanNameGenerator = resolveBeanNameGenerator(registry);
     scanner.setBeanNameGenerator(beanNameGenerator);
     // 添加注解过滤器，比如 @DubboService
-    for (Class<? extends Annotation> annotationType : serviceAnnotationTypes) {
+    for (Class&lt;? extends Annotation&gt; annotationType : serviceAnnotationTypes) {
         scanner.addIncludeFilter(new AnnotationTypeFilter(annotationType));
     }
 
@@ -70,16 +70,16 @@ private void scanServiceBeans(Set<String> packagesToScan, BeanDefinitionRegistry
         scanner.scan(packageToScan);
 
         // Finds all BeanDefinitionHolders of @Service whether @ComponentScan scans or not.
-        Set<BeanDefinitionHolder> beanDefinitionHolders =
+        Set&lt;BeanDefinitionHolder&gt; beanDefinitionHolders =
                 findServiceBeanDefinitionHolders(scanner, packageToScan, registry, beanNameGenerator);
         // 有 @DubboService 的 beanDefintion 
         if (!CollectionUtils.isEmpty(beanDefinitionHolders)) {
             if (logger.isInfoEnabled()) {
-                List<String> serviceClasses = new ArrayList<>(beanDefinitionHolders.size());
+                List&lt;String&gt; serviceClasses = new ArrayList&lt;&gt;(beanDefinitionHolders.size());
                 for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
                     serviceClasses.add(beanDefinitionHolder.getBeanDefinition().getBeanClassName());
                 }
-                logger.info("Found " + beanDefinitionHolders.size() + " classes annotated by Dubbo @Service under package [" + packageToScan + "]: " + serviceClasses);
+                logger.info(&#34;Found &#34; &#43; beanDefinitionHolders.size() &#43; &#34; classes annotated by Dubbo @Service under package [&#34; &#43; packageToScan &#43; &#34;]: &#34; &#43; serviceClasses);
             }
 
             for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
@@ -100,12 +100,12 @@ private void scanServiceBeans(Set<String> packagesToScan, BeanDefinitionRegistry
 
 ```java
 private void processScannedBeanDefinition(BeanDefinitionHolder beanDefinitionHolder) {
-    Class<?> beanClass = resolveClass(beanDefinitionHolder);
+    Class&lt;?&gt; beanClass = resolveClass(beanDefinitionHolder);
     // 找到 @DubboService 
     Annotation service = findServiceAnnotation(beanClass);
 
     // The attributes of @Service annotation
-    Map<String, Object> serviceAnnotationAttributes = AnnotationUtils.getAttributes(service, true);
+    Map&lt;String, Object&gt; serviceAnnotationAttributes = AnnotationUtils.getAttributes(service, true);
     String serviceInterface = resolveInterfaceName(serviceAnnotationAttributes, beanClass);
     String annotatedServiceBeanName = beanDefinitionHolder.getBeanName();
 
@@ -129,7 +129,7 @@ public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) 
     // 遍历所有的 beanName
     String[] beanNames = beanFactory.getBeanDefinitionNames();
     for (String beanName : beanNames) {
-        Class<?> beanType;
+        Class&lt;?&gt; beanType;
         // 解析出 beanType
         if (beanFactory.isFactoryBean(beanName)) {
             ...
@@ -145,7 +145,7 @@ public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) 
             } catch (BeansException e) {
                 throw e;
             } catch (Exception e) {
-                throw new IllegalStateException("Prepare dubbo reference injection element failed", e);
+                throw new IllegalStateException(&#34;Prepare dubbo reference injection element failed&#34;, e);
             }
         }
     }
@@ -164,7 +164,7 @@ protected void prepareInjection(AnnotatedInjectionMetadata metadata) throws Bean
             if (fieldElement.injectedObject != null) {
                 continue;
             }
-            Class<?> injectedType = fieldElement.field.getType();
+            Class&lt;?&gt; injectedType = fieldElement.field.getType();
             AnnotationAttributes attributes = fieldElement.attributes;
             // 注册 @DubboReference bean, 也就是 dubbo 的 ReferenceBean
             String referenceBeanName = registerReferenceBean(fieldElement.getPropertyName(), injectedType, attributes, fieldElement.field);
@@ -180,7 +180,7 @@ protected void prepareInjection(AnnotatedInjectionMetadata metadata) throws Bean
             if (methodElement.injectedObject != null) {
                 continue;
             }
-            Class<?> injectedType = methodElement.getInjectedType();
+            Class&lt;?&gt; injectedType = methodElement.getInjectedType();
             AnnotationAttributes attributes = methodElement.attributes;
             // 注册 @DubboReference bean, 也就是 dubbo 的 ReferenceBean
             String referenceBeanName = registerReferenceBean(methodElement.getPropertyName(), injectedType, attributes, methodElement.method);
@@ -191,7 +191,7 @@ protected void prepareInjection(AnnotatedInjectionMetadata metadata) throws Bean
             injectedMethodReferenceBeanCache.put(methodElement, referenceBeanName);
         }
     } catch (ClassNotFoundException e) {
-        throw new BeanCreationException("prepare reference annotation failed", e);
+        throw new BeanCreationException(&#34;prepare reference annotation failed&#34;, e);
     }
 }
 ```
@@ -206,14 +206,14 @@ protected void prepareInjection(AnnotatedInjectionMetadata metadata) throws Bean
 // type: 字段类型
 // name: 字段名称
 // 字段是需要 setter 方法
-public <T> T getInstance(Class<T> type, String name) {
+public &lt;T&gt; T getInstance(Class&lt;T&gt; type, String name) {
     if (context == null) {
         // ignore if spring context is not bound
         return null;
     }
 
     //check @SPI annotation
-    if (type.isInterface() && type.isAnnotationPresent(SPI.class)) {
+    if (type.isInterface() &amp;&amp; type.isAnnotationPresent(SPI.class)) {
         return null;
     }
 
@@ -223,7 +223,7 @@ public <T> T getInstance(Class<T> type, String name) {
         return bean;
     }
 
-    //logger.warn("No spring extension (bean) named:" + name + ", try to find an extension (bean) of type " + type.getName());
+    //logger.warn(&#34;No spring extension (bean) named:&#34; &#43; name &#43; &#34;, try to find an extension (bean) of type &#34; &#43; type.getName());
     return null;
 }
 ```
@@ -254,10 +254,16 @@ public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) 
 
     // 将 spring 的 environment 传递到 dubbo 的 environment 中，重要
     ConfigurableEnvironment environment = (ConfigurableEnvironment) applicationContext.getEnvironment();
-    SortedMap<String, String> dubboProperties = EnvironmentUtils.filterDubboProperties(environment);
+    SortedMap&lt;String, String&gt; dubboProperties = EnvironmentUtils.filterDubboProperties(environment);
     applicationModel.modelEnvironment().getAppConfigMap().putAll(dubboProperties);
     ...
 }
 ```
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/12-%E9%9B%86%E6%88%90-spring/  
 

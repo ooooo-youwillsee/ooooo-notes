@@ -1,9 +1,9 @@
 # 07 grpc client 设计
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> `nacos` 的 `grpc client` 使用的是生成的代码，位置在 `com.alibaba.nacos.api.grpc.auto`
+&gt; `nacos` 的 `grpc client` 使用的是生成的代码，位置在 `com.alibaba.nacos.api.grpc.auto`
 
 ## client 的启动
 
@@ -19,14 +19,14 @@ public final void start() throws NacosException {
     }
     
     // 初始化客户端事件线程池
-    clientEventExecutor = new ScheduledThreadPoolExecutor(2, r -> {
+    clientEventExecutor = new ScheduledThreadPoolExecutor(2, r -&gt; {
         ...
     });
     
     // connection event consumer.
     // 连接事件
-    clientEventExecutor.submit(() -> {
-        while (!clientEventExecutor.isTerminated() && !clientEventExecutor.isShutdown()) {
+    clientEventExecutor.submit(() -&gt; {
+        while (!clientEventExecutor.isTerminated() &amp;&amp; !clientEventExecutor.isShutdown()) {
             ConnectionEvent take;
             try {
                 take = eventLinkedBlockingQueue.take();
@@ -42,7 +42,7 @@ public final void start() throws NacosException {
     });
     
     // 重连事件
-    clientEventExecutor.submit(() -> {
+    clientEventExecutor.submit(() -&gt; {
         while (true) {
             try {
                 if (isShutdown()) {
@@ -53,7 +53,7 @@ public final void start() throws NacosException {
                 if (reconnectContext == null) {
                     // check alive time.
                     // 进行健康检查，发送 HealthCheckRequest 请求
-                    if (System.currentTimeMillis() - lastActiveTimeStamp >= rpcClientConfig.connectionKeepAlive()) {
+                    if (System.currentTimeMillis() - lastActiveTimeStamp &gt;= rpcClientConfig.connectionKeepAlive()) {
                         boolean isHealthy = healthCheck();
                         if (!isHealthy) {
                             // 判断当前连接
@@ -61,7 +61,7 @@ public final void start() throws NacosException {
                                 continue;
                             }
                             LoggerUtils.printIfInfoEnabled(LOGGER,
-                                    "[{}] Server healthy check fail, currentConnection = {}",
+                                    &#34;[{}] Server healthy check fail, currentConnection = {}&#34;,
                                     rpcClientConfig.name(), currentConnection.getConnectionId());
                             
                             RpcClientStatus rpcClientStatus = RpcClient.this.rpcClientStatus.get();
@@ -102,7 +102,7 @@ public final void start() throws NacosException {
                     }
                     if (!serverExist) {
                         LoggerUtils.printIfInfoEnabled(LOGGER,
-                                "[{}] Recommend server is not in server list, ignore recommend server {}",
+                                &#34;[{}] Recommend server is not in server list, ignore recommend server {}&#34;,
                                 rpcClientConfig.name(), reconnectContext.serverInfo.getAddress());
                         // 赋值为 null，会挑选下一个服务来进行重连 
                         reconnectContext.serverInfo = null;
@@ -123,20 +123,20 @@ public final void start() throws NacosException {
     
     // 重试
     int startUpRetryTimes = rpcClientConfig.retryTimes();
-    while (startUpRetryTimes > 0 && connectToServer == null) {
+    while (startUpRetryTimes &gt; 0 &amp;&amp; connectToServer == null) {
         try {
             startUpRetryTimes--;
             // 获取下一个 serverInfo，因为 nacos 的地址可以配置多个，或者配置一个 http 地址来动态获取
             ServerInfo serverInfo = nextRpcServer();
             
-            LoggerUtils.printIfInfoEnabled(LOGGER, "[{}] Try to connect to server on start up, server: {}",
+            LoggerUtils.printIfInfoEnabled(LOGGER, &#34;[{}] Try to connect to server on start up, server: {}&#34;,
                     rpcClientConfig.name(), serverInfo);
             
             // 连接服务，由子类来实现，接下来继续看
             connectToServer = connectToServer(serverInfo);
         } catch (Throwable e) {
             LoggerUtils.printIfWarnEnabled(LOGGER,
-                    "[{}] Fail to connect to server on start up, error message = {}, start up retry times left: {}",
+                    &#34;[{}] Fail to connect to server on start up, error message = {}, start up retry times left: {}&#34;,
                     rpcClientConfig.name(), e.getMessage(), startUpRetryTimes, e);
         }
         
@@ -145,7 +145,7 @@ public final void start() throws NacosException {
     // 向 eventLinkedBlockingQueue 队列中添加 ConnectionEvent, 产生连接事件 
     if (connectToServer != null) {
         LoggerUtils.printIfInfoEnabled(LOGGER,
-                "[{}] Success to connect to server [{}] on start up, connectionId = {}", rpcClientConfig.name(),
+                &#34;[{}] Success to connect to server [{}] on start up, connectionId = {}&#34;, rpcClientConfig.name(),
                 connectToServer.serverInfo.getAddress(), connectToServer.getConnectionId());
         // 设置当前连接       
         this.currentConnection = connectToServer;
@@ -159,7 +159,7 @@ public final void start() throws NacosException {
     registerServerRequestHandler(new ConnectResetRequestHandler());
     
     // register client detection request.
-    registerServerRequestHandler(request -> {
+    registerServerRequestHandler(request -&gt; {
         if (request instanceof ClientDetectionRequest) {
             return new ClientDetectionResponse();
         }
@@ -184,9 +184,9 @@ public Connection connectToServer(ServerInfo serverInfo) {
         if (grpcExecutor == null) {
             this.grpcExecutor = createGrpcExecutor(serverInfo.getServerIp());
         }
-        // 计算端口偏移，对于 sdkClient 来说，就是 8848 + 1000 = 9848
+        // 计算端口偏移，对于 sdkClient 来说，就是 8848 &#43; 1000 = 9848
         // 如果用 nginx 来做代理，9848 端口也需要代理
-        int port = serverInfo.getServerPort() + rpcPortOffset();
+        int port = serverInfo.getServerPort() &#43; rpcPortOffset();
         ManagedChannel managedChannel = createNewManagedChannel(serverInfo.getServerIp(), port);
         // 单一请求
         RequestGrpc.RequestFutureStub newChannelStubTemp = createNewChannelStub(managedChannel);
@@ -207,7 +207,7 @@ public Connection connectToServer(ServerInfo serverInfo) {
 
             //create stream request and bind connection event to this connection.
             // client 流式处理请求
-            StreamObserver<Payload> payloadStreamObserver = bindRequestStream(biRequestStreamStub, grpcConn);
+            StreamObserver&lt;Payload&gt; payloadStreamObserver = bindRequestStream(biRequestStreamStub, grpcConn);
 
             // stream observer to send response to server
             grpcConn.setPayloadStreamObserver(payloadStreamObserver);
@@ -227,7 +227,7 @@ public Connection connectToServer(ServerInfo serverInfo) {
         }
         return null;
     } catch (Exception e) {
-        LOGGER.error("[{}]Fail to connect to server!,error={}", GrpcClient.this.getName(), e);
+        LOGGER.error(&#34;[{}]Fail to connect to server!,error={}&#34;, GrpcClient.this.getName(), e);
     }
     return null;
 }
@@ -239,15 +239,15 @@ public Connection connectToServer(ServerInfo serverInfo) {
 // client 流式处理请求
 // onNext: 处理请求  
 // onError 和 onCompleted 来变换 grpc server
-private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRequestStreamStub streamStub,
+private StreamObserver&lt;Payload&gt; bindRequestStream(final BiRequestStreamGrpc.BiRequestStreamStub streamStub,
                                                   final GrpcConnection grpcConn) {
 
-    return streamStub.requestBiStream(new StreamObserver<Payload>() {
+    return streamStub.requestBiStream(new StreamObserver&lt;Payload&gt;() {
 
         @Override
         public void onNext(Payload payload) {
 
-            LoggerUtils.printIfDebugEnabled(LOGGER, "[{}]Stream server request receive, original info: {}",
+            LoggerUtils.printIfDebugEnabled(LOGGER, &#34;[{}]Stream server request receive, original info: {}&#34;,
                     grpcConn.getConnectionId(), payload.toString());
             try {
                 Object parseBody = GrpcUtils.parse(payload);
@@ -262,15 +262,15 @@ private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRe
                             // 响应
                             sendResponse(response);
                         } else {
-                            LOGGER.warn("[{}]Fail to process server request, ackId->{}", grpcConn.getConnectionId(),
+                            LOGGER.warn(&#34;[{}]Fail to process server request, ackId-&gt;{}&#34;, grpcConn.getConnectionId(),
                                     request.getRequestId());
                         }
 
                     } catch (Exception e) {
-                        LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Handle server request exception: {}",
+                        LoggerUtils.printIfErrorEnabled(LOGGER, &#34;[{}]Handle server request exception: {}&#34;,
                                 grpcConn.getConnectionId(), payload.toString(), e.getMessage());
                         Response errResponse = ErrorResponse.build(NacosException.CLIENT_ERROR,
-                                "Handle server request error");
+                                &#34;Handle server request error&#34;);
                         errResponse.setRequestId(request.getRequestId());
                         sendResponse(errResponse);
                     }
@@ -279,7 +279,7 @@ private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRe
 
             } catch (Exception e) {
 
-                LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Error to process server push response: {}",
+                LoggerUtils.printIfErrorEnabled(LOGGER, &#34;[{}]Error to process server push response: {}&#34;,
                         grpcConn.getConnectionId(), payload.getBody().getValue().toStringUtf8());
             }
         }
@@ -288,15 +288,15 @@ private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRe
         public void onError(Throwable throwable) {
             boolean isRunning = isRunning();
             boolean isAbandon = grpcConn.isAbandon();
-            if (isRunning && !isAbandon) {
-                LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Request stream error, switch server,error={}",
+            if (isRunning &amp;&amp; !isAbandon) {
+                LoggerUtils.printIfErrorEnabled(LOGGER, &#34;[{}]Request stream error, switch server,error={}&#34;,
                         grpcConn.getConnectionId(), throwable);
                 if (rpcClientStatus.compareAndSet(RpcClientStatus.RUNNING, RpcClientStatus.UNHEALTHY)) {
                     switchServerAsync();
                 }
 
             } else {
-                LoggerUtils.printIfWarnEnabled(LOGGER, "[{}]Ignore error event,isRunning:{},isAbandon={}",
+                LoggerUtils.printIfWarnEnabled(LOGGER, &#34;[{}]Ignore error event,isRunning:{},isAbandon={}&#34;,
                         grpcConn.getConnectionId(), isRunning, isAbandon);
             }
 
@@ -306,15 +306,15 @@ private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRe
         public void onCompleted() {
             boolean isRunning = isRunning();
             boolean isAbandon = grpcConn.isAbandon();
-            if (isRunning && !isAbandon) {
-                LoggerUtils.printIfErrorEnabled(LOGGER, "[{}]Request stream onCompleted, switch server",
+            if (isRunning &amp;&amp; !isAbandon) {
+                LoggerUtils.printIfErrorEnabled(LOGGER, &#34;[{}]Request stream onCompleted, switch server&#34;,
                         grpcConn.getConnectionId());
                 if (rpcClientStatus.compareAndSet(RpcClientStatus.RUNNING, RpcClientStatus.UNHEALTHY)) {
                     switchServerAsync();
                 }
 
             } else {
-                LoggerUtils.printIfInfoEnabled(LOGGER, "[{}]Ignore complete event,isRunning:{},isAbandon={}",
+                LoggerUtils.printIfInfoEnabled(LOGGER, &#34;[{}]Ignore complete event,isRunning:{},isAbandon={}&#34;,
                         grpcConn.getConnectionId(), isRunning, isAbandon);
             }
 
@@ -326,3 +326,9 @@ private StreamObserver<Payload> bindRequestStream(final BiRequestStreamGrpc.BiRe
 ## 测试类
 
 `com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_true`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/07-grpc-client-%E8%AE%BE%E8%AE%A1/  
+

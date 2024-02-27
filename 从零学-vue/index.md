@@ -7,7 +7,7 @@
 
 ## 怎么学
 
-> 如果你没有看过**官方文档**，说明你大概率是一个 `vue` 菜鸟。
+&gt; 如果你没有看过**官方文档**，说明你大概率是一个 `vue` 菜鸟。
 
 1. [vue 官方文档](https://cn.vuejs.org/)
 2. [vue router 官方文档](https://router.vuejs.org/zh/)
@@ -20,4 +20,10 @@
 
 开源框架，最重要的就是要**熟悉源码**，所以我建议你看 `vue` 的源码，然后就**毕业**了。
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E4%BB%8E%E9%9B%B6%E5%AD%A6-vue/  
 

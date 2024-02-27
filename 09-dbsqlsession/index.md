@@ -1,7 +1,7 @@
 # 09 DbSqlSession
 
 
-> activiti 基于 8.0.0 版本
+&gt; activiti 基于 8.0.0 版本
 
 工作流**操作数据库**，并不是直接执行 `SQL` 语句来完成的，而是通过**操作缓存对象**来**实现**的。
 
@@ -74,16 +74,16 @@ public void insert(Entity entity) {
     }
   
     // 加入缓存
-    Class<? extends Entity> clazz = entity.getClass();
+    Class&lt;? extends Entity&gt; clazz = entity.getClass();
     if (!insertedObjects.containsKey(clazz)) {
         insertedObjects.put(clazz,
-                            new LinkedHashMap<String, Entity>()); // order of insert is important, hence LinkedHashMap
+                            new LinkedHashMap&lt;String, Entity&gt;()); // order of insert is important, hence LinkedHashMap
     }
   
     insertedObjects.get(clazz).put(entity.getId(),
                                    entity);
     entityCache.put(entity,
-                    false); // False -> entity is inserted, so always changed
+                    false); // False -&gt; entity is inserted, so always changed
     // 设置为新增
     entity.setInserted(true);
 }
@@ -95,7 +95,7 @@ public void insert(Entity entity) {
 // 更新实体
 public void update(Entity entity) {
     entityCache.put(entity,
-                    false); // false -> we don't store state, meaning it will always be seen as changed
+                    false); // false -&gt; we don&#39;t store state, meaning it will always be seen as changed
     // 设置为更新                
     entity.setUpdated(true);
 }
@@ -107,10 +107,10 @@ public void update(Entity entity) {
 // 删除实体
 public void delete(Entity entity) {
     // 添加缓存
-    Class<? extends Entity> clazz = entity.getClass();
+    Class&lt;? extends Entity&gt; clazz = entity.getClass();
     if (!deletedObjects.containsKey(clazz)) {
         deletedObjects.put(clazz,
-                           new LinkedHashMap<String, Entity>()); // order of insert is important, hence LinkedHashMap
+                           new LinkedHashMap&lt;String, Entity&gt;()); // order of insert is important, hence LinkedHashMap
     }
     deletedObjects.get(clazz).put(entity.getId(),
                                   entity);
@@ -148,3 +148,9 @@ public void commit() {
     sqlSession.commit();
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/09-dbsqlsession/  
+

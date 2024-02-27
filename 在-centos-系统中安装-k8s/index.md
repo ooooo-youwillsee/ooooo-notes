@@ -32,14 +32,14 @@ proxy=http://ooooo:10800 ## 在文件中添加一行
 
 ### 1.5 安装 docker 服务 (两个机器都需要)
 
-> [官方 docker 安装文档](https://docs.docker.com/engine/install/centos/)
+&gt; [官方 docker 安装文档](https://docs.docker.com/engine/install/centos/)
 
 ```shell
 参考文档安装 docker
 
 sudo vim /etc/docker/daemon.json ## 编辑 docker 配置文件， 添加下面 json 配置，这是因为 k8s 默认使用的 cgroup driver 是 systemd
 {
-  "exec-opts": ["native.cgroupdriver=systemd"] 
+  &#34;exec-opts&#34;: [&#34;native.cgroupdriver=systemd&#34;] 
 }
 
 sudo systemctl enable --now docker.service ## 设置 docker 服务开机启动，并且现在启动
@@ -51,14 +51,14 @@ journalctl -xeu docker ## 查看 docker 日志服务
 
 ## 2. k8s 的 kubeadm 安装 (两台都需要)
 
-> [官方 k8s 安装文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+&gt; [官方 k8s 安装文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 
 ```shell
 参考文档检查服务器的状态是否可以安装 k8s 服务
 
 ## 关闭 swap 分区
 swapoff -a
-sudo echo vm.swappiness=0 >> /etc/sysctl.con ## 永久关闭 swap 分区， k8s 不能运行在有 swap 分区的机器上
+sudo echo vm.swappiness=0 &gt;&gt; /etc/sysctl.con ## 永久关闭 swap 分区， k8s 不能运行在有 swap 分区的机器上
 free -h ## 查看 swap 分区是否关闭，显示 0 表示已关闭 
 
 ## 检查 br_netfilter 是否被加载，没有任何输出，表示没有加载
@@ -66,11 +66,11 @@ lsmod | grep br_netfilter
 sudo modprobe br_netfilter ## 加载 br_netfilter 模块
 
 ## 配置网络
-cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+cat &lt;&lt;EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
 EOF
 
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf 
+cat &lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf 
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
@@ -80,7 +80,7 @@ sudo sysctl --system
 
 ## 添加 k8s 镜像仓库，在前面中，设置了 yum 代理
 ## 在官方文档中多了 exclude=kubelet kubeadm kubectl ，这里去掉, 直接安装最新版本的
-cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+cat &lt;&lt;EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-\$basearch
@@ -91,7 +91,7 @@ EOF
 
 ## 关闭 selinux
 sudo setenforce 0 
-sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+sudo sed -i &#39;s/^SELINUX=enforcing$/SELINUX=permissive/&#39; /etc/selinux/config
 
 ## 安装 k8s 服务, --disableexcludes=kubernetes 表示排除 kubernetes 之外的镜像源
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
@@ -105,9 +105,9 @@ journalctl -xeu kubelet ## 查看 kubelet 的日志
 
 ## 3. 创建 k8s 集群 (两台都需要)
 
-> [创建 k8s 集群官方文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
->
-> [k8s pod network 插件文档](https://kubernetes.io/docs/concepts/cluster-administration/networking/##how-to-implement-the-kubernetes-networking-model)
+&gt; [创建 k8s 集群官方文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+&gt;
+&gt; [k8s pod network 插件文档](https://kubernetes.io/docs/concepts/cluster-administration/networking/##how-to-implement-the-kubernetes-networking-model)
 
 ```shell
 ## 执行 kubeadm init 命令， 在 k8s master 机器上执行，默认情况下， k8s 创建 pod 不会在 master 机器上
@@ -146,3 +146,9 @@ kube-system   kube-proxy-wl5jg                  1/1     Running   8 (76m ago)   
 kube-system   kube-scheduler-centos1            1/1     Running   16 (76m ago)   26h
 
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-centos-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E5%AE%89%E8%A3%85-k8s/  
+

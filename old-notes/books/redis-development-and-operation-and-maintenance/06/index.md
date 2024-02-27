@@ -71,3 +71,9 @@ redis 提供了 `repl-disable-tcp-nodelay` 参数用于关闭 **TCP_NODELAY**，
 
 ## 4、开发与运维中的问题
 
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/redis-development-and-operation-and-maintenance/06/  
+

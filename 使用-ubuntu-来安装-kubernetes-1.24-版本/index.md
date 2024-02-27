@@ -51,14 +51,14 @@ mkdir -p /usr/local/lib/systemd/system/
 ```shell
 # Copyright The containerd Authors.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -108,9 +108,9 @@ containerd config default | tee /etc/containerd/config.toml
 # 修改 /etc/containerd/config.toml 配置
 # image 使用阿里云的地址， SystemdCgroup 更改为 true
 
-sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.6"
+sandbox_image = &#34;registry.aliyuncs.com/google_containers/pause:3.6&#34;
 ...
-[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+[plugins.&#34;io.containerd.grpc.v1.cri&#34;.containerd.runtimes.runc.options]
             ...
             SystemdCgroup = true
 # 修改完成后
@@ -134,7 +134,7 @@ tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.1.1.tgz
 
 ## 2. k8s 安装
 
-> [官方 k8s 安装文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+&gt; [官方 k8s 安装文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 
 ```shell
 # 参考文档检查服务器的状态是否可以安装 k8s 服务
@@ -152,11 +152,11 @@ lsmod | grep br_netfilter
 sudo modprobe br_netfilter 
 
 ## 配置网络
-cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+cat &lt;&lt;EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
 EOF
 
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf 
+cat &lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf 
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
@@ -168,7 +168,7 @@ sudo sysctl --system
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
 sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo &#34;deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main&#34; | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
 # 默认安装最新版本
 sudo apt-get install -y kubelet kubeadm kubectl
@@ -194,9 +194,9 @@ journalctl -xeu kubelet
 
 ## 3. 创建 k8s 集群
 
-> [创建 k8s 集群官方文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
->
-> [k8s pod network 插件文档](https://kubernetes.io/docs/concepts/cluster-administration/networking/##how-to-implement-the-kubernetes-networking-model)
+&gt; [创建 k8s 集群官方文档](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+&gt;
+&gt; [k8s pod network 插件文档](https://kubernetes.io/docs/concepts/cluster-administration/networking/##how-to-implement-the-kubernetes-networking-model)
 
 ```shell
 # 执行 kubeadm init 命令， 在 k8s master 机器上执行，默认情况下， k8s 创建 pod 不会在 master 机器上
@@ -251,3 +251,9 @@ kube-system        kube-scheduler-node1                       1/1     Running   
 tigera-operator    tigera-operator-5fb55776df-gjs7s           1/1     Running   0          64m
 
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E4%BD%BF%E7%94%A8-ubuntu-%E6%9D%A5%E5%AE%89%E8%A3%85-kubernetes-1.24-%E7%89%88%E6%9C%AC/  
+

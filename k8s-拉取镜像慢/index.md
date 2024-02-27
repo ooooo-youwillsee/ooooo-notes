@@ -33,7 +33,13 @@ sudo systemctl restart containerd
 
 ## 3. 参考
 
-> [cri proxy](https://github.com/containerd/cri/issues/834)
-> [systemd environment](https://www.flatcar.org/docs/latest/setup/systemd/environment-variables/)
+&gt; [cri proxy](https://github.com/containerd/cri/issues/834)
+&gt; [systemd environment](https://www.flatcar.org/docs/latest/setup/systemd/environment-variables/)
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/k8s-%E6%8B%89%E5%8F%96%E9%95%9C%E5%83%8F%E6%85%A2/  
 

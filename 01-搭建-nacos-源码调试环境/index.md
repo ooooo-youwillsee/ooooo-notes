@@ -1,7 +1,7 @@
 # 01 搭建 nacos 源码调试环境
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 ## 下载源码和编译
 
@@ -23,12 +23,18 @@ mvn clean install -U -DskipTests
 
 相关截图如下：
 
-{{< image src="./run.png" caption="run" >}}
+{{&lt; image src=&#34;./run.png&#34; caption=&#34;run&#34; &gt;}}
 
-{{< image src="./cluster-config.png" caption="cluster-config" >}}
+{{&lt; image src=&#34;./cluster-config.png&#34; caption=&#34;cluster-config&#34; &gt;}}
 
-{{< image src="./application-properties.png" caption="application-properties" >}}
+{{&lt; image src=&#34;./application-properties.png&#34; caption=&#34;application-properties&#34; &gt;}}
 
 ## 启动
 
-{{< image src="./log.png" caption="log" >}}
+{{&lt; image src=&#34;./log.png&#34; caption=&#34;log&#34; &gt;}}
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/01-%E6%90%AD%E5%BB%BA-nacos-%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/  
+

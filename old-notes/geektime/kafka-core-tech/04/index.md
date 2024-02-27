@@ -1,6 +1,6 @@
 # 
 
-## 1、Kafka 不同的"发行版"
+## 1、Kafka 不同的&#34;发行版&#34;
 
 ### 1、Apache Kafka
 
@@ -32,4 +32,10 @@
 
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/04/  
 

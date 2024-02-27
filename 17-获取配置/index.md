@@ -1,7 +1,7 @@
 # 17 获取配置
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 在 `nacos` 中，**获取配置**分为 `http` 和 `grpc` 两种方式，分别为 `ConfigControllerV2#getConfig` 和 `ConfigQueryRequestHandler`。这两个方法的处理逻辑都是**一样的**，所以我就选择 `http` 的方式来分析代码。
 
@@ -12,19 +12,19 @@
 ```java
 // 接受 http 请求
 public void getConfig(HttpServletRequest request, HttpServletResponse response,
-        @RequestParam("dataId") String dataId, @RequestParam("group") String group,
-        @RequestParam(value = "namespaceId", required = false, defaultValue = StringUtils.EMPTY) String namespaceId,
-        @RequestParam(value = "tag", required = false) String tag)
+        @RequestParam(&#34;dataId&#34;) String dataId, @RequestParam(&#34;group&#34;) String group,
+        @RequestParam(value = &#34;namespaceId&#34;, required = false, defaultValue = StringUtils.EMPTY) String namespaceId,
+        @RequestParam(value = &#34;tag&#34;, required = false) String tag)
         throws NacosException, IOException, ServletException {
     // check namespaceId
     // 检查参数
     ParamUtils.checkTenantV2(namespaceId);
     namespaceId = NamespaceUtil.processNamespaceParameter(namespaceId);
     // check params
-    ParamUtils.checkParam(dataId, group, "datumId", "content");
+    ParamUtils.checkParam(dataId, group, &#34;datumId&#34;, &#34;content&#34;);
     ParamUtils.checkParamV2(tag);
     final String clientIp = RequestUtil.getRemoteIp(request);
-    String isNotify = request.getHeader("notify");
+    String isNotify = request.getHeader(&#34;notify&#34;);
     // 获取配置
     inner.doGetConfig(request, response, dataId, group, namespaceId, tag, isNotify, clientIp, true);
 }
@@ -40,7 +40,7 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
     
     ...
     final String groupKey = GroupKey2.getKey(dataId, group, tenant);
-    String autoTag = request.getHeader("Vipserver-Tag");
+    String autoTag = request.getHeader(&#34;Vipserver-Tag&#34;);
     
     String requestIpApp = RequestUtil.getAppName(request);
     // 获取读锁
@@ -50,15 +50,15 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
     boolean isBeta = false;
     boolean isSli = false;
     // 获取锁成功
-    if (lockResult > 0) {
-        // LockResult > 0 means cacheItem is not null and other thread can`t delete this cacheItem
+    if (lockResult &gt; 0) {
+        // LockResult &gt; 0 means cacheItem is not null and other thread can`t delete this cacheItem
         FileInputStream fis = null;
         try {
             String md5 = Constants.NULL;
             long lastModified = 0L;
             CacheItem cacheItem = ConfigCacheService.getContentCache(groupKey);
             // 判断配置是否为 beta
-            if (cacheItem.isBeta() && cacheItem.getIps4Beta().contains(clientIp)) {
+            if (cacheItem.isBeta() &amp;&amp; cacheItem.getIps4Beta().contains(clientIp)) {
                 isBeta = true;
             }
             
@@ -75,7 +75,7 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
                 } else {
                     file = DiskUtil.targetBetaFile(dataId, group, tenant);
                 }
-                response.setHeader("isBeta", "true");
+                response.setHeader(&#34;isBeta&#34;, &#34;true&#34;);
             } else {
                 if (StringUtils.isBlank(tag)) {
                     if (isUseTag(cacheItem, autoTag)) {
@@ -103,14 +103,14 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
                         } else {
                             file = DiskUtil.targetFile(dataId, group, tenant);
                         }
-                        if (configInfoBase == null && fileNotExist(file)) {
+                        if (configInfoBase == null &amp;&amp; fileNotExist(file)) {
                             // FIXME CacheItem
                             // No longer exists. It is impossible to simply calculate the push delayed. Here, simply record it as - 1.
                             ConfigTraceService.logPullEvent(dataId, group, tenant, requestIpApp, -1,
                                     ConfigTraceService.PULL_EVENT_NOTFOUND, -1, requestIp, notify);
                             
-                            // pullLog.info("[client-get] clientIp={}, {},
-                            // no data",
+                            // pullLog.info(&#34;[client-get] clientIp={}, {},
+                            // no data&#34;,
                             // new Object[]{clientIp, groupKey});
                             
                             // 没有配置，返回404
@@ -134,14 +134,14 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
                     } else {
                         file = DiskUtil.targetTagFile(dataId, group, tenant, tag);
                     }
-                    if (configInfoBase == null && fileNotExist(file)) {
+                    if (configInfoBase == null &amp;&amp; fileNotExist(file)) {
                         // FIXME CacheItem
                         // No longer exists. It is impossible to simply calculate the push delayed. Here, simply record it as - 1.
                         ConfigTraceService.logPullEvent(dataId, group, tenant, requestIpApp, -1,
-                                ConfigTraceService.PULL_EVENT_NOTFOUND, -1, requestIp, notify && isSli);
+                                ConfigTraceService.PULL_EVENT_NOTFOUND, -1, requestIp, notify &amp;&amp; isSli);
                         
-                        // pullLog.info("[client-get] clientIp={}, {},
-                        // no data",
+                        // pullLog.info(&#34;[client-get] clientIp={}, {},
+                        // no data&#34;,
                         // new Object[]{clientIp, groupKey});
                         
                         return get404Result(response, isV2);
@@ -152,18 +152,18 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
             response.setHeader(Constants.CONTENT_MD5, md5);
             
             ...  
-            LogUtil.PULL_CHECK_LOG.warn("{}|{}|{}|{}", groupKey, requestIp, md5, TimeUtils.getCurrentTimeStr());
+            LogUtil.PULL_CHECK_LOG.warn(&#34;{}|{}|{}|{}&#34;, groupKey, requestIp, md5, TimeUtils.getCurrentTimeStr());
             
             // 计算延时时间，客户端接受到配置改变之后，会发起获取配置请求
             final long delayed = System.currentTimeMillis() - lastModified;
             
-            // TODO distinguish pull-get && push-get
+            // TODO distinguish pull-get &amp;&amp; push-get
             /*
              Otherwise, delayed cannot be used as the basis of push delay directly,
              because the delayed value of active get requests is very large.
              */
             ConfigTraceService.logPullEvent(dataId, group, tenant, requestIpApp, lastModified,
-                    ConfigTraceService.PULL_EVENT_OK, delayed, requestIp, notify && isSli);
+                    ConfigTraceService.PULL_EVENT_OK, delayed, requestIp, notify &amp;&amp; isSli);
             
         } finally {
             releaseConfigReadLock(groupKey);
@@ -174,22 +174,28 @@ public String doGetConfig(HttpServletRequest request, HttpServletResponse respon
         // FIXME CacheItem No longer exists. It is impossible to simply calculate the push delayed. Here, simply record it as - 1.
         ConfigTraceService
                 .logPullEvent(dataId, group, tenant, requestIpApp, -1, ConfigTraceService.PULL_EVENT_NOTFOUND, -1,
-                        requestIp, notify && isSli);
+                        requestIp, notify &amp;&amp; isSli);
         
         return get404Result(response, isV2);
         
     } else {
         
-        PULL_LOG.info("[client-get] clientIp={}, {}, get data during dump", clientIp, groupKey);
+        PULL_LOG.info(&#34;[client-get] clientIp={}, {}, get data during dump&#34;, clientIp, groupKey);
         return get409Result(response, isV2);
         
     }
     
-    return HttpServletResponse.SC_OK + "";
+    return HttpServletResponse.SC_OK &#43; &#34;&#34;;
 }
 ```
 
 ## 测试类
 
 `com.alibaba.nacos.test.config.ConfigAPI_V2_CITCase#test`
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/17-%E8%8E%B7%E5%8F%96%E9%85%8D%E7%BD%AE/  
 

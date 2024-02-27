@@ -1,7 +1,7 @@
 # 
 
 ## 1、Kafka 是分布式流处理平台
-> Apache Kafka 是消息引擎系统，也是一个分布式流处理平台。
+&gt; Apache Kafka 是消息引擎系统，也是一个分布式流处理平台。
 
 Kafka 的特性：
 - 提供一套 API 实现生产者和消费者。
@@ -10,4 +10,10 @@ Kafka 的特性：
 - 可以实现端到端的精确一次处理语义。
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/03/  
 

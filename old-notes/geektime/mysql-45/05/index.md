@@ -4,14 +4,14 @@
 
 创建表 T :
 ```shell script
-mysql> create table T (
+mysql&gt; create table T (
 ID int primary key,
 k int NOT NULL DEFAULT 0, 
-s varchar(16) NOT NULL DEFAULT '',
+s varchar(16) NOT NULL DEFAULT &#39;&#39;,
 index k(k))
 engine=InnoDB;
 
-insert into T values(100,1, 'aa'),(200,2,'bb'),(300,3,'cc'),(500,5,'ee'),(600,6,'ff'),(700,7,'gg');
+insert into T values(100,1, &#39;aa&#39;),(200,2,&#39;bb&#39;),(300,3,&#39;cc&#39;),(500,5,&#39;ee&#39;),(600,6,&#39;ff&#39;),(700,7,&#39;gg&#39;);
 ```
 
 执行语句 `select ID from T where k between 3 and 5`，只需要扫描 k 索引树。因为结果只需要查询 ID，而 ID 在 k 索引树上，减少了**回表**操作。
@@ -20,7 +20,7 @@ insert into T values(100,1, 'aa'),(200,2,'bb'),(300,3,'cc'),(500,5,'ee'),(600,6,
 
 ## 2、最左前缀匹配
 
-B+ 树这种索引结构，可以利用索引的**最左前缀**，来定位记录。
+B&#43; 树这种索引结构，可以利用索引的**最左前缀**，来定位记录。
 
 创建表 tuser ：
 ```shell script
@@ -48,7 +48,7 @@ CREATE TABLE `tuser` (
 
 可以对索引中存在的字段先做判断，减少**回表**次数。
 
-当查询条件是 `where name like '张%' and age=10 and ismale=1;`，也是可以用到索引树（name,age）的。
+当查询条件是 `where name like &#39;张%&#39; and age=10 and ismale=1;`，也是可以用到索引树（name,age）的。
 
 
 ## 4、问题
@@ -84,4 +84,10 @@ select * from geek where c=N order by b limit 1;
 
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/mysql-45/05/  
 

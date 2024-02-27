@@ -5,7 +5,7 @@
 
 ```java
 // 实体类字段设置
-@TableField(value = "LOCK_EXP_TIME_", updateStrategy = FieldStrategy.IGNORED)
+@TableField(value = &#34;LOCK_EXP_TIME_&#34;, updateStrategy = FieldStrategy.IGNORED)
 private Date lockExpirationTime;
 
 // mapper操作
@@ -20,14 +20,14 @@ JobEntityMapper.updateById(jobEntity);
 上面的操作可能会抛出下面的异常
 
 ```
-### Cause: org.apache.ibatis.type.TypeException: Could not set parameters for mapping: ParameterMapping{property='et.lockExpirationTime', mode=IN, javaType=class java.lang.Object, jdbcType=null, numericScale=null, resultMapId='null', jdbcTypeName='null', expression='null'}. Cause: org.apache.ibatis.type.TypeException: Error setting null for parameter #2 with JdbcType OTHER . Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. 
+### Cause: org.apache.ibatis.type.TypeException: Could not set parameters for mapping: ParameterMapping{property=&#39;et.lockExpirationTime&#39;, mode=IN, javaType=class java.lang.Object, jdbcType=null, numericScale=null, resultMapId=&#39;null&#39;, jdbcTypeName=&#39;null&#39;, expression=&#39;null&#39;}. Cause: org.apache.ibatis.type.TypeException: Error setting null for parameter #2 with JdbcType OTHER . Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. 
 ```
 
 ## 解决方法
 
 ```java
 // 添加 jdbcType
-@TableField(value = "LOCK_EXP_TIME_", updateStrategy = FieldStrategy.IGNORED, jdbcType = JdbcType.TIMESTAMP)
+@TableField(value = &#34;LOCK_EXP_TIME_&#34;, updateStrategy = FieldStrategy.IGNORED, jdbcType = JdbcType.TIMESTAMP)
 private Date lockExpirationTime;
 ```
 
@@ -37,8 +37,14 @@ private Date lockExpirationTime;
 
 ```java
 try {
-    typeHandler.setParameter(ps, i + 1, value, jdbcType);
+    typeHandler.setParameter(ps, i &#43; 1, value, jdbcType);
 } catch (TypeException | SQLException e) {
-    throw new TypeException("Could not set parameters for mapping: " + parameterMapping + ". Cause: " + e, e);
+    throw new TypeException(&#34;Could not set parameters for mapping: &#34; &#43; parameterMapping &#43; &#34;. Cause: &#34; &#43; e, e);
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/mybatis-plus-%E6%9B%B4%E6%96%B0%E5%AD%97%E6%AE%B5%E4%B8%BA-null-%E7%9A%84%E5%9D%91/  
+

@@ -1,14 +1,14 @@
 # 04 订阅服务
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-nacos 订阅服务主要分为 `http+udp` 和 `grpc` 这两种方式，这两者的**内部调用方法**都是一样的，这里主要分析 `http+udp` 的方式。
+nacos 订阅服务主要分为 `http&#43;udp` 和 `grpc` 这两种方式，这两者的**内部调用方法**都是一样的，这里主要分析 `http&#43;udp` 的方式。
 
 ## 订阅服务的 curl
 
 ```shell
-curl --location 'localhost:8848/nacos/v2/ns/instance/list?serviceName=test'
+curl --location &#39;localhost:8848/nacos/v2/ns/instance/list?serviceName=test&#39;
 ```
 
 ## 订阅服务的主流程
@@ -17,14 +17,14 @@ curl --location 'localhost:8848/nacos/v2/ns/instance/list?serviceName=test'
 
 ```java
 // 处理请求
-public Result<ServiceInfo> list(@RequestParam(value = "namespaceId", defaultValue = Constants.DEFAULT_NAMESPACE_ID) String namespaceId,
-        @RequestParam(value = "groupName", defaultValue = Constants.DEFAULT_GROUP) String groupName,
-        @RequestParam("serviceName") String serviceName,
-        @RequestParam(value = "clusterName", defaultValue = StringUtils.EMPTY) String clusterName,
-        @RequestParam(value = "ip", defaultValue = StringUtils.EMPTY) String ip,
-        @RequestParam(value = "port", defaultValue = "0") Integer port,
-        @RequestParam(value = "healthyOnly", defaultValue = "false") Boolean healthyOnly,
-        @RequestParam(value = "app", defaultValue = StringUtils.EMPTY) String app,
+public Result&lt;ServiceInfo&gt; list(@RequestParam(value = &#34;namespaceId&#34;, defaultValue = Constants.DEFAULT_NAMESPACE_ID) String namespaceId,
+        @RequestParam(value = &#34;groupName&#34;, defaultValue = Constants.DEFAULT_GROUP) String groupName,
+        @RequestParam(&#34;serviceName&#34;) String serviceName,
+        @RequestParam(value = &#34;clusterName&#34;, defaultValue = StringUtils.EMPTY) String clusterName,
+        @RequestParam(value = &#34;ip&#34;, defaultValue = StringUtils.EMPTY) String ip,
+        @RequestParam(value = &#34;port&#34;, defaultValue = &#34;0&#34;) Integer port,
+        @RequestParam(value = &#34;healthyOnly&#34;, defaultValue = &#34;false&#34;) Boolean healthyOnly,
+        @RequestParam(value = &#34;app&#34;, defaultValue = StringUtils.EMPTY) String app,
         @RequestHeader(value = HttpHeaderConsts.USER_AGENT_HEADER, required = false) String userAgent,
         @RequestHeader(value = HttpHeaderConsts.CLIENT_VERSION_HEADER, required = false) String clientVersion) {
     if (StringUtils.isEmpty(userAgent)) {
@@ -32,7 +32,7 @@ public Result<ServiceInfo> list(@RequestParam(value = "namespaceId", defaultValu
     }
     String compositeServiceName = NamingUtils.getGroupedName(serviceName, groupName);
     // 根据 ip 和 port 来进行 udp 推送
-    Subscriber subscriber = new Subscriber(ip + ":" + port, userAgent, app, ip, namespaceId, compositeServiceName,
+    Subscriber subscriber = new Subscriber(ip &#43; &#34;:&#34; &#43; port, userAgent, app, ip, namespaceId, compositeServiceName,
             port, clusterName);
     // 获取所有的实例
     return Result.success(instanceServiceV2.listInstance(namespaceId, compositeServiceName, subscriber, clusterName, healthyOnly));
@@ -48,8 +48,8 @@ public ServiceInfo listInstance(String namespaceId, String serviceName, Subscrib
         boolean healthOnly) {
     Service service = getService(namespaceId, serviceName, true);
     // For adapt 1.X subscribe logic
-    if (subscriber.getPort() > 0 && pushService.canEnablePush(subscriber.getAgent())) {
-        //  clientId = address + ID_DELIMITER + ephemeral, 这个很重要，用来判断是不是 udp push
+    if (subscriber.getPort() &gt; 0 &amp;&amp; pushService.canEnablePush(subscriber.getAgent())) {
+        //  clientId = address &#43; ID_DELIMITER &#43; ephemeral, 这个很重要，用来判断是不是 udp push
         String clientId = IpPortBasedClient.getClientId(subscriber.getAddrStr(), true);
         // 根据 udp 的 ip 和 port 来创建 client
         createIpPortClientIfAbsent(clientId);
@@ -108,7 +108,7 @@ private void handleClientOperation(ClientOperationEvent event) {
 
 // 添加 service 对应的 clientId, 然后发布 ServiceSubscribedEvent 事件，这里传入了 clientId
 private void addSubscriberIndexes(Service service, String clientId) {
-    subscriberIndexes.computeIfAbsent(service, key -> new ConcurrentHashSet<>());
+    subscriberIndexes.computeIfAbsent(service, key -&gt; new ConcurrentHashSet&lt;&gt;());
     // Fix #5404, Only first time add need notify event.
     if (subscriberIndexes.get(service).add(clientId)) {
         NotifyCenter.publishEvent(new ServiceEvent.ServiceSubscribedEvent(service, clientId));
@@ -188,7 +188,7 @@ public void run() {
                     new ServicePushCallback(each, subscriber, wrapper.getOriginalData(), delayTask.isPushToAll()));
         }
     } catch (Exception e) {
-        Loggers.PUSH.error("Push task for service" + service.getGroupedServiceName() + " execute failed ", e);
+        Loggers.PUSH.error(&#34;Push task for service&#34; &#43; service.getGroupedServiceName() &#43; &#34; execute failed &#34;, e);
         delayTaskEngine.addTask(service, new PushDelayTask(service, 1000L));
     }
 }
@@ -204,12 +204,12 @@ public void doPushWithCallback(String clientId, Subscriber subscriber, PushDataW
 }
 
 private PushExecutor getPushExecuteService(String clientId, Subscriber subscriber) {
-    Optional<SpiPushExecutor> result = SpiImplPushExecutorHolder.getInstance()
+    Optional&lt;SpiPushExecutor&gt; result = SpiImplPushExecutorHolder.getInstance()
             .findPushExecutorSpiImpl(clientId, subscriber);
     if (result.isPresent()) {
         return result.get();
     }
-    // 获取对应的 pushExecuteService, 之前的 clientId = address + ID_DELIMITER + ephemeral 
+    // 获取对应的 pushExecuteService, 之前的 clientId = address &#43; ID_DELIMITER &#43; ephemeral 
     // use nacos default push executor
     return clientId.contains(IpPortBasedClient.ID_DELIMITER) ? udpPushExecuteService : rpcPushExecuteService;
 }
@@ -221,3 +221,9 @@ private PushExecutor getPushExecuteService(String clientId, Subscriber subscribe
 ## 测试类
 
 `com.alibaba.nacos.test.naming.SubscribeCluster_ITCase#subscribeAdd`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/04-%E8%AE%A2%E9%98%85%E6%9C%8D%E5%8A%A1/  
+

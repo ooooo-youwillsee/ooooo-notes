@@ -1,13 +1,13 @@
 # 事务传播类型
 
 
-> 只要涉及到**数据库操作**，必定就会使用 `@Transactional` 注解，其中有一个属性就是 **propagation(传播类型)**，掌握它的用法很重要。演示代码见末尾。
+&gt; 只要涉及到**数据库操作**，必定就会使用 `@Transactional` 注解，其中有一个属性就是 **propagation(传播类型)**，掌握它的用法很重要。演示代码见末尾。
 
 ## 演示事务传播
 
 ### 基础代码
 
-> 定义了所有的**传播类型**，第二个参数来控制**是否抛出异常**。
+&gt; 定义了所有的**传播类型**，第二个参数来控制**是否抛出异常**。
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
@@ -51,126 +51,126 @@ public void MANDATORY(User user, boolean throwException) {
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_REQUIRED() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.REQUIRED(new User("222"), true);
+        serviceA.REQUIRED(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：不会插入数据, 会抛出异常
+&gt; 结论：不会插入数据, 会抛出异常
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `REQUIRED`, 所以会**共用**之前的事务状态，这样两次调用**是同一个事务状态**。
-> 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**，导致事务状态**冲突**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `REQUIRED`, 所以会**共用**之前的事务状态，这样两次调用**是同一个事务状态**。
+&gt; 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**，导致事务状态**冲突**。
 
 ### REQUIRED_REQUIRES_NEW
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_REQUIRES_NEW() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.REQUIRES_NEW(new User("222"), true);
+        serviceA.REQUIRES_NEW(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：会插入 111 数据
+&gt; 结论：会插入 111 数据
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `REQUIRES_NEW`, 所以会创建**新的事务状态**，这样两次调用**不是同一个事务状态**。
-> 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `REQUIRES_NEW`, 所以会创建**新的事务状态**，这样两次调用**不是同一个事务状态**。
+&gt; 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**。
 
 ### REQUIRED_NESTED
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_NESTED() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.NESTED(new User("222"), true);
+        serviceA.NESTED(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：会插入 111 数据
+&gt; 结论：会插入 111 数据
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `NESTED`, 所以会设置**保存点**，这样两次调用**是同一个事务状态**。
-> 第二次调用**发生异常**，事务状态要**回滚**到**保存点**，而第一次调用**没有异常**，事务状态要**提交**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `NESTED`, 所以会设置**保存点**，这样两次调用**是同一个事务状态**。
+&gt; 第二次调用**发生异常**，事务状态要**回滚**到**保存点**，而第一次调用**没有异常**，事务状态要**提交**。
 
 ### REQUIRED_NOT_SUPPORTED
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_NOT_SUPPORTED() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.NOT_SUPPORTED(new User("222"), true);
+        serviceA.NOT_SUPPORTED(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：会插入 111 数据, 222 数据
+&gt; 结论：会插入 111 数据, 222 数据
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `NOT_SUPPORTED`, 所以会**挂起事务**，这样只有第一次调用是**有事务**。
-> 第二次调用**发生异常**，因为**没有事务**，所以不会**回滚**，而第一次调用**没有异常**，事务状态要**提交**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `NOT_SUPPORTED`, 所以会**挂起事务**，这样只有第一次调用是**有事务**。
+&gt; 第二次调用**发生异常**，因为**没有事务**，所以不会**回滚**，而第一次调用**没有异常**，事务状态要**提交**。
 
 ### REQUIRED_SUPPORTS
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_SUPPORTS() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.SUPPORTS(new User("222"), true);
+        serviceA.SUPPORTS(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：不会插入数据, 会抛出异常
+&gt; 结论：不会插入数据, 会抛出异常
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `SUPPORTS`, 所以会**共用**之前的事务状态，这样两次调用**是同一个事务状态**。
-> 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**，导致事务状态**冲突**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `SUPPORTS`, 所以会**共用**之前的事务状态，这样两次调用**是同一个事务状态**。
+&gt; 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**，导致事务状态**冲突**。
 
 ### REQUIRED_NEVER
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_NEVER() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.NEVER(new User("222"), true);
+        serviceA.NEVER(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：会插入 111 数据
+&gt; 结论：会插入 111 数据
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `NEVER`, 所以会**抛出异常**不会继续**执行代码**。
-> 第一次调用**没有异常**，事务状态要**提交**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `NEVER`, 所以会**抛出异常**不会继续**执行代码**。
+&gt; 第一次调用**没有异常**，事务状态要**提交**。
 
 ### REQUIRED_MANDATORY
 
 ```java
 @Transactional(propagation = Propagation.REQUIRED)
 public void REQUIRED_MANDATORY() {
-    serviceA.REQUIRED(new User("111"), false);
+    serviceA.REQUIRED(new User(&#34;111&#34;), false);
     try {
-        serviceA.MANDATORY(new User("222"), true);
+        serviceA.MANDATORY(new User(&#34;222&#34;), true);
     } catch (Exception ignored) {
     }
 }
 ```
 
-> 结论：不会插入数据, 会抛出异常
+&gt; 结论：不会插入数据, 会抛出异常
 
-> 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `REQUIRED`, 所以会**共用**之前的事务状态，这样两次调用**是同一个事务状态**。
-> 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**，导致事务状态**冲突**。
+&gt; 分析：第一次调用创建**新的事务状态**，第二次调用因为是 `REQUIRED`, 所以会**共用**之前的事务状态，这样两次调用**是同一个事务状态**。
+&gt; 第二次调用**发生异常**，事务状态要**回滚**，而第一次调用**没有异常**，事务状态要**提交**，导致事务状态**冲突**。
 
 ## 事务传播原理
 
@@ -191,7 +191,7 @@ public final TransactionStatus getTransaction(@Nullable TransactionDefinition de
     // 下面是不存在事务的情况
     if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
         throw new IllegalTransactionStateException(
-                "No existing transaction found for transaction marked with propagation 'mandatory'");
+                &#34;No existing transaction found for transaction marked with propagation &#39;mandatory&#39;&#34;);
     }
     else if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
             def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
@@ -224,7 +224,7 @@ private TransactionStatus handleExistingTransaction(
     // 下面是存在事务的情况
     if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NEVER) {
         throw new IllegalTransactionStateException(
-                "Existing transaction found for transaction marked with propagation 'never'");
+                &#34;Existing transaction found for transaction marked with propagation &#39;never&#39;&#34;);
     }
 
     if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NOT_SUPPORTED) {
@@ -272,8 +272,14 @@ private TransactionStatus handleExistingTransaction(
 }
 ```
 
-> 说明：在 `startTransaction` 方法中，每次都会**获取新连接**来**开启事务**。
+&gt; 说明：在 `startTransaction` 方法中，每次都会**获取新连接**来**开启事务**。
 
 ## 代码
 
 [demo-spring-transaction-propagation](https://github.com/ooooo-youwillsee/demo-spring-transaction-propagation)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E4%BA%8B%E5%8A%A1%E4%BC%A0%E6%92%AD%E7%B1%BB%E5%9E%8B/  
+

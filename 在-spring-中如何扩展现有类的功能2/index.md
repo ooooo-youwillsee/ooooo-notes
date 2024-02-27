@@ -25,7 +25,7 @@
 @Component
 public class CompositePropertySourcesBeanDefinitionRegistry implements BeanDefinitionRegistryPostProcessor {
 
-  public static final String COMPOSITE_PROPERTY_SOURCES_BEAN_NAME = "compositePropertySources";
+  public static final String COMPOSITE_PROPERTY_SOURCES_BEAN_NAME = &#34;compositePropertySources&#34;;
 
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
@@ -58,4 +58,10 @@ public class CompositePropertySourcesBeanDefinitionRegistry implements BeanDefin
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-compositePropertySourcesExt2)
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-spring-%E4%B8%AD%E5%A6%82%E4%BD%95%E6%89%A9%E5%B1%95%E7%8E%B0%E6%9C%89%E7%B1%BB%E7%9A%84%E5%8A%9F%E8%83%BD2/  
 

@@ -2,7 +2,7 @@
 
 ## 1、事务隔离级别
 
-> 事务的 **ACID** 中的 **I** 指的就是隔离性（Isolation）。
+&gt; 事务的 **ACID** 中的 **I** 指的就是隔离性（Isolation）。
 
 ### 1、隔离级别
 
@@ -14,12 +14,12 @@
 
 **串行化**（serializable）：当出现读写锁冲突的时候，后执行事务必须等前一个事务执行完成，才能继续执行。
 
-MySQL 的隔离级别设置为"读提交"。
+MySQL 的隔离级别设置为&#34;读提交&#34;。
 
 ### 2、事务隔离例子
 
 ```shell script
-mysql> create table T(c int) engine=InnoDB;
+mysql&gt; create table T(c int) engine=InnoDB;
 insert into T(c) values(1);
 ```
 
@@ -47,7 +47,7 @@ insert into T(c) values(1);
 
 ### 3、事务配置方式
 
-通过命令 `show variables like 'transaction_isolation';` 来查看当前隔离级别。通过命令 `set transaction_isolation = 'read-committed';` 来设置隔离级别。
+通过命令 `show variables like &#39;transaction_isolation&#39;;` 来查看当前隔离级别。通过命令 `set transaction_isolation = &#39;read-committed&#39;;` 来设置隔离级别。
 
 ![事务配置方式](./imgs/03_02.png)
 
@@ -70,7 +70,7 @@ insert into T(c) values(1);
 你可以在 information_schema 库的 innodb_trx 这个表中查询长事务，比如下面这个语句，用于查找持续时间超过 60s 的事务。
 
 ```shell script
-mysql> select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
+mysql&gt; select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))&gt;60
 ```
 
 ## 4、问题
@@ -90,4 +90,10 @@ mysql> select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(no
 4. 如果使用的是MySQL 5.6或者更新版本，把 innodb_undo_tablespaces 设置成2（或更大的值）。如果真的出现大事务导致回滚段过大，这样设置后清理起来更方便。
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/mysql-45/03/  
 

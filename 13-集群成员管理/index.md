@@ -1,7 +1,7 @@
 # 13 集群成员管理
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 在 nacos 中，集群成员分为**静态加载**和**动态加载**，**静态加载**就是读取 `cluster.conf` 文件，**动态加载**就是从`一个接口`中获取。
 
@@ -39,7 +39,7 @@ public static MemberLookup createLookUp(ServerMemberManager memberManager) throw
     }
     //  注入 memberManager
     LOOK_UP.injectMemberManager(memberManager);
-    Loggers.CLUSTER.info("Current addressing mode selection : {}", LOOK_UP.getClass().getSimpleName());
+    Loggers.CLUSTER.info(&#34;Current addressing mode selection : {}&#34;, LOOK_UP.getClass().getSimpleName());
     return LOOK_UP;
 }
 ```
@@ -110,7 +110,7 @@ public void doStart() throws NacosException {
         // 动态监听配置文件
         WatchFileCenter.registerWatcher(EnvUtil.getConfPath(), watcher);
     } catch (Throwable e) {
-        Loggers.CLUSTER.error("An exception occurred in the launch file monitor : {}", e.getMessage());
+        Loggers.CLUSTER.error(&#34;An exception occurred in the launch file monitor : {}&#34;, e.getMessage());
     }
 }
 
@@ -164,15 +164,15 @@ private void initAddressSys() {
     }
     String envAddressUrl = System.getenv(ADDRESS_SERVER_URL_ENV);
     if (StringUtils.isBlank(envAddressUrl)) {
-        addressUrl = EnvUtil.getProperty(ADDRESS_SERVER_URL_PROPERTY, EnvUtil.getContextPath() + "/" + "serverlist");
+        addressUrl = EnvUtil.getProperty(ADDRESS_SERVER_URL_PROPERTY, EnvUtil.getContextPath() &#43; &#34;/&#34; &#43; &#34;serverlist&#34;);
     } else {
         addressUrl = envAddressUrl;
     }
-    addressServerUrl = HTTP_PREFIX + domainName + ":" + addressPort + addressUrl;
-    envIdUrl = HTTP_PREFIX + domainName + ":" + addressPort + "/env";
+    addressServerUrl = HTTP_PREFIX &#43; domainName &#43; &#34;:&#34; &#43; addressPort &#43; addressUrl;
+    envIdUrl = HTTP_PREFIX &#43; domainName &#43; &#34;:&#34; &#43; addressPort &#43; &#34;/env&#34;;
     
-    Loggers.CORE.info("ServerListService address-server port:" + addressPort);
-    Loggers.CORE.info("ADDRESS_SERVER_URL:" + addressServerUrl);
+    Loggers.CORE.info(&#34;ServerListService address-server port:&#34; &#43; addressPort);
+    Loggers.CORE.info(&#34;ADDRESS_SERVER_URL:&#34; &#43; addressServerUrl);
 }
 ```
 
@@ -187,7 +187,7 @@ private void run() throws NacosException {
     Throwable ex = null;
     int maxRetry = EnvUtil.getProperty(ADDRESS_SERVER_RETRY_PROPERTY, Integer.class, DEFAULT_SERVER_RETRY_TIME);
     // 重试次数
-    for (int i = 0; i < maxRetry; i++) {
+    for (int i = 0; i &lt; maxRetry; i&#43;&#43;) {
         try {
             // 获取集群成员地址, 发布 MembersChangeEvent 事件
             syncFromAddressUrl();
@@ -195,7 +195,7 @@ private void run() throws NacosException {
             break;
         } catch (Throwable e) {
             ex = e;
-            Loggers.CLUSTER.error("[serverlist] exception, error : {}", ExceptionUtil.getAllExceptionMsg(ex));
+            Loggers.CLUSTER.error(&#34;[serverlist] exception, error : {}&#34;, ExceptionUtil.getAllExceptionMsg(ex));
         }
     }
     if (!success) {
@@ -213,4 +213,10 @@ private void run() throws NacosException {
 
 `com.alibaba.nacos.test.core.cluster.MemberLookup_ITCase#test_c_lookup_address_server`
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/13-%E9%9B%86%E7%BE%A4%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86/  
 

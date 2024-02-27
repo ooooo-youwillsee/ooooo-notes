@@ -1,9 +1,9 @@
 # 10 client 订阅服务
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
+&gt; 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
 
 ## 订阅服务的主流程
 
@@ -12,12 +12,12 @@
 ```java
 // NacosNamingService 订阅服务
 @Override
-public void subscribe(String serviceName, String groupName, List<String> clusters, EventListener listener)
+public void subscribe(String serviceName, String groupName, List&lt;String&gt; clusters, EventListener listener)
         throws NacosException {
     if (null == listener) {
         return;
     }
-    String clusterString = StringUtils.join(clusters, ",");
+    String clusterString = StringUtils.join(clusters, &#34;,&#34;);
     // 监听服务改变的回调函数，changeNotifier 订阅了 InstancesChangeEvent 事件
     changeNotifier.registerListener(groupName, serviceName, clusterString, listener);
     // clientProxy 的实现类为 NamingClientProxyDelegate
@@ -31,7 +31,7 @@ public void subscribe(String serviceName, String groupName, List<String> cluster
 // NamingClientProxyDelegate 订阅服务
 @Override
 public ServiceInfo subscribe(String serviceName, String groupName, String clusters) throws NacosException {
-    NAMING_LOGGER.info("[SUBSCRIBE-SERVICE] service:{}, group:{}, clusters:{} ", serviceName, groupName, clusters);
+    NAMING_LOGGER.info(&#34;[SUBSCRIBE-SERVICE] service:{}, group:{}, clusters:{} &#34;, serviceName, groupName, clusters);
     String serviceNameWithGroup = NamingUtils.getGroupedName(serviceName, groupName);
     String serviceKey = ServiceInfo.getKey(serviceNameWithGroup, clusters);
     // 注册 UpdateTask, 发送 http 请求来全量更新, 这个后面说
@@ -54,7 +54,7 @@ public ServiceInfo subscribe(String serviceName, String groupName, String cluste
 @Override
 public ServiceInfo subscribe(String serviceName, String groupName, String clusters) throws NacosException {
     if (NAMING_LOGGER.isDebugEnabled()) {
-        NAMING_LOGGER.debug("[GRPC-SUBSCRIBE] service:{}, group:{}, cluster:{} ", serviceName, groupName, clusters);
+        NAMING_LOGGER.debug(&#34;[GRPC-SUBSCRIBE] service:{}, group:{}, cluster:{} &#34;, serviceName, groupName, clusters);
     }
     // 标记服务要订阅，在 redoService 的定时任务中重新订阅
     redoService.cacheSubscriberForRedo(serviceName, groupName, clusters);
@@ -94,7 +94,7 @@ public SubscribeServiceResponse handle(SubscribeServiceRequest request, RequestM
     String namespaceId = request.getNamespace();
     String serviceName = request.getServiceName();
     String groupName = request.getGroupName();
-    String app = request.getHeader("app", "unknown");
+    String app = request.getHeader(&#34;app&#34;, &#34;unknown&#34;);
     String groupedServiceName = NamingUtils.getGroupedName(serviceName, groupName);
     Service service = Service.newService(namespaceId, groupName, serviceName, true);
     // 把订阅的信息包装为 Subscriber 对象
@@ -115,7 +115,7 @@ public SubscribeServiceResponse handle(SubscribeServiceRequest request, RequestM
         NotifyCenter.publishEvent(new UnsubscribeServiceTraceEvent(System.currentTimeMillis(),
                 meta.getClientIp(), service.getNamespace(), service.getGroup(), service.getName()));
     }
-    return new SubscribeServiceResponse(ResponseCode.SUCCESS.getCode(), "success", serviceInfo);
+    return new SubscribeServiceResponse(ResponseCode.SUCCESS.getCode(), &#34;success&#34;, serviceInfo);
 }
 ```
 
@@ -163,15 +163,15 @@ public Response requestReply(Request request) {
 public void onEvent(InstancesChangeEvent event) {
     String key = ServiceInfo
             .getKey(NamingUtils.getGroupedName(event.getServiceName(), event.getGroupName()), event.getClusters());
-    ConcurrentHashSet<EventListener> eventListeners = listenerMap.get(key);
+    ConcurrentHashSet&lt;EventListener&gt; eventListeners = listenerMap.get(key);
     if (CollectionUtils.isEmpty(eventListeners)) {
         return;
     }
     for (final EventListener listener : eventListeners) {
         // 遍历回调函数
         final com.alibaba.nacos.api.naming.listener.Event namingEvent = transferToNamingEvent(event);
-        if (listener instanceof AbstractEventListener && ((AbstractEventListener) listener).getExecutor() != null) {
-            ((AbstractEventListener) listener).getExecutor().execute(() -> listener.onEvent(namingEvent));
+        if (listener instanceof AbstractEventListener &amp;&amp; ((AbstractEventListener) listener).getExecutor() != null) {
+            ((AbstractEventListener) listener).getExecutor().execute(() -&gt; listener.onEvent(namingEvent));
         } else {
             listener.onEvent(namingEvent);
         }
@@ -191,9 +191,9 @@ public void run() {
     
     try {
         // 判断是否订阅服务
-        if (!changeNotifier.isSubscribed(groupName, serviceName, clusters) && !futureMap.containsKey(
+        if (!changeNotifier.isSubscribed(groupName, serviceName, clusters) &amp;&amp; !futureMap.containsKey(
                 serviceKey)) {
-            NAMING_LOGGER.info("update task is stopped, service:{}, clusters:{}", groupedServiceName, clusters);
+            NAMING_LOGGER.info(&#34;update task is stopped, service:{}, clusters:{}&#34;, groupedServiceName, clusters);
             isCancel = true;
             return;
         }
@@ -208,7 +208,7 @@ public void run() {
         }
         
         // 判断过期时间，然后再拉取
-        if (serviceObj.getLastRefTime() <= lastRefTime) {
+        if (serviceObj.getLastRefTime() &lt;= lastRefTime) {
             serviceObj = namingClientProxy.queryInstancesOfService(serviceName, groupName, clusters, 0, false);
             serviceInfoHolder.processServiceInfo(serviceObj);
         }
@@ -228,7 +228,7 @@ public void run() {
     } finally {
         if (!isCancel) {
             // 下一次拉取任务
-            executor.schedule(this, Math.min(delayTime << failCount, DEFAULT_DELAY * 60),
+            executor.schedule(this, Math.min(delayTime &lt;&lt; failCount, DEFAULT_DELAY * 60),
                     TimeUnit.MILLISECONDS);
         }
     }
@@ -238,3 +238,9 @@ public void run() {
 ## 测试类
 
 `com.alibaba.nacos.test.naming.SubscribeCluster_ITCase#subscribeAdd`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/10-client-%E8%AE%A2%E9%98%85%E6%9C%8D%E5%8A%A1/  
+

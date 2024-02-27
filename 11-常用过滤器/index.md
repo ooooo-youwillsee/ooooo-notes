@@ -1,9 +1,9 @@
 # 11 常用过滤器
 
 
-> dubbo 基于 3.2.6 版本
+&gt; dubbo 基于 3.2.6 版本
 
-> 在 `dubbo` 中，`filter` 是**非常核心**的组件之一，很多功能都是依靠 `filter` 来实现的，下面我来介绍几种常用的 `filter` 实现。
+&gt; 在 `dubbo` 中，`filter` 是**非常核心**的组件之一，很多功能都是依靠 `filter` 来实现的，下面我来介绍几种常用的 `filter` 实现。
 
 ## ConsumerContextFilter (consumer 传递隐式参数)
 
@@ -11,7 +11,7 @@
 
 ```java
 @Override
-public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+public Result invoke(Invoker&lt;?&gt; invoker, Invocation invocation) throws RpcException {
     ...
     RpcContext context = RpcContext.getClientAttachment();
     context.setAttachment(REMOTE_APPLICATION_KEY, invoker.getUrl().getApplication());
@@ -22,7 +22,7 @@ public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcExcept
     // 添加 ServerAttachment 参数
     ((RpcInvocation) invocation).addObjectAttachments(RpcContext.getServerAttachment().getObjectAttachments());
     // 添加 ClientAttachment 参数
-    Map<String, Object> contextAttachments = RpcContext.getClientAttachment().getObjectAttachments();
+    Map&lt;String, Object&gt; contextAttachments = RpcContext.getClientAttachment().getObjectAttachments();
     if (CollectionUtils.isNotEmptyMap(contextAttachments)) {
         ((RpcInvocation) invocation).addObjectAttachments(contextAttachments);
     }
@@ -38,8 +38,8 @@ public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcExcept
 
 ```java
 @Override
-public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-    Map<String, Object> attachments = invocation.getObjectAttachments();
+public Result invoke(Invoker&lt;?&gt; invoker, Invocation invocation) throws RpcException {
+    Map&lt;String, Object&gt; attachments = invocation.getObjectAttachments();
     ...
     // 设置 RemoteApplicationName
     String remoteApplication = invocation.getAttachment(REMOTE_APPLICATION_KEY);
@@ -51,7 +51,7 @@ public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcExcept
 
     // 添加 invocation 中的 attachments（consumer 端传递的隐式参数）
     if (CollectionUtils.isNotEmptyMap(attachments)) {
-        if (context.getObjectAttachments().size() > 0) {
+        if (context.getObjectAttachments().size() &gt; 0) {
             context.getObjectAttachments().putAll(attachments);
         } else {
             context.setObjectAttachments(attachments);
@@ -75,7 +75,7 @@ public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcExcept
 源码位置: `org.apache.dubbo.rpc.filter.ClassLoaderFilter`
 
 ```java
-public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+public Result invoke(Invoker&lt;?&gt; invoker, Invocation invocation) throws RpcException {
     // 获取之前的 classloader
     ClassLoader stagedClassLoader = Thread.currentThread().getContextClassLoader();
     // 获取当前的 classloader
@@ -115,23 +115,23 @@ public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcExcept
 
 ```java
 @Override
-public void onResponse(Result appResponse, Invoker<?> invoker, Invocation invocation) {
+public void onResponse(Result appResponse, Invoker&lt;?&gt; invoker, Invocation invocation) {
     // 有异常，并且不是泛化调用
-    if (appResponse.hasException() && GenericService.class != invoker.getInterface()) {
+    if (appResponse.hasException() &amp;&amp; GenericService.class != invoker.getInterface()) {
         try {
             Throwable exception = appResponse.getException();
 
-            // directly throw if it's checked exception
+            // directly throw if it&#39;s checked exception
             // 不是 RuntimeException, 直接 return, 传递到 consumer 端
-            if (!(exception instanceof RuntimeException) && (exception instanceof Exception)) {
+            if (!(exception instanceof RuntimeException) &amp;&amp; (exception instanceof Exception)) {
                 return;
             }
             // directly throw if the exception appears in the signature
             // 检查方法上声明的异常
             try {
                 Method method = invoker.getInterface().getMethod(RpcUtils.getMethodName(invocation), invocation.getParameterTypes());
-                Class<?>[] exceptionClasses = method.getExceptionTypes();
-                for (Class<?> exceptionClass : exceptionClasses) {
+                Class&lt;?&gt;[] exceptionClasses = method.getExceptionTypes();
+                for (Class&lt;?&gt; exceptionClass : exceptionClasses) {
                     if (exception.getClass().equals(exceptionClass)) {
                         return;
                     }
@@ -146,13 +146,13 @@ public void onResponse(Result appResponse, Invoker<?> invoker, Invocation invoca
             if (serviceFile == null || exceptionFile == null || serviceFile.equals(exceptionFile)) {
                 return;
             }
-            // directly throw if it's JDK exception
+            // directly throw if it&#39;s JDK exception
             String className = exception.getClass().getName();
             // 检查是 JDK 异常，直接 return，返回给 consumer 端
-            if (className.startsWith("java.") || className.startsWith("javax.")) {
+            if (className.startsWith(&#34;java.&#34;) || className.startsWith(&#34;javax.&#34;)) {
                 return;
             }
-            // directly throw if it's dubbo exception
+            // directly throw if it&#39;s dubbo exception
             // 检查是 RpcException，直接 return, 返回给 consumer 端
             if (exception instanceof RpcException) {
                 return;
@@ -174,19 +174,19 @@ public void onResponse(Result appResponse, Invoker<?> invoker, Invocation invoca
 
 ```java
 @Override
-public Result invoke(Invoker<?> invoker, Invocation inv) throws RpcException {
+public Result invoke(Invoker&lt;?&gt; invoker, Invocation inv) throws RpcException {
     // 检查是否为泛化调用
     if ((inv.getMethodName().equals($INVOKE) || inv.getMethodName().equals($INVOKE_ASYNC))
-        && inv.getArguments() != null
-        && inv.getArguments().length == 3
-        && !GenericService.class.isAssignableFrom(invoker.getInterface())) {
+        &amp;&amp; inv.getArguments() != null
+        &amp;&amp; inv.getArguments().length == 3
+        &amp;&amp; !GenericService.class.isAssignableFrom(invoker.getInterface())) {
         // 获取泛化调用的 方法名，参数类型，参数值
         String name = ((String) inv.getArguments()[0]).trim();
         String[] types = (String[]) inv.getArguments()[1];
         Object[] args = (Object[]) inv.getArguments()[2];
         try {
             Method method = findMethodByMethodSignature(invoker.getInterface(), name, types, inv.getServiceModel());
-            Class<?>[] params = method.getParameterTypes();
+            Class&lt;?&gt;[] params = method.getParameterTypes();
             ...
             String generic = inv.getAttachment(GENERIC_KEY);
 
@@ -228,4 +228,10 @@ public Result invoke(Invoker<?> invoker, Invocation inv) throws RpcException {
 ```
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/11-%E5%B8%B8%E7%94%A8%E8%BF%87%E6%BB%A4%E5%99%A8/  
 

@@ -7,8 +7,8 @@
 
 ```java
 // 这个注解虽然可以指定 sqlSessionFactory, 但是最终使用的 configuration 对象是同一份。
-@MapperScan("com.ooooo.**.mapper1")
-@MapperScan("com.ooooo.**.mapper2")
+@MapperScan(&#34;com.ooooo.**.mapper1&#34;)
+@MapperScan(&#34;com.ooooo.**.mapper2&#34;)
 public class DemoApplication {
 
   public static void main(String[] args) {
@@ -30,12 +30,12 @@ public class ComponentConfigMybatiPlusConfiguration {
   public static SqlSessionFactory sqlSessionFactory;
   
   @Bean
-  public MapperFactoryBean<ComponentTreeMapper> componentTreeMapper() {
+  public MapperFactoryBean&lt;ComponentTreeMapper&gt; componentTreeMapper() {
     return createMapper(ComponentTreeMapper.class);
   }
 
-  private <T> MapperFactoryBean<T> createMapper(Class<T> clazz) {
-    MapperFactoryBean<T> factoryBean = new MapperFactoryBean<>(clazz);
+  private &lt;T&gt; MapperFactoryBean&lt;T&gt; createMapper(Class&lt;T&gt; clazz) {
+    MapperFactoryBean&lt;T&gt; factoryBean = new MapperFactoryBean&lt;&gt;(clazz);
     factoryBean.setSqlSessionFactory(sqlSessionFactory());
     return factoryBean;
   }
@@ -54,7 +54,7 @@ public class ComponentConfigMybatiPlusConfiguration {
     configuration.setCacheEnabled(false);
     configuration.setLocalCacheScope(LocalCacheScope.STATEMENT);
     setInterceptors(configuration);
-    setMapperLocations(configuration, new String[]{"classpath*:/mapper/**/*.xml"});
+    setMapperLocations(configuration, new String[]{&#34;classpath*:/mapper/**/*.xml&#34;});
     setGlobalConfig(configuration);
     // factory
     sqlSessionFactory = new MybatisSqlSessionFactoryBuilder().build(configuration);
@@ -108,7 +108,7 @@ public class DBUtil {
 
     public static DataSource buildDataSource(AbstractDBProperties dbProperties) {
         HikariConfig config = new HikariConfig();
-        config.setPoolName("pool-" + dbProperties.getName());
+        config.setPoolName(&#34;pool-&#34; &#43; dbProperties.getName());
         config.setDriverClassName(dbProperties.getDriverClassName());
         config.setJdbcUrl(dbProperties.getUrl());
         config.setUsername(dbProperties.getUsername());
@@ -116,11 +116,11 @@ public class DBUtil {
         return new HikariDataSource(config);
     }
 
-    public static SqlSessionTemplate buildSqlSession(String id, DataSource dataSource, Class<?>... mapperClazz) {
+    public static SqlSessionTemplate buildSqlSession(String id, DataSource dataSource, Class&lt;?&gt;... mapperClazz) {
         Environment environment = new Environment(id, new SpringManagedTransactionFactory(), dataSource);
         MybatisConfiguration configuration = new MybatisConfiguration(environment);
         if (ArrayUtil.isNotEmpty(mapperClazz)) {
-            for (Class<?> clazz : mapperClazz) {
+            for (Class&lt;?&gt; clazz : mapperClazz) {
                 configuration.addMapper(clazz);
             }
         }
@@ -136,3 +136,9 @@ public class DBUtil {
     }
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/mybatis-plus-%E8%87%AA%E5%AE%9A%E4%B9%89-mapper/  
+

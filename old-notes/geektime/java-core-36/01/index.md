@@ -2,7 +2,7 @@
 
 ## 1、Java本身有两个显著的特性
 
-> JRE 就是 Java 运行环境， JDK 就是 Java 开发工具包
+&gt; JRE 就是 Java 运行环境， JDK 就是 Java 开发工具包
 
 - 跨平台运行（一次编写，到处运行）
 - 垃圾回收器（程序员不用手动回收内存，但仍然可能存在内存泄漏）
@@ -45,4 +45,10 @@ java -XX:AOTLibrary=./libHelloWorld.so,./libjava.base.so HelloWorld
 
 
 
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/java-core-36/01/  
 

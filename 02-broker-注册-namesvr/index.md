@@ -1,7 +1,7 @@
 # 02 broker 注册 namesvr
 
 
-> rocketmq 基于 5.1.4 版本
+&gt; rocketmq 基于 5.1.4 版本
 
 ## broker 发起注册请求
 
@@ -11,7 +11,7 @@
 // 启动定时任务，发起 broker 注册
 public void start() throws Exception {
     ...
-    if (!isIsolated && !this.messageStoreConfig.isEnableDLegerCommitLog() && !this.messageStoreConfig.isDuplicationEnable()) {
+    if (!isIsolated &amp;&amp; !this.messageStoreConfig.isEnableDLegerCommitLog() &amp;&amp; !this.messageStoreConfig.isDuplicationEnable()) {
         changeSpecialServiceStatus(this.brokerConfig.getBrokerId() == MixAll.MASTER_ID);
         // 注册 broker
         this.registerBrokerAll(true, false, true);
@@ -22,18 +22,18 @@ public void start() throws Exception {
         @Override
         public void run0() {
             try {
-                if (System.currentTimeMillis() < shouldStartTime) {
-                    BrokerController.LOG.info("Register to namesrv after {}", shouldStartTime);
+                if (System.currentTimeMillis() &lt; shouldStartTime) {
+                    BrokerController.LOG.info(&#34;Register to namesrv after {}&#34;, shouldStartTime);
                     return;
                 }
                 if (isIsolated) {
-                    BrokerController.LOG.info("Skip register for broker is isolated");
+                    BrokerController.LOG.info(&#34;Skip register for broker is isolated&#34;);
                     return;
                 }
                 // 注册 broker
                 BrokerController.this.registerBrokerAll(true, false, brokerConfig.isForceRegister());
             } catch (Throwable e) {
-                BrokerController.LOG.error("registerBrokerAll Exception", e);
+                BrokerController.LOG.error(&#34;registerBrokerAll Exception&#34;, e);
             }
         }
     }, 1000 * 10, Math.max(10000, Math.min(brokerConfig.getRegisterNameServerPeriod(), 60000)), TimeUnit.MILLISECONDS));
@@ -47,8 +47,8 @@ public void start() throws Exception {
 ```java
 // 注册 broker, 需要把 broker 的 topic 配置推送到 namesrv 中
 public synchronized void registerBrokerAll(final boolean checkOrderConfig, boolean oneway, boolean forceRegister) {
-    ConcurrentMap<String, TopicConfig> topicConfigMap = this.getTopicConfigManager().getTopicConfigTable();
-    ConcurrentHashMap<String, TopicConfig> topicConfigTable = new ConcurrentHashMap<>();
+    ConcurrentMap&lt;String, TopicConfig&gt; topicConfigMap = this.getTopicConfigManager().getTopicConfigTable();
+    ConcurrentHashMap&lt;String, TopicConfig&gt; topicConfigTable = new ConcurrentHashMap&lt;&gt;();
 
     // 遍历 topic
     for (TopicConfig topicConfig : topicConfigMap.values()) {
@@ -57,14 +57,14 @@ public synchronized void registerBrokerAll(final boolean checkOrderConfig, boole
             || !PermName.isReadable(this.getBrokerConfig().getBrokerPermission())) {
             topicConfigTable.put(topicConfig.getTopicName(),
                 new TopicConfig(topicConfig.getTopicName(), topicConfig.getReadQueueNums(), topicConfig.getWriteQueueNums(),
-                    topicConfig.getPerm() & getBrokerConfig().getBrokerPermission()));
+                    topicConfig.getPerm() &amp; getBrokerConfig().getBrokerPermission()));
         } else {
             topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
         }
 
         // topic 很多，分几个请求
         if (this.brokerConfig.isEnableSplitRegistration()
-            && topicConfigTable.size() >= this.brokerConfig.getSplitRegistrationSize()) {
+            &amp;&amp; topicConfigTable.size() &gt;= this.brokerConfig.getSplitRegistrationSize()) {
             TopicConfigAndMappingSerializeWrapper topicConfigWrapper = this.getTopicConfigManager().buildSerializeWrapper(topicConfigTable);
             doRegisterBrokerAll(checkOrderConfig, oneway, topicConfigWrapper);
             topicConfigTable.clear();
@@ -72,8 +72,8 @@ public synchronized void registerBrokerAll(final boolean checkOrderConfig, boole
     }
 
     // topic 的 TopicQueueMappingInfo, 暂时不用关心
-    Map<String, TopicQueueMappingInfo> topicQueueMappingInfoMap = this.getTopicQueueMappingManager().getTopicQueueMappingTable().entrySet().stream()
-        .map(entry -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey(), TopicQueueMappingDetail.cloneAsMappingInfo(entry.getValue())))
+    Map&lt;String, TopicQueueMappingInfo&gt; topicQueueMappingInfoMap = this.getTopicQueueMappingManager().getTopicQueueMappingTable().entrySet().stream()
+        .map(entry -&gt; new AbstractMap.SimpleImmutableEntry&lt;&gt;(entry.getKey(), TopicQueueMappingDetail.cloneAsMappingInfo(entry.getValue())))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     TopicConfigAndMappingSerializeWrapper topicConfigWrapper = this.getTopicConfigManager().
@@ -99,11 +99,11 @@ protected void doRegisterBrokerAll(boolean checkOrderConfig, boolean oneway,
     TopicConfigSerializeWrapper topicConfigWrapper) {
   
     if (shutdown) {
-        BrokerController.LOG.info("BrokerController#doResterBrokerAll: broker has shutdown, no need to register any more.");
+        BrokerController.LOG.info(&#34;BrokerController#doResterBrokerAll: broker has shutdown, no need to register any more.&#34;);
         return;
     }
     // 发起 RegisterBrokerRequestHeader 请求, RequestCode.REGISTER_BROKER
-    List<RegisterBrokerResult> registerBrokerResultList = this.brokerOuterAPI.registerBrokerAll(
+    List&lt;RegisterBrokerResult&gt; registerBrokerResultList = this.brokerOuterAPI.registerBrokerAll(
         this.brokerConfig.getBrokerClusterName(),
         this.getBrokerAddr(),
         this.brokerConfig.getBrokerName(),
@@ -152,16 +152,16 @@ public RemotingCommand registerBroker(ChannelHandlerContext ctx,  RemotingComman
     // 校验 crc32
     if (!checksum(ctx, request, requestHeader)) {
         response.setCode(ResponseCode.SYSTEM_ERROR);
-        response.setRemark("crc32 not match");
+        response.setRemark(&#34;crc32 not match&#34;);
         return response;
     }
   
     TopicConfigSerializeWrapper topicConfigWrapper = null;
-    List<String> filterServerList = null;
+    List&lt;String&gt; filterServerList = null;
   
     // 获取 topic 配置
     Version brokerVersion = MQVersion.value2Version(request.getVersion());
-    if (brokerVersion.ordinal() >= MQVersion.Version.V3_0_11.ordinal()) {
+    if (brokerVersion.ordinal() &gt;= MQVersion.Version.V3_0_11.ordinal()) {
         final RegisterBrokerBody registerBrokerBody = extractRegisterBrokerBodyFromRequest(request, requestHeader);
         topicConfigWrapper = registerBrokerBody.getTopicConfigSerializeWrapper();
         filterServerList = registerBrokerBody.getFilterServerList();
@@ -188,7 +188,7 @@ public RemotingCommand registerBroker(ChannelHandlerContext ctx,  RemotingComman
     if (result == null) {
         // Register single topic route info should be after the broker completes the first registration.
         response.setCode(ResponseCode.SYSTEM_ERROR);
-        response.setRemark("register broker failed");
+        response.setRemark(&#34;register broker failed&#34;);
         return response;
     }
   
@@ -215,7 +215,7 @@ public RegisterBrokerResult registerBroker(
     final Long timeoutMillis,
     final Boolean enableActingMaster,
     final TopicConfigSerializeWrapper topicConfigWrapper,
-    final List<String> filterServerList,
+    final List&lt;String&gt; filterServerList,
     final Channel channel) {
     RegisterBrokerResult result = new RegisterBrokerResult();
     try {
@@ -223,7 +223,7 @@ public RegisterBrokerResult registerBroker(
   
         //init or update the cluster info
         // 更新 cluster 信息
-        Set<String> brokerNames = ConcurrentHashMapUtils.computeIfAbsent((ConcurrentHashMap<String, Set<String>>) this.clusterAddrTable, clusterName, k -> new HashSet<>());
+        Set&lt;String&gt; brokerNames = ConcurrentHashMapUtils.computeIfAbsent((ConcurrentHashMap&lt;String, Set&lt;String&gt;&gt;) this.clusterAddrTable, clusterName, k -&gt; new HashSet&lt;&gt;());
         brokerNames.add(brokerName);
   
         boolean registerFirst = false;
@@ -231,15 +231,15 @@ public RegisterBrokerResult registerBroker(
         BrokerData brokerData = this.brokerAddrTable.get(brokerName);
         if (null == brokerData) {
             registerFirst = true;
-            brokerData = new BrokerData(clusterName, brokerName, new HashMap<>());
+            brokerData = new BrokerData(clusterName, brokerName, new HashMap&lt;&gt;());
             this.brokerAddrTable.put(brokerName, brokerData);
         }
   
         boolean isOldVersionBroker = enableActingMaster == null;
-        brokerData.setEnableActingMaster(!isOldVersionBroker && enableActingMaster);
+        brokerData.setEnableActingMaster(!isOldVersionBroker &amp;&amp; enableActingMaster);
         brokerData.setZoneName(zoneName);
   
-        Map<Long, String> brokerAddrsMap = brokerData.getBrokerAddrs();
+        Map&lt;Long, String&gt; brokerAddrsMap = brokerData.getBrokerAddrs();
   
         boolean isMinBrokerIdChanged = false;
         long prevMinBrokerId = 0;
@@ -247,26 +247,26 @@ public RegisterBrokerResult registerBroker(
             prevMinBrokerId = Collections.min(brokerAddrsMap.keySet());
         }
   
-        if (brokerId < prevMinBrokerId) {
+        if (brokerId &lt; prevMinBrokerId) {
             isMinBrokerIdChanged = true;
         }
   
-        //Switch slave to master: first remove <1, IP:PORT> in namesrv, then add <0, IP:PORT>
+        //Switch slave to master: first remove &lt;1, IP:PORT&gt; in namesrv, then add &lt;0, IP:PORT&gt;
         //The same IP:PORT must only have one record in brokerAddrTable
-        brokerAddrsMap.entrySet().removeIf(item -> null != brokerAddr && brokerAddr.equals(item.getValue()) && brokerId != item.getKey());
+        brokerAddrsMap.entrySet().removeIf(item -&gt; null != brokerAddr &amp;&amp; brokerAddr.equals(item.getValue()) &amp;&amp; brokerId != item.getKey());
   
         //If Local brokerId stateVersion bigger than the registering one,
         String oldBrokerAddr = brokerAddrsMap.get(brokerId);
         // 检查 brokerAddr
-        if (null != oldBrokerAddr && !oldBrokerAddr.equals(brokerAddr)) {
+        if (null != oldBrokerAddr &amp;&amp; !oldBrokerAddr.equals(brokerAddr)) {
             BrokerLiveInfo oldBrokerInfo = brokerLiveTable.get(new BrokerAddrInfo(clusterName, oldBrokerAddr));
   
             if (null != oldBrokerInfo) {
                 long oldStateVersion = oldBrokerInfo.getDataVersion().getStateVersion();
                 long newStateVersion = topicConfigWrapper.getDataVersion().getStateVersion();
-                if (oldStateVersion > newStateVersion) {
-                    log.warn("Registered Broker conflicts with the existed one, just ignore.: Cluster:{}, BrokerName:{}, BrokerId:{}, " +
-                            "Old BrokerAddr:{}, Old Version:{}, New BrokerAddr:{}, New Version:{}.",
+                if (oldStateVersion &gt; newStateVersion) {
+                    log.warn(&#34;Registered Broker conflicts with the existed one, just ignore.: Cluster:{}, BrokerName:{}, BrokerId:{}, &#34; &#43;
+                            &#34;Old BrokerAddr:{}, Old Version:{}, New BrokerAddr:{}, New Version:{}.&#34;,
                         clusterName, brokerName, brokerId, oldBrokerAddr, oldStateVersion, brokerAddr, newStateVersion);
                     //Remove the rejected brokerAddr from brokerLiveTable.
                     brokerLiveTable.remove(new BrokerAddrInfo(clusterName, brokerAddr));
@@ -275,8 +275,8 @@ public RegisterBrokerResult registerBroker(
             }
         }
   
-        if (!brokerAddrsMap.containsKey(brokerId) && topicConfigWrapper.getTopicConfigTable().size() == 1) {
-            log.warn("Can't register topicConfigWrapper={} because broker[{}]={} has not registered.",
+        if (!brokerAddrsMap.containsKey(brokerId) &amp;&amp; topicConfigWrapper.getTopicConfigTable().size() == 1) {
+            log.warn(&#34;Can&#39;t register topicConfigWrapper={} because broker[{}]={} has not registered.&#34;,
                 topicConfigWrapper.getTopicConfigTable(), brokerId, brokerAddr);
             return null;
         }
@@ -285,43 +285,43 @@ public RegisterBrokerResult registerBroker(
         registerFirst = registerFirst || (StringUtils.isEmpty(oldAddr));
   
         boolean isMaster = MixAll.MASTER_ID == brokerId;
-        boolean isPrimeSlave = !isOldVersionBroker && !isMaster
-            && brokerId == Collections.min(brokerAddrsMap.keySet());
+        boolean isPrimeSlave = !isOldVersionBroker &amp;&amp; !isMaster
+            &amp;&amp; brokerId == Collections.min(brokerAddrsMap.keySet());
   
         // 判断是否为 master 或者 primeSlave (5.0之后引入的优化)
-        if (null != topicConfigWrapper && (isMaster || isPrimeSlave)) {
+        if (null != topicConfigWrapper &amp;&amp; (isMaster || isPrimeSlave)) {
   
-            ConcurrentMap<String, TopicConfig> tcTable =
+            ConcurrentMap&lt;String, TopicConfig&gt; tcTable =
                 topicConfigWrapper.getTopicConfigTable();
   
             if (tcTable != null) {
   
                 TopicConfigAndMappingSerializeWrapper mappingSerializeWrapper = TopicConfigAndMappingSerializeWrapper.from(topicConfigWrapper);
-                Map<String, TopicQueueMappingInfo> topicQueueMappingInfoMap = mappingSerializeWrapper.getTopicQueueMappingInfoMap();
+                Map&lt;String, TopicQueueMappingInfo&gt; topicQueueMappingInfoMap = mappingSerializeWrapper.getTopicQueueMappingInfoMap();
   
-                // Delete the topics that don't exist in tcTable from the current broker
+                // Delete the topics that don&#39;t exist in tcTable from the current broker
                 // Static topic is not supported currently
                 // 检查是否删除 topic，默认为 false
-                if (namesrvConfig.isDeleteTopicWithBrokerRegistration() && topicQueueMappingInfoMap.isEmpty()) {
-                    final Set<String> oldTopicSet = topicSetOfBrokerName(brokerName);
-                    final Set<String> newTopicSet = tcTable.keySet();
-                    final Sets.SetView<String> toDeleteTopics = Sets.difference(oldTopicSet, newTopicSet);
+                if (namesrvConfig.isDeleteTopicWithBrokerRegistration() &amp;&amp; topicQueueMappingInfoMap.isEmpty()) {
+                    final Set&lt;String&gt; oldTopicSet = topicSetOfBrokerName(brokerName);
+                    final Set&lt;String&gt; newTopicSet = tcTable.keySet();
+                    final Sets.SetView&lt;String&gt; toDeleteTopics = Sets.difference(oldTopicSet, newTopicSet);
                     for (final String toDeleteTopic : toDeleteTopics) {
-                        Map<String, QueueData> queueDataMap = topicQueueTable.get(toDeleteTopic);
+                        Map&lt;String, QueueData&gt; queueDataMap = topicQueueTable.get(toDeleteTopic);
                         final QueueData removedQD = queueDataMap.remove(brokerName);
                         if (removedQD != null) {
-                            log.info("deleteTopic, remove one broker's topic {} {} {}", brokerName, toDeleteTopic, removedQD);
+                            log.info(&#34;deleteTopic, remove one broker&#39;s topic {} {} {}&#34;, brokerName, toDeleteTopic, removedQD);
                         }
   
                         if (queueDataMap.isEmpty()) {
-                            log.info("deleteTopic, remove the topic all queue {}", toDeleteTopic);
+                            log.info(&#34;deleteTopic, remove the topic all queue {}&#34;, toDeleteTopic);
                             topicQueueTable.remove(toDeleteTopic);
                         }
                     }
                 }
   
                 // 遍历 topic 配置
-                for (Map.Entry<String, TopicConfig> entry : tcTable.entrySet()) {
+                for (Map.Entry&lt;String, TopicConfig&gt; entry : tcTable.entrySet()) {
                     // 检查 topic 配置是否改变
                     if (registerFirst || this.isTopicConfigChanged(clusterName, brokerAddr,
                         topicConfigWrapper.getDataVersion(), brokerName,
@@ -330,7 +330,7 @@ public RegisterBrokerResult registerBroker(
                         if (isPrimeSlave) {
                             // Wipe write perm for prime slave
                             // 删除 write 权限
-                            topicConfig.setPerm(topicConfig.getPerm() & (~PermName.PERM_WRITE));
+                            topicConfig.setPerm(topicConfig.getPerm() &amp; (~PermName.PERM_WRITE));
                         }
                         // 创建或者更新 queue
                         this.createAndUpdateQueueData(brokerName, topicConfig);
@@ -340,9 +340,9 @@ public RegisterBrokerResult registerBroker(
                 // 更新 topicQueueMappingInfoTable
                 if (this.isBrokerTopicConfigChanged(clusterName, brokerAddr, topicConfigWrapper.getDataVersion()) || registerFirst) {
                     //the topicQueueMappingInfoMap should never be null, but can be empty
-                    for (Map.Entry<String, TopicQueueMappingInfo> entry : topicQueueMappingInfoMap.entrySet()) {
+                    for (Map.Entry&lt;String, TopicQueueMappingInfo&gt; entry : topicQueueMappingInfoMap.entrySet()) {
                         if (!topicQueueMappingInfoTable.containsKey(entry.getKey())) {
-                            topicQueueMappingInfoTable.put(entry.getKey(), new HashMap<>());
+                            topicQueueMappingInfoTable.put(entry.getKey(), new HashMap&lt;&gt;());
                         }
                         //Note asset brokerName equal entry.getValue().getBname()
                         //here use the mappingDetail.bname
@@ -362,7 +362,7 @@ public RegisterBrokerResult registerBroker(
                 channel,
                 haServerAddr));
         if (null == prevBrokerLiveInfo) {
-            log.info("new broker registered, {} HAService: {}", brokerAddrInfo, haServerAddr);
+            log.info(&#34;new broker registered, {} HAService: {}&#34;, brokerAddrInfo, haServerAddr);
         }
   
         ...
@@ -380,7 +380,7 @@ public RegisterBrokerResult registerBroker(
         }
         ...
     } catch (Exception e) {
-        log.error("registerBroker Exception", e);
+        log.error(&#34;registerBroker Exception&#34;, e);
     } finally {
         this.lock.writeLock().unlock();
     }
@@ -407,20 +407,20 @@ private void startScheduleService() {
 // 扫描失效的 broker 
 public void scanNotActiveBroker() {
     try {
-        log.info("start scanNotActiveBroker");
+        log.info(&#34;start scanNotActiveBroker&#34;);
         // 遍历 brokerLiveTable
-        for (Entry<BrokerAddrInfo, BrokerLiveInfo> next : this.brokerLiveTable.entrySet()) {
+        for (Entry&lt;BrokerAddrInfo, BrokerLiveInfo&gt; next : this.brokerLiveTable.entrySet()) {
             long last = next.getValue().getLastUpdateTimestamp();
             long timeoutMillis = next.getValue().getHeartbeatTimeoutMillis();
             // 检查时间
-            if ((last + timeoutMillis) < System.currentTimeMillis()) {
+            if ((last &#43; timeoutMillis) &lt; System.currentTimeMillis()) {
                 RemotingHelper.closeChannel(next.getValue().getChannel());
-                log.warn("The broker channel expired, {} {}ms", next.getKey(), timeoutMillis);
+                log.warn(&#34;The broker channel expired, {} {}ms&#34;, next.getKey(), timeoutMillis);
                 this.onChannelDestroy(next.getKey());
             }
         }
     } catch (Exception e) {
-        log.error("scanNotActiveBroker exception", e);
+        log.error(&#34;scanNotActiveBroker exception&#34;, e);
     }
 }
 ```
@@ -428,4 +428,10 @@ public void scanNotActiveBroker() {
 ## 测试类
 
 `org.apache.rocketmq.test.client.consumer.topic.OneConsumerMulTopicIT#testSynSendMessage`
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/02-broker-%E6%B3%A8%E5%86%8C-namesvr/  
 

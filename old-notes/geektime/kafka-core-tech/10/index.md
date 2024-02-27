@@ -19,9 +19,9 @@ Kafka 的消息格式目前有两种：V1 和 V2。
 在 Kafka 中，压缩可能发生在两个地方：生产者端和 Broker 端。
 ```java
   Properties props = new Properties();
-  props.put("bootstrap.servers", "localhost:9092");
-  props.put("compression.type", "gzip");
-  Producer<String, String> producer = new KafkaProducer<>(props);
+  props.put(&#34;bootstrap.servers&#34;, &#34;localhost:9092&#34;);
+  props.put(&#34;compression.type&#34;, &#34;gzip&#34;);
+  Producer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);
 ```
 
 上述代码，表明该 Producer 的压缩算法使用的是 GZIP。
@@ -44,10 +44,16 @@ Kafka 的消息格式目前有两种：V1 和 V2。
 
 ![压缩算法对比](./imgs/10_02.png)
 
-- 吞吐量方面: LZ4 > Snappy > zstd 和 GZIP。
-- 压缩比方面：zstd > LZ4 > GZIP > Snappy
+- 吞吐量方面: LZ4 &gt; Snappy &gt; zstd 和 GZIP。
+- 压缩比方面：zstd &gt; LZ4 &gt; GZIP &gt; Snappy
 
 总结：
 - 机器的 CPU 资源不充足，不建议开启压缩，因为压缩需要消耗大量 CPU。
 - 机器的 CPU 资源充足，强烈建议你开启 zstd 压缩，这样能极大地节省网络资源消耗。
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/kafka-core-tech/10/  
 

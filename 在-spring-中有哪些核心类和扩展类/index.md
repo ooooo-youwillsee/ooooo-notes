@@ -44,3 +44,9 @@ bean工厂： `org.springframework.beans.factory.ObjectFactory`
 
 上面这几个类，一般在扩展功能时，都会用到。
 
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-spring-%E4%B8%AD%E6%9C%89%E5%93%AA%E4%BA%9B%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%92%8C%E6%89%A9%E5%B1%95%E7%B1%BB/  
+

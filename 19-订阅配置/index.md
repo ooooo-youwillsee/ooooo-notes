@@ -1,9 +1,9 @@
 # 19 订阅配置
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> 在 `nacos` 中，订阅配置分为 `http长轮询` 和 `grpc` 两种方式。
+&gt; 在 `nacos` 中，订阅配置分为 `http长轮询` 和 `grpc` 两种方式。
 
 ## http 长轮询
 
@@ -11,28 +11,28 @@
 
 ```java
 // http 长轮询
-@PostMapping("/listener")
+@PostMapping(&#34;/listener&#34;)
 @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
 public void listener(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
     
     // 启用 servlet 异步
-    request.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true);
+    request.setAttribute(&#34;org.apache.catalina.ASYNC_SUPPORTED&#34;, true);
     // 获取要监听的配置
-    String probeModify = request.getParameter("Listening-Configs");
+    String probeModify = request.getParameter(&#34;Listening-Configs&#34;);
     if (StringUtils.isBlank(probeModify)) {
-        LOGGER.warn("invalid probeModify is blank");
-        throw new IllegalArgumentException("invalid probeModify");
+        LOGGER.warn(&#34;invalid probeModify is blank&#34;);
+        throw new IllegalArgumentException(&#34;invalid probeModify&#34;);
     }
     
     probeModify = URLDecoder.decode(probeModify, Constants.ENCODE);
     
-    Map<String, String> clientMd5Map;
+    Map&lt;String, String&gt; clientMd5Map;
     try {
         // 解析出 md5 值，key 是 groupKey, value 是 md5 值
         clientMd5Map = MD5Util.getClientMd5Map(probeModify);
     } catch (Throwable e) {
-        throw new IllegalArgumentException("invalid probeModify");
+        throw new IllegalArgumentException(&#34;invalid probeModify&#34;);
     }
     
     // do long-polling
@@ -46,20 +46,20 @@ public void listener(HttpServletRequest request, HttpServletResponse response)
 ```java
 // 长轮询
 public String doPollingConfig(HttpServletRequest request, HttpServletResponse response,
-        Map<String, String> clientMd5Map, int probeRequestSize) throws IOException {
+        Map&lt;String, String&gt; clientMd5Map, int probeRequestSize) throws IOException {
     
     // Long polling.
     // 是否支持长轮询, 判断请求头 Long-Pulling-Timeout 是否存在
     if (LongPollingService.isSupportLongPolling(request)) {
         // 添加长轮询
         longPollingService.addLongPollingClient(request, response, clientMd5Map, probeRequestSize);
-        return HttpServletResponse.SC_OK + "";
+        return HttpServletResponse.SC_OK &#43; &#34;&#34;;
     }
     
     // Compatible with short polling logic.
     // 下面的逻辑都是兼容短轮询的，也就是立马对比 md5 值是否发生改变
     // 如果不一样，返回改变的 groupKey，下面的逻辑就不看了
-    List<String> changedGroups = MD5Util.compareMd5(request, response, clientMd5Map);
+    List&lt;String&gt; changedGroups = MD5Util.compareMd5(request, response, clientMd5Map);
     
     // Compatible with short polling result.
     String oldResult = MD5Util.compareMd5OldResult(changedGroups);
@@ -67,24 +67,24 @@ public String doPollingConfig(HttpServletRequest request, HttpServletResponse re
     
     String version = request.getHeader(Constants.CLIENT_VERSION_HEADER);
     if (version == null) {
-        version = "2.0.0";
+        version = &#34;2.0.0&#34;;
     }
     int versionNum = Protocol.getVersionNumber(version);
     
     // Before 2.0.4 version, return value is put into header.
-    if (versionNum < START_LONG_POLLING_VERSION_NUM) {
+    if (versionNum &lt; START_LONG_POLLING_VERSION_NUM) {
         response.addHeader(Constants.PROBE_MODIFY_RESPONSE, oldResult);
         response.addHeader(Constants.PROBE_MODIFY_RESPONSE_NEW, newResult);
     } else {
-        request.setAttribute("content", newResult);
+        request.setAttribute(&#34;content&#34;, newResult);
     }
     
     // Disable cache.
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
-    response.setHeader("Cache-Control", "no-cache,no-store");
+    response.setHeader(&#34;Pragma&#34;, &#34;no-cache&#34;);
+    response.setDateHeader(&#34;Expires&#34;, 0);
+    response.setHeader(&#34;Cache-Control&#34;, &#34;no-cache,no-store&#34;);
     response.setStatus(HttpServletResponse.SC_OK);
-    return HttpServletResponse.SC_OK + "";
+    return HttpServletResponse.SC_OK &#43; &#34;&#34;;
 }
 ```
 
@@ -92,7 +92,7 @@ public String doPollingConfig(HttpServletRequest request, HttpServletResponse re
 
 ```java
 // 添加长轮询
-public void addLongPollingClient(HttpServletRequest req, HttpServletResponse rsp, Map<String, String> clientMd5Map,
+public void addLongPollingClient(HttpServletRequest req, HttpServletResponse rsp, Map&lt;String, String&gt; clientMd5Map,
         int probeRequestSize) {
     
     // str 就是长轮询的超时时间，由客户端传入
@@ -110,18 +110,18 @@ public void addLongPollingClient(HttpServletRequest req, HttpServletResponse rsp
         // 计算长轮询时间
         timeout = Math.max(10000, Long.parseLong(str) - delayTime);
         long start = System.currentTimeMillis();
-        List<String> changedGroups = MD5Util.compareMd5(req, rsp, clientMd5Map);
+        List&lt;String&gt; changedGroups = MD5Util.compareMd5(req, rsp, clientMd5Map);
         // 如果 md5 值有变化，立即返回结果
-        if (changedGroups.size() > 0) {
+        if (changedGroups.size() &gt; 0) {
             generateResponse(req, rsp, changedGroups);
-            LogUtil.CLIENT_LOG.info("{}|{}|{}|{}|{}|{}|{}", System.currentTimeMillis() - start, "instant",
-                    RequestUtil.getRemoteIp(req), "polling", clientMd5Map.size(), probeRequestSize,
+            LogUtil.CLIENT_LOG.info(&#34;{}|{}|{}|{}|{}|{}|{}&#34;, System.currentTimeMillis() - start, &#34;instant&#34;,
+                    RequestUtil.getRemoteIp(req), &#34;polling&#34;, clientMd5Map.size(), probeRequestSize,
                     changedGroups.size());
             return;
-        } else if (noHangUpFlag != null && noHangUpFlag.equalsIgnoreCase(TRUE_STR)) {
+        } else if (noHangUpFlag != null &amp;&amp; noHangUpFlag.equalsIgnoreCase(TRUE_STR)) {
             // 不挂起请求
-            LogUtil.CLIENT_LOG.info("{}|{}|{}|{}|{}|{}|{}", System.currentTimeMillis() - start, "nohangup",
-                    RequestUtil.getRemoteIp(req), "polling", clientMd5Map.size(), probeRequestSize,
+            LogUtil.CLIENT_LOG.info(&#34;{}|{}|{}|{}|{}|{}|{}&#34;, System.currentTimeMillis() - start, &#34;nohangup&#34;,
+                    RequestUtil.getRemoteIp(req), &#34;polling&#34;, clientMd5Map.size(), probeRequestSize,
                     changedGroups.size());
             return;
         }
@@ -142,7 +142,7 @@ public void addLongPollingClient(HttpServletRequest req, HttpServletResponse rsp
     asyncContext.setTimeout(0L);
     
     String appName = req.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
-    String tag = req.getHeader("Vipserver-Tag");
+    String tag = req.getHeader(&#34;Vipserver-Tag&#34;);
     // 提交长轮询任务
     ConfigExecutor.executeLongPolling(
             new ClientLongPolling(asyncContext, clientMd5Map, ip, probeRequestSize, timeout, appName, tag));
@@ -155,23 +155,23 @@ public void addLongPollingClient(HttpServletRequest req, HttpServletResponse rsp
 // 提交长轮询任务
 @Override
 public void run() {
-    asyncTimeoutFuture = ConfigExecutor.scheduleLongPolling(() -> {
+    asyncTimeoutFuture = ConfigExecutor.scheduleLongPolling(() -&gt; {
         try {
             getRetainIps().put(ClientLongPolling.this.ip, System.currentTimeMillis());
             
-            // Delete subscriber's relations.
+            // Delete subscriber&#39;s relations.
             boolean removeFlag = allSubs.remove(ClientLongPolling.this);
             // 移除成功，表示这段时间配置没有发生改变
             if (removeFlag) {
                 if (isFixedPolling()) {
                     LogUtil.CLIENT_LOG
-                            .info("{}|{}|{}|{}|{}|{}", (System.currentTimeMillis() - createTime), "fix",
+                            .info(&#34;{}|{}|{}|{}|{}|{}&#34;, (System.currentTimeMillis() - createTime), &#34;fix&#34;,
                                     RequestUtil.getRemoteIp((HttpServletRequest) asyncContext.getRequest()),
-                                    "polling", clientMd5Map.size(), probeRequestSize);
-                    List<String> changedGroups = MD5Util
+                                    &#34;polling&#34;, clientMd5Map.size(), probeRequestSize);
+                    List&lt;String&gt; changedGroups = MD5Util
                             .compareMd5((HttpServletRequest) asyncContext.getRequest(),
                                     (HttpServletResponse) asyncContext.getResponse(), clientMd5Map);
-                    if (changedGroups.size() > 0) {
+                    if (changedGroups.size() &gt; 0) {
                         // 发送有变动的配置
                         sendResponse(changedGroups);
                     } else {
@@ -180,17 +180,17 @@ public void run() {
                     }
                 } else {
                     LogUtil.CLIENT_LOG
-                            .info("{}|{}|{}|{}|{}|{}", (System.currentTimeMillis() - createTime), "timeout",
+                            .info(&#34;{}|{}|{}|{}|{}|{}&#34;, (System.currentTimeMillis() - createTime), &#34;timeout&#34;,
                                     RequestUtil.getRemoteIp((HttpServletRequest) asyncContext.getRequest()),
-                                    "polling", clientMd5Map.size(), probeRequestSize);
+                                    &#34;polling&#34;, clientMd5Map.size(), probeRequestSize);
                     // 返回 null，配置没有变动
                     sendResponse(null);
                 }
             } else {
-                LogUtil.DEFAULT_LOG.warn("client subsciber's relations delete fail.");
+                LogUtil.DEFAULT_LOG.warn(&#34;client subsciber&#39;s relations delete fail.&#34;);
             }
         } catch (Throwable t) {
-            LogUtil.DEFAULT_LOG.error("long polling error:" + t.getMessage(), t.getCause());
+            LogUtil.DEFAULT_LOG.error(&#34;long polling error:&#34; &#43; t.getMessage(), t.getCause());
         }
         
     }, timeoutTime, TimeUnit.MILLISECONDS);
@@ -208,36 +208,36 @@ public void run() {
 public void run() {
     try {
         ConfigCacheService.getContentBetaMd5(groupKey);
-        for (Iterator<ClientLongPolling> iter = allSubs.iterator(); iter.hasNext(); ) {
+        for (Iterator&lt;ClientLongPolling&gt; iter = allSubs.iterator(); iter.hasNext(); ) {
             ClientLongPolling clientSub = iter.next();
             if (clientSub.clientMd5Map.containsKey(groupKey)) {
                 // If published tag is not in the beta list, then it skipped.
                 // beta 配置有变动
-                if (isBeta && !CollectionUtils.contains(betaIps, clientSub.ip)) {
+                if (isBeta &amp;&amp; !CollectionUtils.contains(betaIps, clientSub.ip)) {
                     continue;
                 }
                 
                 // If published tag is not in the tag list, then it skipped.
                 // tag 配置有变动
-                if (StringUtils.isNotBlank(tag) && !tag.equals(clientSub.tag)) {
+                if (StringUtils.isNotBlank(tag) &amp;&amp; !tag.equals(clientSub.tag)) {
                     continue;
                 }
                 
                 getRetainIps().put(clientSub.ip, System.currentTimeMillis());
                 // 删除
-                iter.remove(); // Delete subscribers' relationships.
+                iter.remove(); // Delete subscribers&#39; relationships.
                 LogUtil.CLIENT_LOG
-                        .info("{}|{}|{}|{}|{}|{}|{}", (System.currentTimeMillis() - changeTime), "in-advance",
+                        .info(&#34;{}|{}|{}|{}|{}|{}|{}&#34;, (System.currentTimeMillis() - changeTime), &#34;in-advance&#34;,
                                 RequestUtil
                                         .getRemoteIp((HttpServletRequest) clientSub.asyncContext.getRequest()),
-                                "polling", clientSub.clientMd5Map.size(), clientSub.probeRequestSize, groupKey);
+                                &#34;polling&#34;, clientSub.clientMd5Map.size(), clientSub.probeRequestSize, groupKey);
                 // 返回响应
                 clientSub.sendResponse(Arrays.asList(groupKey));
             }
         }
         
     } catch (Throwable t) {
-        LogUtil.DEFAULT_LOG.error("data change error: {}", ExceptionUtil.getStackTrace(t));
+        LogUtil.DEFAULT_LOG.error(&#34;data change error: {}&#34;, ExceptionUtil.getStackTrace(t));
     }
 }
 ```
@@ -287,17 +287,17 @@ public ConfigChangeBatchListenResponse handle(ConfigBatchListenRequest configCha
 // 添加监听
 public synchronized void addListen(String groupKey, String md5, String connectionId) {
     // 1.add groupKeyContext
-    Set<String> listenClients = groupKeyContext.get(groupKey);
+    Set&lt;String&gt; listenClients = groupKeyContext.get(groupKey);
     if (listenClients == null) {
-        groupKeyContext.putIfAbsent(groupKey, new HashSet<>());
+        groupKeyContext.putIfAbsent(groupKey, new HashSet&lt;&gt;());
         listenClients = groupKeyContext.get(groupKey);
     }
     listenClients.add(connectionId);
     
     // 2.add connectionIdContext
-    HashMap<String, String> groupKeys = connectionIdContext.get(connectionId);
+    HashMap&lt;String, String&gt; groupKeys = connectionIdContext.get(connectionId);
     if (groupKeys == null) {
-        connectionIdContext.putIfAbsent(connectionId, new HashMap<>(16));
+        connectionIdContext.putIfAbsent(connectionId, new HashMap&lt;&gt;(16));
         groupKeys = connectionIdContext.get(connectionId);
     }
     groupKeys.put(groupKey, md5);
@@ -312,7 +312,7 @@ public synchronized void addListen(String groupKey, String md5, String connectio
 public synchronized void removeListen(String groupKey, String connectionId) {
     
     //1. remove groupKeyContext
-    Set<String> connectionIds = groupKeyContext.get(groupKey);
+    Set&lt;String&gt; connectionIds = groupKeyContext.get(groupKey);
     if (connectionIds != null) {
         connectionIds.remove(connectionId);
         if (connectionIds.isEmpty()) {
@@ -321,7 +321,7 @@ public synchronized void removeListen(String groupKey, String connectionId) {
     }
     
     //2.remove connectionIdContext
-    HashMap<String, String> groupKeys = connectionIdContext.get(connectionId);
+    HashMap&lt;String, String&gt; groupKeys = connectionIdContext.get(connectionId);
     if (groupKeys != null) {
         groupKeys.remove(groupKey);
     }
@@ -333,9 +333,9 @@ public synchronized void removeListen(String groupKey, String connectionId) {
 ```java
 // 接受 LocalDataChangeEvent 事件，会执行这个方法
 public void configDataChanged(String groupKey, String dataId, String group, String tenant, boolean isBeta,
-        List<String> betaIps, String tag) {
+        List&lt;String&gt; betaIps, String tag) {
     
-    Set<String> listeners = configChangeListenContext.getListeners(groupKey);
+    Set&lt;String&gt; listeners = configChangeListenContext.getListeners(groupKey);
     if (CollectionUtils.isEmpty(listeners)) {
         return;
     }
@@ -352,12 +352,12 @@ public void configDataChanged(String groupKey, String dataId, String group, Stri
         String clientIp = metaInfo.getClientIp();
         String clientTag = metaInfo.getTag();
         // 判断 beat 配置
-        if (isBeta && betaIps != null && !betaIps.contains(clientIp)) {
+        if (isBeta &amp;&amp; betaIps != null &amp;&amp; !betaIps.contains(clientIp)) {
             continue;
         }
         //tag check
         // 判断 tag 配置
-        if (StringUtils.isNotBlank(tag) && !tag.equals(clientTag)) {
+        if (StringUtils.isNotBlank(tag) &amp;&amp; !tag.equals(clientTag)) {
             continue;
         }
         
@@ -366,12 +366,18 @@ public void configDataChanged(String groupKey, String dataId, String group, Stri
         // 推送配置的 groupKey
         RpcPushTask rpcPushRetryTask = new RpcPushTask(notifyRequest, 50, client, clientIp, metaInfo.getAppName());
         push(rpcPushRetryTask);
-        notifyClientCount++;
+        notifyClientCount&#43;&#43;;
     }
-    Loggers.REMOTE_PUSH.info("push [{}] clients ,groupKey=[{}]", notifyClientCount, groupKey);
+    Loggers.REMOTE_PUSH.info(&#34;push [{}] clients ,groupKey=[{}]&#34;, notifyClientCount, groupKey);
 }
 ```
 
 ## 测试类
 
 `com.alibaba.nacos.test.config.ConfigLongPollReturnChanges_CITCase#testAdd`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/19-%E8%AE%A2%E9%98%85%E9%85%8D%E7%BD%AE/  
+

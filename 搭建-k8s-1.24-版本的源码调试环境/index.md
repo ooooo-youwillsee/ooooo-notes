@@ -39,7 +39,7 @@ mv manifests/kube-controller-manager.yaml ./
 
 点击，配置启动参数，如下图
 
-![02-配置启动参数](/ooooo-notes/images/k8s-source-code-env-config-launch-parameter.png "配置启动参数")
+![02-配置启动参数](/ooooo-notes/images/k8s-source-code-env-config-launch-parameter.png &#34;配置启动参数&#34;)
 
 现在基本就配置好了
 
@@ -101,7 +101,7 @@ mv manifests/kube-controller-manager.yaml ./
 
 注意:
 * **启动参数**和**程序路径**，配置成你自己的，监听的端口是 `2346`
-* `dlv` 在配置程序参数时，有 `--`， 如果后面参数有特殊符号，用 `--key="value"` 形式
+* `dlv` 在配置程序参数时，有 `--`， 如果后面参数有特殊符号，用 `--key=&#34;value&#34;` 形式
 * `dlv` 启动之后，必须要触发(IDE go remote)，才能启动, 否则会一直等着。
 
 ```shell
@@ -116,7 +116,7 @@ dlv --listen=:2346 --headless=true --api-version=2 --accept-multiclient exec /ro
 * 添加 **Go Remote**， 配置 **host** 和 **port**。
 * 点击 ok，然后启动服务。
 
-![02-连接dlv](/ooooo-notes/images/k8s-source-code-env-connect-dlv.png "连接dlv")
+![02-连接dlv](/ooooo-notes/images/k8s-source-code-env-connect-dlv.png &#34;连接dlv&#34;)
 
 现在基本就配置好了
 
@@ -139,4 +139,10 @@ dlv --listen=:2346 --headless=true --api-version=2 --accept-multiclient exec /ro
 ```
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E6%90%AD%E5%BB%BA-k8s-1.24-%E7%89%88%E6%9C%AC%E7%9A%84%E6%BA%90%E7%A0%81%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83/  
 

@@ -1,7 +1,7 @@
 # 14 CP 协议 Raft
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 ## raft 协议的初始化
 
@@ -23,16 +23,16 @@ public void init(RaftConfig config) {
         // There is only one consumer to ensure that the internal consumption
         // is sequential and there is no concurrent competition
         // 监听 RaftEvent 事件
-        NotifyCenter.registerSubscriber(new Subscriber<RaftEvent>() {
+        NotifyCenter.registerSubscriber(new Subscriber&lt;RaftEvent&gt;() {
             @Override
             public void onEvent(RaftEvent event) {
-                Loggers.RAFT.info("This Raft event changes : {}", event);
+                Loggers.RAFT.info(&#34;This Raft event changes : {}&#34;, event);
                 final String groupId = event.getGroupId();
-                Map<String, Map<String, Object>> value = new HashMap<>();
-                Map<String, Object> properties = new HashMap<>();
+                Map&lt;String, Map&lt;String, Object&gt;&gt; value = new HashMap&lt;&gt;();
+                Map&lt;String, Object&gt; properties = new HashMap&lt;&gt;();
                 final String leader = event.getLeader();
                 final Long term = event.getTerm();
-                final List<String> raftClusterInfo = event.getRaftClusterInfo();
+                final List&lt;String&gt; raftClusterInfo = event.getRaftClusterInfo();
                 final String errMsg = event.getErrMsg();
                 
                 // Leader information needs to be selectively updated. If it is valid data,
@@ -52,7 +52,7 @@ public void init(RaftConfig config) {
             }
             
             @Override
-            public Class<? extends Event> subscribeType() {
+            public Class&lt;? extends Event&gt; subscribeType() {
                 return RaftEvent.class;
             }
             
@@ -69,7 +69,7 @@ public void init(RaftConfig config) {
 void init(RaftConfig config) {
     this.raftConfig = config;
     this.serializer = SerializeFactory.getDefault();
-    Loggers.RAFT.info("Initializes the Raft protocol, raft-config info : {}", config);
+    Loggers.RAFT.info(&#34;Initializes the Raft protocol, raft-config info : {}&#34;, config);
     // 初始化 raft 线程池
     RaftExecutor.init(config);
     
@@ -120,7 +120,7 @@ void init(RaftConfig config) {
 synchronized void start() {
     // 判断是否已经启动
     if (!isStarted) {
-        Loggers.RAFT.info("========= The raft protocol is starting... =========");
+        Loggers.RAFT.info(&#34;========= The raft protocol is starting... =========&#34;);
         try {
             // init raft group node
             // 初始化 raft 的节点列表
@@ -138,17 +138,17 @@ synchronized void start() {
             
             // rpcServer 初始化
             if (!this.rpcServer.init(null)) {
-                Loggers.RAFT.error("Fail to init [BaseRpcServer].");
-                throw new RuntimeException("Fail to init [BaseRpcServer].");
+                Loggers.RAFT.error(&#34;Fail to init [BaseRpcServer].&#34;);
+                throw new RuntimeException(&#34;Fail to init [BaseRpcServer].&#34;);
             }
             
             // Initialize multi raft group service framework
             isStarted = true;
             // 创建 raftGroup
             createMultiRaftGroup(processors);
-            Loggers.RAFT.info("========= The raft protocol start finished... =========");
+            Loggers.RAFT.info(&#34;========= The raft protocol start finished... =========&#34;);
         } catch (Exception e) {
-            Loggers.RAFT.error("raft protocol start failure, cause: ", e);
+            Loggers.RAFT.error(&#34;raft protocol start failure, cause: &#34;, e);
             throw new JRaftException(e);
         }
     }
@@ -195,7 +195,7 @@ public static RpcServer initRpcServer(JRaftServer server, PeerId peerId) {
 // 创建 raftGroup
 // 从这个方法可以看出
 // 每个 groupName 都会对应一个 processor，一个 NacosStateMachine，一个 Node。
-synchronized void createMultiRaftGroup(Collection<RequestProcessor4CP> processors) {
+synchronized void createMultiRaftGroup(Collection&lt;RequestProcessor4CP&gt; processors) {
     // There is no reason why the LogProcessor cannot be processed because of the synchronization
     if (!this.isStarted) {
         // 添加 processor
@@ -204,7 +204,7 @@ synchronized void createMultiRaftGroup(Collection<RequestProcessor4CP> processor
     }
     
     // raft 日志存储路径
-    final String parentPath = Paths.get(EnvUtil.getNacosHome(), "data/protocol/raft").toString();
+    final String parentPath = Paths.get(EnvUtil.getNacosHome(), &#34;data/protocol/raft&#34;).toString();
     
     // 遍历 processors
     for (RequestProcessor4CP processor : processors) {
@@ -238,7 +238,7 @@ synchronized void createMultiRaftGroup(Collection<RequestProcessor4CP> processor
         
         // 设置快照
         copy.setSnapshotIntervalSecs(doSnapshotInterval);
-        Loggers.RAFT.info("create raft group : {}", groupName);
+        Loggers.RAFT.info(&#34;create raft group : {}&#34;, groupName);
         // 创建 raftGroupService
         RaftGroupService raftGroupService = new RaftGroupService(groupName, localPeerId, copy, rpcServer, true);
 
@@ -251,13 +251,13 @@ synchronized void createMultiRaftGroup(Collection<RequestProcessor4CP> processor
         RouteTable.getInstance().updateConfiguration(groupName, configuration);
         
         // 定时任务，注册自己到 raft 集群中
-        RaftExecutor.executeByCommon(() -> registerSelfToCluster(groupName, localPeerId, configuration));
+        RaftExecutor.executeByCommon(() -&gt; registerSelfToCluster(groupName, localPeerId, configuration));
         
         // Turn on the leader auto refresh for this group
         Random random = new Random();
-        long period = nodeOptions.getElectionTimeoutMs() + random.nextInt(5 * 1000);
+        long period = nodeOptions.getElectionTimeoutMs() &#43; random.nextInt(5 * 1000);
         // 定时任务，刷新 raft 配置，可以获取集群成员列表
-        RaftExecutor.scheduleRaftMemberRefreshJob(() -> refreshRouteTable(groupName),
+        RaftExecutor.scheduleRaftMemberRefreshJob(() -&gt; refreshRouteTable(groupName),
                 nodeOptions.getElectionTimeoutMs(), period, TimeUnit.MILLISECONDS);
         // 添加 multiRaftGroup
         multiRaftGroup.put(groupName, new RaftGroupTuple(node, processor, raftGroupService, machine));
@@ -275,7 +275,7 @@ void registerSelfToCluster(String groupId, PeerId selfIp, Configuration conf) {
     while (!isShutdown) {
         try {
             // 获取 groupId 对应的成员列表
-            List<PeerId> peerIds = cliService.getPeers(groupId, conf);
+            List&lt;PeerId&gt; peerIds = cliService.getPeers(groupId, conf);
             if (peerIds.contains(selfIp)) {
                 return;
             }
@@ -284,9 +284,9 @@ void registerSelfToCluster(String groupId, PeerId selfIp, Configuration conf) {
             if (status.isOk()) {
                 return;
             }
-            Loggers.RAFT.warn("Failed to join the cluster, retry...");
+            Loggers.RAFT.warn(&#34;Failed to join the cluster, retry...&#34;);
         } catch (Exception e) {
-            Loggers.RAFT.error("Failed to join the cluster, retry...", e);
+            Loggers.RAFT.error(&#34;Failed to join the cluster, retry...&#34;, e);
         }
         ThreadUtils.sleep(1_000L);
     }
@@ -298,21 +298,21 @@ void registerSelfToCluster(String groupId, PeerId selfIp, Configuration conf) {
 ```java
 // 删除节点
 @Override
-public void memberChange(Set<String> addresses) {
+public void memberChange(Set&lt;String&gt; addresses) {
     // 这里会重试 5 次
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i &lt; 5; i&#43;&#43;) {
         // 删除节点
         if (this.raftServer.peerChange(jRaftMaintainService, addresses)) {
             return;
         }
         ThreadUtils.sleep(100L);
     }
-    Loggers.RAFT.warn("peer removal failed");
+    Loggers.RAFT.warn(&#34;peer removal failed&#34;);
 }
 
-boolean peerChange(JRaftMaintainService maintainService, Set<String> newPeers) {
+boolean peerChange(JRaftMaintainService maintainService, Set&lt;String&gt; newPeers) {
     // This is only dealing with node deletion, the Raft protocol, where the node adds itself to the cluster when it starts up
-    Set<String> oldPeers = new HashSet<>(this.raftConfig.getMembers());
+    Set&lt;String&gt; oldPeers = new HashSet&lt;&gt;(this.raftConfig.getMembers());
     this.raftConfig.setMembers(localPeerId.toString(), newPeers);
     oldPeers.removeAll(newPeers);
     // 检查节点是否有删除，为空，表示节点不变或者有新的节点加入
@@ -320,22 +320,22 @@ boolean peerChange(JRaftMaintainService maintainService, Set<String> newPeers) {
         return true;
     }
     
-    Set<String> waitRemove = oldPeers;
+    Set&lt;String&gt; waitRemove = oldPeers;
     AtomicInteger successCnt = new AtomicInteger(0);
     // 遍历 multiRaftGroup 来删除
-    multiRaftGroup.forEach(new BiConsumer<String, RaftGroupTuple>() {
+    multiRaftGroup.forEach(new BiConsumer&lt;String, RaftGroupTuple&gt;() {
         @Override
         public void accept(String group, RaftGroupTuple tuple) {
-            Map<String, String> params = new HashMap<>();
+            Map&lt;String, String&gt; params = new HashMap&lt;&gt;();
             params.put(JRaftConstants.GROUP_ID, group);
             params.put(JRaftConstants.COMMAND_NAME, JRaftConstants.REMOVE_PEERS);
             params.put(JRaftConstants.COMMAND_VALUE, StringUtils.join(waitRemove, StringUtils.COMMA));
             // 执行删除命令, REMOVE_PEERS
-            RestResult<String> result = maintainService.execute(params);
+            RestResult&lt;String&gt; result = maintainService.execute(params);
             if (result.ok()) {
                 successCnt.incrementAndGet();
             } else {
-                Loggers.RAFT.error("Node removal failed : {}", result);
+                Loggers.RAFT.error(&#34;Node removal failed : {}&#34;, result);
             }
         }
     });
@@ -345,12 +345,12 @@ boolean peerChange(JRaftMaintainService maintainService, Set<String> newPeers) {
 // 源码位置：com.alibaba.nacos.core.distributed.raft.utils.JRaftOps#REMOVE_PEERS
 REMOVE_PEERS(JRaftConstants.REMOVE_PEERS) {
     @Override
-    public RestResult<String> execute(CliService cliService, String groupId, Node node, Map<String, String> args) {
+    public RestResult&lt;String&gt; execute(CliService cliService, String groupId, Node node, Map&lt;String, String&gt; args) {
         final Configuration conf = node.getOptions().getInitialConf();
         final String peers = args.get(JRaftConstants.COMMAND_VALUE);
         // 遍历节点
-        for (String s : peers.split(",")) {
-            List<PeerId> peerIds = cliService.getPeers(groupId, conf);
+        for (String s : peers.split(&#34;,&#34;)) {
+            List&lt;PeerId&gt; peerIds = cliService.getPeers(groupId, conf);
             final PeerId waitRemove = PeerId.parsePeer(s);
             
             // 不包含，则不需要删除
@@ -382,7 +382,7 @@ public void registerInstance(Service service, Instance instance, String clientId
     Service singleton = ServiceManager.getInstance().getSingleton(service);
     if (singleton.isEphemeral()) {
         throw new NacosRuntimeException(NacosException.INVALID_PARAM,
-                String.format("Current service %s is ephemeral service, can't register persistent instance.",
+                String.format(&#34;Current service %s is ephemeral service, can&#39;t register persistent instance.&#34;,
                         singleton.getGroupedServiceName()));
     }
     final InstanceStoreRequest request = new InstanceStoreRequest();
@@ -397,7 +397,7 @@ public void registerInstance(Service service, Instance instance, String clientId
     try {
         // raftProtocol 来写请求
         protocol.write(writeRequest);
-        Loggers.RAFT.info("Client registered. service={}, clientId={}, instance={}", service, instance, clientId);
+        Loggers.RAFT.info(&#34;Client registered. service={}, clientId={}, instance={}&#34;, service, instance, clientId);
     } catch (Exception e) {
         throw new NacosRuntimeException(NacosException.SERVER_ERROR, e);
     }
@@ -411,15 +411,15 @@ public void registerInstance(Service service, Instance instance, String clientId
 @Override
 public Response write(WriteRequest request) throws Exception {
     // 异步请求
-    CompletableFuture<Response> future = writeAsync(request);
+    CompletableFuture&lt;Response&gt; future = writeAsync(request);
     // Here you wait for 10 seconds, as long as possible, for the request to complete
     return future.get(10_000L, TimeUnit.MILLISECONDS);
 }
 
 @Override
-public CompletableFuture<Response> writeAsync(WriteRequest request) {
+public CompletableFuture&lt;Response&gt; writeAsync(WriteRequest request) {
     // raftServer 提交请求
-    return raftServer.commit(request.getGroup(), request, new CompletableFuture<>());
+    return raftServer.commit(request.getGroup(), request, new CompletableFuture&lt;&gt;());
 }
 ```
 
@@ -427,13 +427,13 @@ public CompletableFuture<Response> writeAsync(WriteRequest request) {
 
 ```java
 // raftServer 提交请求
-public CompletableFuture<Response> commit(final String group, final Message data,
-        final CompletableFuture<Response> future) {
-    LoggerUtils.printIfDebugEnabled(Loggers.RAFT, "data requested this time : {}", data);
+public CompletableFuture&lt;Response&gt; commit(final String group, final Message data,
+        final CompletableFuture&lt;Response&gt; future) {
+    LoggerUtils.printIfDebugEnabled(Loggers.RAFT, &#34;data requested this time : {}&#34;, data);
     // 通过 group 找到对应的 raft 配置
     final RaftGroupTuple tuple = findTupleByGroup(group);
     if (tuple == null) {
-        future.completeExceptionally(new IllegalArgumentException("No corresponding Raft Group found : " + group));
+        future.completeExceptionally(new IllegalArgumentException(&#34;No corresponding Raft Group found : &#34; &#43; group));
         return future;
     }
     
@@ -461,7 +461,7 @@ public CompletableFuture<Response> commit(final String group, final Message data
 public void applyOperation(Node node, Message data, FailoverClosure closure) {
     final Task task = new Task();
     // 设置回调
-    task.setDone(new NacosClosure(data, status -> {
+    task.setDone(new NacosClosure(data, status -&gt; {
         // 把响应设置给 closure, closure 就是 FailoverClosureImpl
         NacosClosure.NacosStatus nacosStatus = (NacosClosure.NacosStatus) status;
         closure.setThrowable(nacosStatus.getThrowable());
@@ -481,7 +481,7 @@ public void applyOperation(Node node, Message data, FailoverClosure closure) {
     
     byte[] dataBytes = data.toByteArray();
     // 设置数据
-    task.setData((ByteBuffer) ByteBuffer.allocate(requestTypeFieldBytes.length + dataBytes.length)
+    task.setData((ByteBuffer) ByteBuffer.allocate(requestTypeFieldBytes.length &#43; dataBytes.length)
             .put(requestTypeFieldBytes).put(dataBytes).position(0));
     // apply 请求，写入主节点日志，复制日志到从节点，超过半数节点成功，然后执行状态机 NacosStateMachine
     node.apply(task);
@@ -510,15 +510,15 @@ public void onApply(Iterator iter) {
                     final ByteBuffer data = iter.getData();
                     message = ProtoMessageUtil.parse(data.array());
                     if (message instanceof ReadRequest) {
-                        //'iter.done() == null' means current node is follower, ignore read operation
-                        applied++;
-                        index++;
+                        //&#39;iter.done() == null&#39; means current node is follower, ignore read operation
+                        applied&#43;&#43;;
+                        index&#43;&#43;;
                         iter.next();
                         continue;
                     }
                 }
                 
-                LoggerUtils.printIfDebugEnabled(Loggers.RAFT, "receive log : {}", message);
+                LoggerUtils.printIfDebugEnabled(Loggers.RAFT, &#34;receive log : {}&#34;, message);
                 
                 // 处理 WriteRequest
                 if (message instanceof WriteRequest) {
@@ -532,22 +532,22 @@ public void onApply(Iterator iter) {
                     postProcessor(response, closure);
                 }
             } catch (Throwable e) {
-                index++;
+                index&#43;&#43;;
                 status.setError(RaftError.UNKNOWN, e.toString());
-                Optional.ofNullable(closure).ifPresent(closure1 -> closure1.setThrowable(e));
+                Optional.ofNullable(closure).ifPresent(closure1 -&gt; closure1.setThrowable(e));
                 throw e;
             } finally {
-                Optional.ofNullable(closure).ifPresent(closure1 -> closure1.run(status));
+                Optional.ofNullable(closure).ifPresent(closure1 -&gt; closure1.run(status));
             }
             
-            applied++;
-            index++;
+            applied&#43;&#43;;
+            index&#43;&#43;;
             iter.next();
         }
     } catch (Throwable t) {
-        Loggers.RAFT.error("processor : {}, stateMachine meet critical error: {}.", processor, t);
+        Loggers.RAFT.error(&#34;processor : {}, stateMachine meet critical error: {}.&#34;, processor, t);
         iter.setErrorAndRollback(index - applied,
-                new Status(RaftError.ESTATEMACHINE, "StateMachine meet critical error: %s.",
+                new Status(RaftError.ESTATEMACHINE, &#34;StateMachine meet critical error: %s.&#34;,
                         ExceptionUtil.getStackTrace(t)));
     }
 }
@@ -579,14 +579,14 @@ public Response onApply(WriteRequest request) {
                 }
                 break;
             default:
-                return Response.newBuilder().setSuccess(false).setErrMsg("unsupport operation : " + operation)
+                return Response.newBuilder().setSuccess(false).setErrMsg(&#34;unsupport operation : &#34; &#43; operation)
                         .build();
         }
         return Response.newBuilder().setSuccess(true).build();
     } catch (Exception e) {
-        Loggers.RAFT.warn("Persistent client operation failed. ", e);
+        Loggers.RAFT.warn(&#34;Persistent client operation failed. &#34;, e);
         return Response.newBuilder().setSuccess(false)
-                .setErrMsg("Persistent client operation failed. " + e.getMessage()).build();
+                .setErrMsg(&#34;Persistent client operation failed. &#34; &#43; e.getMessage()).build();
     } finally {
         lock.unlock();
     }
@@ -603,7 +603,7 @@ private void invokeToLeader(final String group, final Message request, final int
         FailoverClosure closure) {
     try {
         final Endpoint leaderIp = Optional.ofNullable(getLeader(group))
-                .orElseThrow(() -> new NoLeaderException(group)).getEndpoint();
+                .orElseThrow(() -&gt; new NoLeaderException(group)).getEndpoint();
         // 调用 cliClientService 来转发请求
         cliClientService.getRpcClient().invokeAsync(leaderIp, request, new InvokeCallback() {
             @Override
@@ -638,7 +638,7 @@ private void invokeToLeader(final String group, final Message request, final int
 
 ```java
 // 接受 WriteRequest
-public class NacosWriteRequestProcessor extends AbstractProcessor implements RpcProcessor<WriteRequest> {
+public class NacosWriteRequestProcessor extends AbstractProcessor implements RpcProcessor&lt;WriteRequest&gt; {
     
     private static final String INTEREST_NAME = WriteRequest.class.getName();
     
@@ -670,10 +670,10 @@ protected void handleRequest(final JRaftServer server, final String group, final
             execute(server, rpcCtx, message, tuple);
         } else {
             rpcCtx.sendResponse(
-                    Response.newBuilder().setSuccess(false).setErrMsg("Could not find leader : " + group).build());
+                    Response.newBuilder().setSuccess(false).setErrMsg(&#34;Could not find leader : &#34; &#43; group).build());
         }
     } catch (Throwable e) {
-        Loggers.RAFT.error("handleRequest has error : ", e);
+        Loggers.RAFT.error(&#34;handleRequest has error : &#34;, e);
         rpcCtx.sendResponse(Response.newBuilder().setSuccess(false).setErrMsg(e.toString()).build());
     }
 }
@@ -693,9 +693,9 @@ protected void execute(JRaftServer server, final RpcContext asyncCtx, final Mess
 
 ```java
 // raft 处理 ReadRequest 
-CompletableFuture<Response> get(final ReadRequest request) {
+CompletableFuture&lt;Response&gt; get(final ReadRequest request) {
     final String group = request.getGroup();
-    CompletableFuture<Response> future = new CompletableFuture<>();
+    CompletableFuture&lt;Response&gt; future = new CompletableFuture&lt;&gt;();
     // 检查 group 是否存在
     final RaftGroupTuple tuple = findTupleByGroup(group);
     if (Objects.isNull(tuple)) {
@@ -716,13 +716,13 @@ CompletableFuture<Response> get(final ReadRequest request) {
                     } catch (Throwable t) {
                         MetricsMonitor.raftReadIndexFailed();
                         future.completeExceptionally(new ConsistencyException(
-                                "The conformance protocol is temporarily unavailable for reading", t));
+                                &#34;The conformance protocol is temporarily unavailable for reading&#34;, t));
                     }
                     return;
                 }
                 // 返回错误，从 leader 中读取数据
                 MetricsMonitor.raftReadIndexFailed();
-                Loggers.RAFT.error("ReadIndex has error : {}, go to Leader read.", status.getErrorMsg());
+                Loggers.RAFT.error(&#34;ReadIndex has error : {}, go to Leader read.&#34;, status.getErrorMsg());
                 MetricsMonitor.raftReadFromLeader();
                 readFromLeader(request, future);
             }
@@ -730,7 +730,7 @@ CompletableFuture<Response> get(final ReadRequest request) {
         return future;
     } catch (Throwable e) {
         MetricsMonitor.raftReadFromLeader();
-        Loggers.RAFT.warn("Raft linear read failed, go to Leader read logic : {}", e.toString());
+        Loggers.RAFT.warn(&#34;Raft linear read failed, go to Leader read logic : {}&#34;, e.toString());
         // run raft read
         readFromLeader(request, future);
         return future;
@@ -738,17 +738,17 @@ CompletableFuture<Response> get(final ReadRequest request) {
 }
 
 // 从 leader 中读取数据
-public void readFromLeader(final ReadRequest request, final CompletableFuture<Response> future) {
+public void readFromLeader(final ReadRequest request, final CompletableFuture&lt;Response&gt; future) {
     commit(request.getGroup(), request, future);
 }
 
 // 提交请求, 这个方法上面已经解析过了
-public CompletableFuture<Response> commit(final String group, final Message data,
-        final CompletableFuture<Response> future) {
-    LoggerUtils.printIfDebugEnabled(Loggers.RAFT, "data requested this time : {}", data);
+public CompletableFuture&lt;Response&gt; commit(final String group, final Message data,
+        final CompletableFuture&lt;Response&gt; future) {
+    LoggerUtils.printIfDebugEnabled(Loggers.RAFT, &#34;data requested this time : {}&#34;, data);
     final RaftGroupTuple tuple = findTupleByGroup(group);
     if (tuple == null) {
-        future.completeExceptionally(new IllegalArgumentException("No corresponding Raft Group found : " + group));
+        future.completeExceptionally(new IllegalArgumentException(&#34;No corresponding Raft Group found : &#34; &#43; group));
         return future;
     }
     
@@ -776,3 +776,9 @@ public CompletableFuture<Response> commit(final String group, final Message data
 ## 测试类
 
 `com.alibaba.nacos.test.naming.CPInstancesAPI_ITCase#registerInstance_ephemeral_false`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/14-cp-%E5%8D%8F%E8%AE%AE-raft/  
+

@@ -42,7 +42,7 @@ InnoDB 的数据是按数据页为单位来读写，也就是说，当找到 k=5
 
 执行插入语句：
 ```shell script
-mysql> insert into t(id,k) values(id1,k1),(id2,k2);
+mysql&gt; insert into t(id,k) values(id1,k1),(id2,k2);
 ```
 
 我们假设当前 k 索引树的状态，查找到位置后，k1 所在的数据页在内存(InnoDB buffer pool)中，k2 所在的数据页不在内存中。下图是带 **change buffer** 的更新状态图。
@@ -51,7 +51,7 @@ mysql> insert into t(id,k) values(id1,k1),(id2,k2);
 
 这条插入语句做了如下的操作:
 1. Page 1 在内存中，直接更新内存。
-2. Page 2 没有在内存中，就在内存的 **change buffer** 区域，记录下"我要往 Page 2 插入一行"这个信息。
+2. Page 2 没有在内存中，就在内存的 **change buffer** 区域，记录下&#34;我要往 Page 2 插入一行&#34;这个信息。
 3. 将上述两个动作记入 redo log 中（图中3和4）。   
    
 图中的两个虚线箭头，是后台操作，不影响更新的响应时间。
@@ -75,4 +75,10 @@ merge 的执行流程是这样的：
 - 从磁盘读入数据页到内存（老版本的数据页）；
 - 从 change buffer 里找出这个数据页的 change buffer 记录(可能有多个），依次应用，得到新版数据页；
 - 写 redo log。这个 redo log 包含了数据的变更和 change buffer 的变更。
+
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/geektime/mysql-45/09/  
 

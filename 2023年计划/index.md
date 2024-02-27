@@ -4,9 +4,9 @@
 
 ## 0、持续学习者
 
-> Talk is cheap. Show me the code.
+&gt; Talk is cheap. Show me the code.
 
-<br/>
+&lt;br/&gt;
 
 - **英语比编程简单。**
 - **学习和实践要平衡。**
@@ -40,11 +40,11 @@
 
 :zero::three:. [《Go Web 编程》](https://book.douban.com/subject/27204133/) :white_check_mark:
 
-:zero::four:. [《Effective C++》](https://book.douban.com/subject/1842426/)
+:zero::four:. [《Effective C&#43;&#43;》](https://book.douban.com/subject/1842426/)
 
-:zero::five:. [《More Effective C++》](https://book.douban.com/subject/5908727/)
+:zero::five:. [《More Effective C&#43;&#43;》](https://book.douban.com/subject/5908727/)
 
-:zero::six:. [《深度探索C++对象模型》](https://book.douban.com/subject/10427315/)
+:zero::six:. [《深度探索C&#43;&#43;对象模型》](https://book.douban.com/subject/10427315/)
 
 :zero::seven:. [《Go语言设计与实现》](https://book.douban.com/subject/35635836/)
 
@@ -68,9 +68,9 @@
 
 :one::seven:. [《深入剖析Java虚拟机》](https://book.douban.com/subject/35571969/)
 
-:one::eight:. [《算法训练营：海量图解+竞赛刷题（入门篇》](https://book.douban.com/subject/35528404/) :white_check_mark:
+:one::eight:. [《算法训练营：海量图解&#43;竞赛刷题（入门篇》](https://book.douban.com/subject/35528404/) :white_check_mark:
 
-:one::nine:. [《算法训练营：海量图解+竞赛刷题（进阶篇）》](https://book.douban.com/subject/35430410/)
+:one::nine:. [《算法训练营：海量图解&#43;竞赛刷题（进阶篇）》](https://book.douban.com/subject/35430410/)
 
 :two::zero:. [《TCP/IP详解 卷1：协议》](https://book.douban.com/subject/1088054/) :white_check_mark:
 
@@ -96,7 +96,7 @@
 
 :three::one:. [《数据密集型应用系统设计》](https://book.douban.com/subject/30329536/) :white_check_mark:
 
-:three::two:. [《C++语言导学（第二版）》](https://book.douban.com/subject/34809273/) :white_check_mark:
+:three::two:. [《C&#43;&#43;语言导学（第二版）》](https://book.douban.com/subject/34809273/) :white_check_mark:
 
 :three::three:. [《Linux内核设计与实现(原书第3版)》](https://book.douban.com/subject/6097773/) :o:
 
@@ -185,4 +185,10 @@
 :zero::four:. [《天气之子》](https://movie.douban.com/subject/30402296/) :white_check_mark:
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/2023%E5%B9%B4%E8%AE%A1%E5%88%92/  
 

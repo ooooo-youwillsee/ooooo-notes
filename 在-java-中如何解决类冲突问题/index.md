@@ -25,10 +25,10 @@
   public String test1(String message) {
     // 查找类
     ClassLoader classLoader = new ModuleAClassLoader();
-    Class<?> clazz = classLoader.loadClass("com.ooooo.HelloService");
+    Class&lt;?&gt; clazz = classLoader.loadClass(&#34;com.ooooo.HelloService&#34;);
 
     // 执行
-    Method test1 = ReflectionUtils.findMethod(clazz, "test1", String.class);
+    Method test1 = ReflectionUtils.findMethod(clazz, &#34;test1&#34;, String.class);
     Object result = test1.invoke(null, message);
 
     return (String) result;
@@ -38,10 +38,10 @@
   public String test2(String message) {
     // 查找类
     ClassLoader classLoader = new ModuleBClassLoader();
-    Class<?> clazz = classLoader.loadClass("com.ooooo.HelloService");
+    Class&lt;?&gt; clazz = classLoader.loadClass(&#34;com.ooooo.HelloService&#34;);
 
     // 执行
-    Method test2 = ReflectionUtils.findMethod(clazz, "test2", String.class);
+    Method test2 = ReflectionUtils.findMethod(clazz, &#34;test2&#34;, String.class);
     Object result = test2.invoke(null, message);
 
     return (String) result;
@@ -56,19 +56,19 @@
 
     @SneakyThrows
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-      Class<?> c = findLoadedClass(name);
+    protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      Class&lt;?&gt; c = findLoadedClass(name);
 
       if (c == null) {
         // 当前路径下去找
-        if (name.contains("com.ooooo")) {
-          String path = name.replace(".", "/") + ".class";
-          Enumeration<URL> resources = getResources(path);
+        if (name.contains(&#34;com.ooooo&#34;)) {
+          String path = name.replace(&#34;.&#34;, &#34;/&#34;) &#43; &#34;.class&#34;;
+          Enumeration&lt;URL&gt; resources = getResources(path);
 
           URL targetUrl = null;
           while (resources.hasMoreElements()) {
             targetUrl = resources.nextElement();
-            if (targetUrl.toString().contains("module-a")) {
+            if (targetUrl.toString().contains(&#34;module-a&#34;)) {
               break;
             }
           }
@@ -102,19 +102,19 @@
 
     @SneakyThrows
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-      Class<?> c = findLoadedClass(name);
+    protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      Class&lt;?&gt; c = findLoadedClass(name);
 
       if (c == null) {
         // 当前路径下去找
-        if (name.contains("com.ooooo")) {
-          String path = name.replace(".", "/") + ".class";
-          Enumeration<URL> resources = getResources(path);
+        if (name.contains(&#34;com.ooooo&#34;)) {
+          String path = name.replace(&#34;.&#34;, &#34;/&#34;) &#43; &#34;.class&#34;;
+          Enumeration&lt;URL&gt; resources = getResources(path);
 
           URL targetUrl = null;
           while (resources.hasMoreElements()) {
             targetUrl = resources.nextElement();
-            if (targetUrl.toString().contains("module-b")) {
+            if (targetUrl.toString().contains(&#34;module-b&#34;)) {
               break;
             }
           }
@@ -145,4 +145,10 @@
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/spring-boot-classloader)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%B1%BB%E5%86%B2%E7%AA%81%E9%97%AE%E9%A2%98/  
 

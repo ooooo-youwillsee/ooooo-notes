@@ -1,11 +1,11 @@
 # 06 grpc server 设计
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> `nacos` 在 `2.0` 版本中引入了 `grpc`，用来处理**http连接数过多**的问题，所以有必要看看**nacos 是怎么使用 grpc**的，这样方便我们理清整个请求流程。
-> 
-> 在 `nacos` 中只定义了**两个通用的请求模型**，一个是 `request-response`, 另外一个就是**基于双向流**的 `request-response`.
+&gt; `nacos` 在 `2.0` 版本中引入了 `grpc`，用来处理**http连接数过多**的问题，所以有必要看看**nacos 是怎么使用 grpc**的，这样方便我们理清整个请求流程。
+&gt; 
+&gt; 在 `nacos` 中只定义了**两个通用的请求模型**，一个是 `request-response`, 另外一个就是**基于双向流**的 `request-response`.
 
 ## grpc server 的启动 
 
@@ -47,21 +47,21 @@ public void startServer() throws Exception {
 }
 
 // 添加 rpc 请求
-// 这里添加了两个通用的请求模型，payload -> payload , stream payload <-> stream payload
+// 这里添加了两个通用的请求模型，payload -&gt; payload , stream payload &lt;-&gt; stream payload
 // 所有的请求都会由 grpcCommonRequestAcceptor 和 grpcBiStreamRequestAcceptor 来处理，接下来看看是怎么处理请求的
 private void addServices(MutableHandlerRegistry handlerRegistry, ServerInterceptor... serverInterceptor) {
 
     // unary common call register.
-    final MethodDescriptor<Payload, Payload> unaryPayloadMethod = MethodDescriptor.<Payload, Payload>newBuilder()
+    final MethodDescriptor&lt;Payload, Payload&gt; unaryPayloadMethod = MethodDescriptor.&lt;Payload, Payload&gt;newBuilder()
             .setType(MethodDescriptor.MethodType.UNARY)
             .setFullMethodName(MethodDescriptor.generateFullMethodName(GrpcServerConstants.REQUEST_SERVICE_NAME,
                     GrpcServerConstants.REQUEST_METHOD_NAME))
             .setRequestMarshaller(ProtoUtils.marshaller(Payload.getDefaultInstance()))
             .setResponseMarshaller(ProtoUtils.marshaller(Payload.getDefaultInstance())).build();
 
-    // 定义 payload -> payload
-    final ServerCallHandler<Payload, Payload> payloadHandler = ServerCalls
-            .asyncUnaryCall((request, responseObserver) -> grpcCommonRequestAcceptor.request(request, responseObserver));
+    // 定义 payload -&gt; payload
+    final ServerCallHandler&lt;Payload, Payload&gt; payloadHandler = ServerCalls
+            .asyncUnaryCall((request, responseObserver) -&gt; grpcCommonRequestAcceptor.request(request, responseObserver));
 
     final ServerServiceDefinition serviceDefOfUnaryPayload = ServerServiceDefinition.builder(
                     GrpcServerConstants.REQUEST_SERVICE_NAME)
@@ -69,11 +69,11 @@ private void addServices(MutableHandlerRegistry handlerRegistry, ServerIntercept
     handlerRegistry.addService(ServerInterceptors.intercept(serviceDefOfUnaryPayload, serverInterceptor));
 
     // bi stream register.
-    // 定义 stream payload <-> stream payload
-    final ServerCallHandler<Payload, Payload> biStreamHandler = ServerCalls.asyncBidiStreamingCall(
-            (responseObserver) -> grpcBiStreamRequestAcceptor.requestBiStream(responseObserver));
+    // 定义 stream payload &lt;-&gt; stream payload
+    final ServerCallHandler&lt;Payload, Payload&gt; biStreamHandler = ServerCalls.asyncBidiStreamingCall(
+            (responseObserver) -&gt; grpcBiStreamRequestAcceptor.requestBiStream(responseObserver));
 
-    final MethodDescriptor<Payload, Payload> biStreamMethod = MethodDescriptor.<Payload, Payload>newBuilder()
+    final MethodDescriptor&lt;Payload, Payload&gt; biStreamMethod = MethodDescriptor.&lt;Payload, Payload&gt;newBuilder()
             .setType(MethodDescriptor.MethodType.BIDI_STREAMING).setFullMethodName(MethodDescriptor
                     .generateFullMethodName(GrpcServerConstants.REQUEST_BI_STREAM_SERVICE_NAME,
                             GrpcServerConstants.REQUEST_BI_STREAM_METHOD_NAME))
@@ -95,7 +95,7 @@ private void addServices(MutableHandlerRegistry handlerRegistry, ServerIntercept
 // GrpcRequestAcceptor 处理请求
 // 请求的逻辑比较清楚，最终由 RequestHandler 来处理请求
 @Override
-public void request(Payload grpcRequest, StreamObserver<Payload> responseObserver) {
+public void request(Payload grpcRequest, StreamObserver&lt;Payload&gt; responseObserver) {
     
     // trace 请求
     traceIfNecessary(grpcRequest, true);
@@ -105,7 +105,7 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
     // server 正在启动中， 返回错误
     if (!ApplicationUtils.isStarted()) {
         Payload payloadResponse = GrpcUtils.convert(
-                ErrorResponse.build(NacosException.INVALID_SERVER_STATUS, "Server is starting,please try later."));
+                ErrorResponse.build(NacosException.INVALID_SERVER_STATUS, &#34;Server is starting,please try later.&#34;));
         traceIfNecessary(payloadResponse, false);
         responseObserver.onNext(payloadResponse);
         responseObserver.onCompleted();
@@ -127,9 +127,9 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
     //no handler found.
     // 没有找到对应的 handler，返回错误
     if (requestHandler == null) {
-        Loggers.REMOTE_DIGEST.warn(String.format("[%s] No handler for request type : %s :", "grpc", type));
+        Loggers.REMOTE_DIGEST.warn(String.format(&#34;[%s] No handler for request type : %s :&#34;, &#34;grpc&#34;, type));
         Payload payloadResponse = GrpcUtils
-                .convert(ErrorResponse.build(NacosException.NO_HANDLER, "RequestHandler Not Found"));
+                .convert(ErrorResponse.build(NacosException.NO_HANDLER, &#34;RequestHandler Not Found&#34;));
         traceIfNecessary(payloadResponse, false);
         responseObserver.onNext(payloadResponse);
         responseObserver.onCompleted();
@@ -142,9 +142,9 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
     boolean requestValid = connectionManager.checkValid(connectionId);
     if (!requestValid) {
         Loggers.REMOTE_DIGEST
-                .warn("[{}] Invalid connection Id ,connection [{}] is un registered ,", "grpc", connectionId);
+                .warn(&#34;[{}] Invalid connection Id ,connection [{}] is un registered ,&#34;, &#34;grpc&#34;, connectionId);
         Payload payloadResponse = GrpcUtils
-                .convert(ErrorResponse.build(NacosException.UN_REGISTER, "Connection is unregistered."));
+                .convert(ErrorResponse.build(NacosException.UN_REGISTER, &#34;Connection is unregistered.&#34;));
         traceIfNecessary(payloadResponse, false);
         responseObserver.onNext(payloadResponse);
         responseObserver.onCompleted();
@@ -157,7 +157,7 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
         parseObj = GrpcUtils.parse(grpcRequest);
     } catch (Exception e) {
         Loggers.REMOTE_DIGEST
-                .warn("[{}] Invalid request receive from connection [{}] ,error={}", "grpc", connectionId, e);
+                .warn(&#34;[{}] Invalid request receive from connection [{}] ,error={}&#34;, &#34;grpc&#34;, connectionId, e);
         Payload payloadResponse = GrpcUtils.convert(ErrorResponse.build(NacosException.BAD_GATEWAY, e.getMessage()));
         traceIfNecessary(payloadResponse, false);
         responseObserver.onNext(payloadResponse);
@@ -167,9 +167,9 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
     
     // 无效的请求，返回错误
     if (parseObj == null) {
-        Loggers.REMOTE_DIGEST.warn("[{}] Invalid request receive  ,parse request is null", connectionId);
+        Loggers.REMOTE_DIGEST.warn(&#34;[{}] Invalid request receive  ,parse request is null&#34;, connectionId);
         Payload payloadResponse = GrpcUtils
-                .convert(ErrorResponse.build(NacosException.BAD_GATEWAY, "Invalid request"));
+                .convert(ErrorResponse.build(NacosException.BAD_GATEWAY, &#34;Invalid request&#34;));
         traceIfNecessary(payloadResponse, false);
         responseObserver.onNext(payloadResponse);
         responseObserver.onCompleted();
@@ -179,10 +179,10 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
     // 只能是 request 对象
     if (!(parseObj instanceof Request)) {
         Loggers.REMOTE_DIGEST
-                .warn("[{}] Invalid request receive  ,parsed payload is not a request,parseObj={}", connectionId,
+                .warn(&#34;[{}] Invalid request receive  ,parsed payload is not a request,parseObj={}&#34;, connectionId,
                         parseObj);
         Payload payloadResponse = GrpcUtils
-                .convert(ErrorResponse.build(NacosException.BAD_GATEWAY, "Invalid request"));
+                .convert(ErrorResponse.build(NacosException.BAD_GATEWAY, &#34;Invalid request&#34;));
         traceIfNecessary(payloadResponse, false);
         responseObserver.onNext(payloadResponse);
         responseObserver.onCompleted();
@@ -208,7 +208,7 @@ public void request(Payload grpcRequest, StreamObserver<Payload> responseObserve
         responseObserver.onCompleted();
     } catch (Throwable e) {
         Loggers.REMOTE_DIGEST
-                .error("[{}] Fail to handle request from connection [{}] ,error message :{}", "grpc", connectionId,
+                .error(&#34;[{}] Fail to handle request from connection [{}] ,error message :{}&#34;, &#34;grpc&#34;, connectionId,
                         e);
         Payload payloadResponse = GrpcUtils.convert(ErrorResponse.build(e));
         traceIfNecessary(payloadResponse, false);
@@ -227,11 +227,11 @@ public Response handleRequest(T request, RequestMeta meta) throws NacosException
     for (AbstractRequestFilter filter : requestFilters.filters) {
         try {
             Response filterResult = filter.filter(request, meta, this.getClass());
-            if (filterResult != null && !filterResult.isSuccess()) {
+            if (filterResult != null &amp;&amp; !filterResult.isSuccess()) {
                 return filterResult;
             }
         } catch (Throwable throwable) {
-            Loggers.REMOTE.error("filter error", throwable);
+            Loggers.REMOTE.error(&#34;filter error&#34;, throwable);
         }
         
     }
@@ -250,9 +250,9 @@ public Response handleRequest(T request, RequestMeta meta) throws NacosException
 // 在流式处理中，没有 requestHandler 来处理请求，
 // 这是因为流式请求主要是 服务端发送数据给客户端，客户端接受后发送 ack response
 @Override
-public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseObserver) {
+public StreamObserver&lt;Payload&gt; requestBiStream(StreamObserver&lt;Payload&gt; responseObserver) {
     
-    StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
+    StreamObserver&lt;Payload&gt; streamObserver = new StreamObserver&lt;Payload&gt;() {
         
         final String connectionId = GrpcServerConstants.CONTEXT_KEY_CONN_ID.get();
         
@@ -262,7 +262,7 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
         
         String remoteIp = GrpcServerConstants.CONTEXT_KEY_CONN_REMOTE_IP.get();
         
-        String clientIp = "";
+        String clientIp = &#34;&#34;;
         
         @Override
         public void onNext(Payload payload) {
@@ -277,23 +277,23 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
                 parseObj = GrpcUtils.parse(payload);
             } catch (Throwable throwable) {
                 Loggers.REMOTE_DIGEST
-                        .warn("[{}]Grpc request bi stream,payload parse error={}", connectionId, throwable);
+                        .warn(&#34;[{}]Grpc request bi stream,payload parse error={}&#34;, connectionId, throwable);
                 return;
             }
             
             // 请求对象为 null，不处理
             if (parseObj == null) {
                 Loggers.REMOTE_DIGEST
-                        .warn("[{}]Grpc request bi stream,payload parse null ,body={},meta={}", connectionId,
+                        .warn(&#34;[{}]Grpc request bi stream,payload parse null ,body={},meta={}&#34;, connectionId,
                                 payload.getBody().getValue().toStringUtf8(), payload.getMetadata());
                 return;
             }
             //  处理 ConnectionSetupRequest 请求，客户端启动时会发送这个请求
             if (parseObj instanceof ConnectionSetupRequest) {
                 ConnectionSetupRequest setUpRequest = (ConnectionSetupRequest) parseObj;
-                Map<String, String> labels = setUpRequest.getLabels();
-                String appName = "-";
-                if (labels != null && labels.containsKey(Constants.APPNAME)) {
+                Map&lt;String, String&gt; labels = setUpRequest.getLabels();
+                String appName = &#34;-&#34;;
+                if (labels != null &amp;&amp; labels.containsKey(Constants.APPNAME)) {
                     appName = labels.get(Constants.APPNAME);
                 }
                 
@@ -304,21 +304,21 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
                 // 新建 connection
                 Connection connection = new GrpcConnection(metaInfo, responseObserver, GrpcServerConstants.CONTEXT_KEY_CHANNEL.get());
                 connection.setAbilities(setUpRequest.getAbilities());
-                boolean rejectSdkOnStarting = metaInfo.isSdkSource() && !ApplicationUtils.isStarted();
+                boolean rejectSdkOnStarting = metaInfo.isSdkSource() &amp;&amp; !ApplicationUtils.isStarted();
                 
                 // 注册 connection 对象, 如果不成功，则关闭连接
                 if (rejectSdkOnStarting || !connectionManager.register(connectionId, connection)) {
                     //Not register to the connection manager if current server is over limit or server is starting.
                     try {
-                        Loggers.REMOTE_DIGEST.warn("[{}]Connection register fail,reason:{}", connectionId,
-                                rejectSdkOnStarting ? " server is not started" : " server is over limited.");
+                        Loggers.REMOTE_DIGEST.warn(&#34;[{}]Connection register fail,reason:{}&#34;, connectionId,
+                                rejectSdkOnStarting ? &#34; server is not started&#34; : &#34; server is over limited.&#34;);
                         connection.request(new ConnectResetRequest(), 3000L);
                         connection.close();
                     } catch (Exception e) {
                         //Do nothing.
                         if (connectionManager.traced(clientIp)) {
                             Loggers.REMOTE_DIGEST
-                                    .warn("[{}]Send connect reset request error,error={}", connectionId, e);
+                                    .warn(&#34;[{}]Send connect reset request error,error={}&#34;, connectionId, e);
                         }
                     }
                 }
@@ -328,14 +328,14 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
                 Response response = (Response) parseObj;
                 if (connectionManager.traced(clientIp)) {
                     Loggers.REMOTE_DIGEST
-                            .warn("[{}]Receive response of server request  ,response={}", connectionId, response);
+                            .warn(&#34;[{}]Receive response of server request  ,response={}&#34;, connectionId, response);
                 }
                 // ack 通知
                 RpcAckCallbackSynchronizer.ackNotify(connectionId, response);
                 connectionManager.refreshActiveTime(connectionId);
             } else {
                 Loggers.REMOTE_DIGEST
-                        .warn("[{}]Grpc request bi stream,unknown payload receive ,parseObj={}", connectionId,
+                        .warn(&#34;[{}]Grpc request bi stream,unknown payload receive ,parseObj={}&#34;, connectionId,
                                 parseObj);
             }
             
@@ -344,7 +344,7 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
         @Override
         public void onError(Throwable t) {
             if (connectionManager.traced(clientIp)) {
-                Loggers.REMOTE_DIGEST.warn("[{}]Bi stream on error,error={}", connectionId, t);
+                Loggers.REMOTE_DIGEST.warn(&#34;[{}]Bi stream on error,error={}&#34;, connectionId, t);
             }
             
             if (responseObserver instanceof ServerCallStreamObserver) {
@@ -365,7 +365,7 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
         @Override
         public void onCompleted() {
             if (connectionManager.traced(clientIp)) {
-                Loggers.REMOTE_DIGEST.warn("[{}]Bi stream on completed", connectionId);
+                Loggers.REMOTE_DIGEST.warn(&#34;[{}]Bi stream on completed&#34;, connectionId);
             }
             if (responseObserver instanceof ServerCallStreamObserver) {
                 ServerCallStreamObserver serverCallStreamObserver = ((ServerCallStreamObserver) responseObserver);
@@ -391,3 +391,9 @@ public StreamObserver<Payload> requestBiStream(StreamObserver<Payload> responseO
 
 `com.alibaba.nacos.core.remote.grpc.GrpcServerTest#testGrpcSdkServer`
 `com.alibaba.nacos.core.remote.grpc.GrpcServerTest#testGrpcClusterServer`
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/06-grpc-server-%E8%AE%BE%E8%AE%A1/  
+

@@ -34,19 +34,19 @@ kind: Pod
 
 ```go
 type Deployment struct {
-metav1.TypeMeta `json:",inline"`
-// Standard object's metadata.
+metav1.TypeMeta `json:&#34;,inline&#34;`
+// Standard object&#39;s metadata.
 // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-// +optional
-metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+// &#43;optional
+metav1.ObjectMeta `json:&#34;metadata,omitempty&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`
 
 // Specification of the desired behavior of the Deployment.
-// +optional
-Spec DeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+// &#43;optional
+Spec DeploymentSpec `json:&#34;spec,omitempty&#34; protobuf:&#34;bytes,2,opt,name=spec&#34;`
 
 // Most recently observed status of the Deployment.
-// +optional
-Status DeploymentStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+// &#43;optional
+Status DeploymentStatus `json:&#34;status,omitempty&#34; protobuf:&#34;bytes,3,opt,name=status&#34;`
 }
 ```
 
@@ -72,4 +72,10 @@ Status DeploymentStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=stat
 
 以后的阅读代码的部分，我基本以**测试类**来带领大家阅读。
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%AD%A6%E4%B9%A0-k8s-%E6%BA%90%E7%A0%81%E7%9A%84%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86/  
 

@@ -1,24 +1,24 @@
 # 02 注册实例
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
 
 ## 注册实例的 curl
 
 ```shell
-curl --location 'http://localhost:8848/nacos/v2/ns/instance' \
---header 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'serviceName=test' \
---data-urlencode 'ip=1.2.3.4' \
---data-urlencode 'port=80'
+curl --location &#39;http://localhost:8848/nacos/v2/ns/instance&#39; \
+--header &#39;Content-Type: application/x-www-form-urlencoded&#39; \
+--data-urlencode &#39;serviceName=test&#39; \
+--data-urlencode &#39;ip=1.2.3.4&#39; \
+--data-urlencode &#39;port=80&#39;
 ```
 
 ## 注册实例的主流程
 
 源码位置: `com.alibaba.nacos.naming.controllers.v2.InstanceControllerV2#register`
 ```java
-public Result<String> register(InstanceForm instanceForm) throws NacosException {
+public Result&lt;String&gt; register(InstanceForm instanceForm) throws NacosException {
     // check param
     instanceForm.validate();
     checkWeight(instanceForm.getWeight());
@@ -27,10 +27,10 @@ public Result<String> register(InstanceForm instanceForm) throws NacosException 
     // 注册实例
     instanceServiceV2.registerInstance(instanceForm.getNamespaceId(), buildCompositeServiceName(instanceForm), instance);
     // 发布 traceEvent
-    NotifyCenter.publishEvent(new RegisterInstanceTraceEvent(System.currentTimeMillis(), "",
+    NotifyCenter.publishEvent(new RegisterInstanceTraceEvent(System.currentTimeMillis(), &#34;&#34;,
             false, instanceForm.getNamespaceId(), instanceForm.getGroupName(), instanceForm.getServiceName(),
             instance.getIp(), instance.getPort()));
-    return Result.success("ok");
+    return Result.success(&#34;ok&#34;);
 }
 ```
 
@@ -62,7 +62,7 @@ public void registerInstance(Service service, Instance instance, String clientId
     Service singleton = ServiceManager.getInstance().getSingleton(service);
     if (!singleton.isEphemeral()) {
         throw new NacosRuntimeException(NacosException.INVALID_PARAM,
-                String.format("Current service %s is persistent service, can't register ephemeral instance.",
+                String.format(&#34;Current service %s is persistent service, can&#39;t register ephemeral instance.&#34;,
                         singleton.getGroupedServiceName()));
     }
     // 获取 client，并检查 client
@@ -123,7 +123,7 @@ private void handleClientOperation(ClientOperationEvent event) {
 }
 private void addPublisherIndexes(Service service, String clientId) {
     // service 和 clientId 是一对多的关系
-    publisherIndexes.computeIfAbsent(service, key -> new ConcurrentHashSet<>());
+    publisherIndexes.computeIfAbsent(service, key -&gt; new ConcurrentHashSet&lt;&gt;());
     publisherIndexes.get(service).add(clientId);
     // 发布 ServiceChangedEvent 事件
     NotifyCenter.publishEvent(new ServiceEvent.ServiceChangedEvent(service, true));
@@ -161,7 +161,7 @@ public void registerInstance(Service service, Instance instance, String clientId
     Service singleton = ServiceManager.getInstance().getSingleton(service);
     if (singleton.isEphemeral()) {
         throw new NacosRuntimeException(NacosException.INVALID_PARAM,
-                String.format("Current service %s is ephemeral service, can't register persistent instance.",
+                String.format(&#34;Current service %s is ephemeral service, can&#39;t register persistent instance.&#34;,
                         singleton.getGroupedServiceName()));
     }
     // 包装为 writeRequest 对象
@@ -177,7 +177,7 @@ public void registerInstance(Service service, Instance instance, String clientId
     try {
         // CPProtocol 负责写请求，同步到其他的节点，然后应用状态机
         protocol.write(writeRequest);
-        Loggers.RAFT.info("Client registered. service={}, clientId={}, instance={}", service, instance, clientId);
+        Loggers.RAFT.info(&#34;Client registered. service={}, clientId={}, instance={}&#34;, service, instance, clientId);
     } catch (Exception e) {
         throw new NacosRuntimeException(NacosException.SERVER_ERROR, e);
     }
@@ -216,14 +216,14 @@ public Response onApply(WriteRequest request) {
                 }
                 break;
             default:
-                return Response.newBuilder().setSuccess(false).setErrMsg("unsupport operation : " + operation)
+                return Response.newBuilder().setSuccess(false).setErrMsg(&#34;unsupport operation : &#34; &#43; operation)
                         .build();
         }
         return Response.newBuilder().setSuccess(true).build();
     } catch (Exception e) {
-        Loggers.RAFT.warn("Persistent client operation failed. ", e);
+        Loggers.RAFT.warn(&#34;Persistent client operation failed. &#34;, e);
         return Response.newBuilder().setSuccess(false)
-                .setErrMsg("Persistent client operation failed. " + e.getMessage()).build();
+                .setErrMsg(&#34;Persistent client operation failed. &#34; &#43; e.getMessage()).build();
     } finally {
         lock.unlock();
     }
@@ -252,4 +252,10 @@ private void onInstanceRegister(Service service, Instance instance, String clien
 
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/02-%E6%B3%A8%E5%86%8C%E5%AE%9E%E4%BE%8B/  
 

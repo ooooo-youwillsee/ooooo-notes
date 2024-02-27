@@ -1,13 +1,13 @@
 # 2024年学习计划
 
 
-> :o: **进行中**
-> :white_check_mark: **已完成**
-> :x: **已废弃**
-> :question: **有必要**
-> :exclamation: **重要性**
-> :memo: **记笔记**
-> :pen: **写代码**
+&gt; :o: **进行中**
+&gt; :white_check_mark: **已完成**
+&gt; :x: **已废弃**
+&gt; :question: **有必要**
+&gt; :exclamation: **重要性**
+&gt; :memo: **记笔记**
+&gt; :pen: **写代码**
 
 ## 1. 关于阅读
 
@@ -46,3 +46,9 @@
 :zero::five:. [《netty 源码》](https://github.com/netty/netty)
 
 :zero::six:. [《tomcat 源码》](https://github.com/apache/tomcat)
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/2024%E5%B9%B4%E8%AE%A1%E5%88%92/  
+

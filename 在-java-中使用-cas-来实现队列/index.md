@@ -11,19 +11,19 @@
 * 这里使用 `curTail.next` 进行 `CAS` 来指定下一个节点, 很少这么使用，后面再详细说说
 
 ```java
-public class LinkedQueue<E> {
+public class LinkedQueue&lt;E&gt; {
 
-  private final Node<E> dummy = new Node<>(null, null);
+  private final Node&lt;E&gt; dummy = new Node&lt;&gt;(null, null);
 
-  private final AtomicReference<Node<E>> head = new AtomicReference<>(dummy);
+  private final AtomicReference&lt;Node&lt;E&gt;&gt; head = new AtomicReference&lt;&gt;(dummy);
 
-  private final AtomicReference<Node<E>> tail = new AtomicReference<>(dummy);
+  private final AtomicReference&lt;Node&lt;E&gt;&gt; tail = new AtomicReference&lt;&gt;(dummy);
 
   public boolean put(E item) {
-    Node<E> newNode = new Node<>(item, null);
+    Node&lt;E&gt; newNode = new Node&lt;&gt;(item, null);
     while (true) {
-      Node<E> curTail = tail.get();
-      Node<E> tailNext = curTail.next.get();
+      Node&lt;E&gt; curTail = tail.get();
+      Node&lt;E&gt; tailNext = curTail.next.get();
       if (curTail == tail.get()) {
         if (tailNext != null) {
           // 队列处于中间状态，推进尾节点
@@ -46,8 +46,8 @@ public class LinkedQueue<E> {
         return null;
       }
 
-      Node<E> oldHead = head.get();
-      Node<E> newHead = oldHead.next.get();
+      Node&lt;E&gt; oldHead = head.get();
+      Node&lt;E&gt; newHead = oldHead.next.get();
       // 队列处于中间状态，可能另外一个线程已经 CAS 成功， 只剩下一个元素 dummy 了
       if (newHead == null) {
         return null;
@@ -59,15 +59,15 @@ public class LinkedQueue<E> {
     }
   }
 
-  private static class Node<E> {
+  private static class Node&lt;E&gt; {
 
     private final E item;
 
-    private AtomicReference<Node<E>> next;
+    private AtomicReference&lt;Node&lt;E&gt;&gt; next;
 
-    public Node(E item, Node<E> next) {
+    public Node(E item, Node&lt;E&gt; next) {
       this.item = item;
-      this.next = new AtomicReference<>(next);
+      this.next = new AtomicReference&lt;&gt;(next);
     }
   }
 }
@@ -77,4 +77,10 @@ public class LinkedQueue<E> {
 ## 2. 代码实现位置
 
 [github 地址](https://github.com/ooooo-youwillsee/java-framework-guide/blob/main/demo-java-concurrent)
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-java-%E4%B8%AD%E4%BD%BF%E7%94%A8-cas-%E6%9D%A5%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/  
 

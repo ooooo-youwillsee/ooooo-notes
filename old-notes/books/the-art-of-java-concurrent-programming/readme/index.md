@@ -9,3 +9,9 @@
 
 [第三章 Java 内存模型](./03)
 
+
+---
+
+> 作者:   
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/old-notes/books/the-art-of-java-concurrent-programming/readme/  
+

@@ -2,8 +2,8 @@
 
 
 
-> 在 `spring boot` 中，只需要创建一个 `bean` 实现 `filter` 接口，`spring boot` 就会把这个 `filter` 加入到 `servlet` 容器中。
-> 在实际使用中，常用的接口就是 `OncePerRequestFilter` 和 `OrderedFilter`, 所以来看看 `spring boot` 是如何适配 `servlet` 规范。
+&gt; 在 `spring boot` 中，只需要创建一个 `bean` 实现 `filter` 接口，`spring boot` 就会把这个 `filter` 加入到 `servlet` 容器中。
+&gt; 在实际使用中，常用的接口就是 `OncePerRequestFilter` 和 `OrderedFilter`, 所以来看看 `spring boot` 是如何适配 `servlet` 规范。
 
 ## 创建 WebServer
 
@@ -19,7 +19,7 @@ protected void onRefresh() {
         createWebServer();
     }
     catch (Throwable ex) {
-        throw new ApplicationContextException("Unable to start web server", ex);
+        throw new ApplicationContextException(&#34;Unable to start web server&#34;, ex);
     }
 }
 ```
@@ -31,18 +31,18 @@ protected void onRefresh() {
 private void createWebServer() {
     WebServer webServer = this.webServer;
     ServletContext servletContext = getServletContext();
-    if (webServer == null && servletContext == null) {
-        StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
+    if (webServer == null &amp;&amp; servletContext == null) {
+        StartupStep createWebServer = this.getApplicationStartup().start(&#34;spring.boot.webserver.create&#34;);
         // 获取工厂类，比如有 tomcat，jetty 的实现, 这个省略了。
         ServletWebServerFactory factory = getWebServerFactory();
-        createWebServer.tag("factory", factory.getClass().toString());
+        createWebServer.tag(&#34;factory&#34;, factory.getClass().toString());
         // 创建 webServer，重点看这个
         this.webServer = factory.getWebServer(getSelfInitializer());
         createWebServer.end();
         // 注册钩子
-        getBeanFactory().registerSingleton("webServerGracefulShutdown",
+        getBeanFactory().registerSingleton(&#34;webServerGracefulShutdown&#34;,
             new WebServerGracefulShutdownLifecycle(this.webServer));
-        getBeanFactory().registerSingleton("webServerStartStop",
+        getBeanFactory().registerSingleton(&#34;webServerStartStop&#34;,
             new WebServerStartStopLifecycle(this, this.webServer));
     }
     ...
@@ -68,7 +68,7 @@ private void selfInitialize(ServletContext servletContext) throws ServletExcepti
 }
 
 // ServletContextInitializerBeans 的构造方法很重要
-protected Collection<ServletContextInitializer> getServletContextInitializerBeans() {
+protected Collection&lt;ServletContextInitializer&gt; getServletContextInitializerBeans() {
   return new ServletContextInitializerBeans(getBeanFactory());
 }
 ```
@@ -80,8 +80,8 @@ protected Collection<ServletContextInitializer> getServletContextInitializerBean
 ```java
 // ServletContextInitializerBeans 的构造函数
 public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
-    Class<? extends ServletContextInitializer>... initializerTypes) {
-    this.initializers = new LinkedMultiValueMap<>();
+    Class&lt;? extends ServletContextInitializer&gt;... initializerTypes) {
+    this.initializers = new LinkedMultiValueMap&lt;&gt;();
     this.initializerTypes = (initializerTypes.length != 0) ? Arrays.asList(initializerTypes)
         : Collections.singletonList(ServletContextInitializer.class);
     // 适配 filter，servlet，listener，很重要
@@ -89,8 +89,8 @@ public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
     // 适配 filter，servlet，很重要
     addAdaptableBeans(beanFactory);
     // 排序 ServletContextInitializer
-    List<ServletContextInitializer> sortedInitializers = this.initializers.values().stream()
-        .flatMap((value) -> value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
+    List&lt;ServletContextInitializer&gt; sortedInitializers = this.initializers.values().stream()
+        .flatMap((value) -&gt; value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
         .collect(Collectors.toList());
     this.sortedList = Collections.unmodifiableList(sortedInitializers);
     logMappings(this.initializers);
@@ -102,8 +102,8 @@ public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
 ```java
 // 适配 filter，servlet，listener
 private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) {
-    for (Class<? extends ServletContextInitializer> initializerType : this.initializerTypes) {
-        for (Entry<String, ? extends ServletContextInitializer> initializerBean : getOrderedBeansOfType(beanFactory,
+    for (Class&lt;? extends ServletContextInitializer&gt; initializerType : this.initializerTypes) {
+        for (Entry&lt;String, ? extends ServletContextInitializer&gt; initializerBean : getOrderedBeansOfType(beanFactory,
             initializerType)) {
           addServletContextInitializerBean(initializerBean.getKey(), initializerBean.getValue(), beanFactory);
         }
@@ -114,12 +114,12 @@ private void addServletContextInitializerBean(String beanName, ServletContextIni
     ListableBeanFactory beanFactory) {
     // 适配 servlet
     if (initializer instanceof ServletRegistrationBean) {
-        Servlet source = ((ServletRegistrationBean<?>) initializer).getServlet();
+        Servlet source = ((ServletRegistrationBean&lt;?&gt;) initializer).getServlet();
         addServletContextInitializerBean(Servlet.class, beanName, initializer, beanFactory, source);
     }
     // 适配 filter
     else if (initializer instanceof FilterRegistrationBean) {
-        Filter source = ((FilterRegistrationBean<?>) initializer).getFilter();
+        Filter source = ((FilterRegistrationBean&lt;?&gt;) initializer).getFilter();
         addServletContextInitializerBean(Filter.class, beanName, initializer, beanFactory, source);
     }
     // 适配 filter
@@ -129,7 +129,7 @@ private void addServletContextInitializerBean(String beanName, ServletContextIni
     }
     // 适配 listener
     else if (initializer instanceof ServletListenerRegistrationBean) {
-        EventListener source = ((ServletListenerRegistrationBean<?>) initializer).getListener();
+        EventListener source = ((ServletListenerRegistrationBean&lt;?&gt;) initializer).getListener();
         addServletContextInitializerBean(EventListener.class, beanName, initializer, beanFactory, source);
     }
     else {
@@ -149,10 +149,16 @@ protected void addAdaptableBeans(ListableBeanFactory beanFactory) {
     addAsRegistrationBean(beanFactory, Servlet.class, new ServletRegistrationBeanAdapter(multipartConfig));
     // 适配 filter
     addAsRegistrationBean(beanFactory, Filter.class, new FilterRegistrationBeanAdapter());
-    for (Class<?> listenerType : ServletListenerRegistrationBean.getSupportedTypes()) {
-        addAsRegistrationBean(beanFactory, EventListener.class, (Class<EventListener>) listenerType,
+    for (Class&lt;?&gt; listenerType : ServletListenerRegistrationBean.getSupportedTypes()) {
+        addAsRegistrationBean(beanFactory, EventListener.class, (Class&lt;EventListener&gt;) listenerType,
             new ServletListenerRegistrationBeanAdapter());
     }
 }
 ```
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E9%80%82%E9%85%8D-servlet-%E8%A7%84%E8%8C%83/  
 

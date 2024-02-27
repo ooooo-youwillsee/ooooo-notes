@@ -8,7 +8,7 @@
 ```java
 @Configuration(proxyBeanMethods = false)
 // 自动激活 aop 配置, 还会激活 @EnableAspectJAutoProxy 注解
-@ConditionalOnProperty(prefix = "spring.aop", name = "auto", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = &#34;spring.aop&#34;, name = &#34;auto&#34;, havingValue = &#34;true&#34;, matchIfMissing = true)
 public class AopAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
@@ -18,7 +18,7 @@ public class AopAutoConfiguration {
 		@Configuration(proxyBeanMethods = false)
 		@EnableAspectJAutoProxy(proxyTargetClass = false)
 		// aop 使用 jdk proxy
-		@ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "false")
+		@ConditionalOnProperty(prefix = &#34;spring.aop&#34;, name = &#34;proxy-target-class&#34;, havingValue = &#34;false&#34;)
 		static class JdkDynamicAutoProxyConfiguration {
 
 		}
@@ -26,7 +26,7 @@ public class AopAutoConfiguration {
 		@Configuration(proxyBeanMethods = false)
 		@EnableAspectJAutoProxy(proxyTargetClass = true)
 		// aop 使用 cglib proxy
-		@ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "true",
+		@ConditionalOnProperty(prefix = &#34;spring.aop&#34;, name = &#34;proxy-target-class&#34;, havingValue = &#34;true&#34;,
 				matchIfMissing = true)
 		static class CglibAutoProxyConfiguration {
 
@@ -34,15 +34,15 @@ public class AopAutoConfiguration {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnMissingClass("org.aspectj.weaver.Advice")
+	@ConditionalOnMissingClass(&#34;org.aspectj.weaver.Advice&#34;)
 	// cglib proxy 激活
-	@ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "true",
+	@ConditionalOnProperty(prefix = &#34;spring.aop&#34;, name = &#34;proxy-target-class&#34;, havingValue = &#34;true&#34;,
 			matchIfMissing = true)
 	static class ClassProxyingConfiguration {
 
 		@Bean
 		static BeanFactoryPostProcessor forceAutoProxyCreatorToUseClassProxying() {
-			return (beanFactory) -> {
+			return (beanFactory) -&gt; {
 				if (beanFactory instanceof BeanDefinitionRegistry) {
 					BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 					// 注册 aop 相关类
@@ -69,9 +69,9 @@ public static BeanDefinition registerAutoProxyCreatorIfNecessary(
 }
 
 private static BeanDefinition registerOrEscalateApcAsRequired(
-        Class<?> cls, BeanDefinitionRegistry registry, @Nullable Object source) {
+        Class&lt;?&gt; cls, BeanDefinitionRegistry registry, @Nullable Object source) {
 
-    Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
+    Assert.notNull(registry, &#34;BeanDefinitionRegistry must not be null&#34;);
 
     // 检查之前是否注册过
     if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
@@ -81,7 +81,7 @@ private static BeanDefinition registerOrEscalateApcAsRequired(
             int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
             int requiredPriority = findPriorityForClass(cls);
             // 比较优先级
-            if (currentPriority < requiredPriority) {
+            if (currentPriority &lt; requiredPriority) {
                 // 重新设置 beanClassName
                 apcDefinition.setBeanClassName(cls.getName());
             }
@@ -93,7 +93,7 @@ private static BeanDefinition registerOrEscalateApcAsRequired(
     RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
     beanDefinition.setSource(source);
     // order 是最大值
-    beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);
+    beanDefinition.getPropertyValues().add(&#34;order&#34;, Ordered.HIGHEST_PRECEDENCE);
     // 基础类
     beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
     // 注册 beanDefinition
@@ -163,11 +163,11 @@ class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 		AnnotationAttributes enableAspectJAutoProxy =
 				AnnotationConfigUtils.attributesFor(importingClassMetadata, EnableAspectJAutoProxy.class);
 		if (enableAspectJAutoProxy != null) {
-			if (enableAspectJAutoProxy.getBoolean("proxyTargetClass")) {
+			if (enableAspectJAutoProxy.getBoolean(&#34;proxyTargetClass&#34;)) {
 			    // 强制使用 proxyTargetClass = true, 使用 cglib 来实现代理
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
-			if (enableAspectJAutoProxy.getBoolean("exposeProxy")) {
+			if (enableAspectJAutoProxy.getBoolean(&#34;exposeProxy&#34;)) {
 			    // 强制使用 exposeProxy = true, 可以用 AopContext#currentProxy 获取代理对象
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
 			}
@@ -178,7 +178,7 @@ class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 
 ## AnnotationAwareAspectJAutoProxyCreator
 
-> 这里以 `AnnotationAwareAspectJAutoProxyCreator` 为例, 当我们添加了 `org.springframework.boot:spring-boot-starter-aop` 依赖后就会激活这个类。
+&gt; 这里以 `AnnotationAwareAspectJAutoProxyCreator` 为例, 当我们添加了 `org.springframework.boot:spring-boot-starter-aop` 依赖后就会激活这个类。
 
 
 源码位置: `org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#postProcessBeforeInstantiation`
@@ -186,7 +186,7 @@ class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 ```java
 // bean 实例化之前会执行这个方法
 @Override
-public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+public Object postProcessBeforeInstantiation(Class&lt;?&gt; beanClass, String beanName) {
     Object cacheKey = getCacheKey(beanClass, beanName);
     
     if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
@@ -244,7 +244,7 @@ public Object postProcessAfterInitialization(@Nullable Object bean, String beanN
 ```java
 protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
     // 有自定义的 targetSource, 则跳过
-    if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
+    if (StringUtils.hasLength(beanName) &amp;&amp; this.targetSourcedBeans.contains(beanName)) {
         return bean;
     }
     // 不需要代理
@@ -282,9 +282,9 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
 @Override
 @Nullable
 protected Object[] getAdvicesAndAdvisorsForBean(
-        Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
+        Class&lt;?&gt; beanClass, String beanName, @Nullable TargetSource targetSource) {
     // 找到合适的 advisor
-    List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
+    List&lt;Advisor&gt; advisors = findEligibleAdvisors(beanClass, beanName);
     if (advisors.isEmpty()) {
         // 返回 null，不需要代理
         return DO_NOT_PROXY;
@@ -293,11 +293,11 @@ protected Object[] getAdvicesAndAdvisorsForBean(
 }
 
 // 找到合适的 advisor
-protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+protected List&lt;Advisor&gt; findEligibleAdvisors(Class&lt;?&gt; beanClass, String beanName) {
     // 找到所有的 advisor bean, 包括 @Aspect
-    List<Advisor> candidateAdvisors = findCandidateAdvisors();
+    List&lt;Advisor&gt; candidateAdvisors = findCandidateAdvisors();
     // 判断 advisor 是否能应用到 bean, ClassFilter 和 MethodMatcher
-    List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+    List&lt;Advisor&gt; eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
     // 子类扩展，目前会添加 ExposeInvocationInterceptor
     extendAdvisors(eligibleAdvisors);
     if (!eligibleAdvisors.isEmpty()) {
@@ -312,7 +312,7 @@ protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName
 
 ```java
 // 创建代理对象
-protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
+protected Object createProxy(Class&lt;?&gt; beanClass, @Nullable String beanName,
         @Nullable Object[] specificInterceptors, TargetSource targetSource) {
     ...
     // 代理工厂
@@ -323,14 +323,14 @@ protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
     if (proxyFactory.isProxyTargetClass()) {
         // Explicit handling of JDK proxy targets and lambdas (for introduction advice scenarios)
         if (Proxy.isProxyClass(beanClass) || ClassUtils.isLambdaClass(beanClass)) {
-            // Must allow for introductions; can't just set interfaces to the proxy's interfaces only.
-            for (Class<?> ifc : beanClass.getInterfaces()) {
+            // Must allow for introductions; can&#39;t just set interfaces to the proxy&#39;s interfaces only.
+            for (Class&lt;?&gt; ifc : beanClass.getInterfaces()) {
                 proxyFactory.addInterface(ifc);
             }
         }
     }
     else {
-        // No proxyTargetClass flag enforced, let's apply our default checks...
+        // No proxyTargetClass flag enforced, let&#39;s apply our default checks...
         if (shouldProxyTargetClass(beanClass, beanName)) {
             proxyFactory.setProxyTargetClass(true);
         }
@@ -349,4 +349,10 @@ protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
 ```
 
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%AE%9E%E7%8E%B0-aop-%E5%8E%9F%E7%90%86/  
 

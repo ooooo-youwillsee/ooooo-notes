@@ -3,9 +3,9 @@
 
 在 idea 中实际有一个非常有用的功能，那就是**远端构建**和**远端运行**。
 
-在我们实际开发项目中，自己的**本地环境**和**服务器环境**不太一样，例如 go 开发中的 **build-tags**, 还有 c/c++ 开发中的**API 调用**不一样，无法模拟**相同的开发环境**。
+在我们实际开发项目中，自己的**本地环境**和**服务器环境**不太一样，例如 go 开发中的 **build-tags**, 还有 c/c&#43;&#43; 开发中的**API 调用**不一样，无法模拟**相同的开发环境**。
 
-<!--more-->
+&lt;!--more--&gt;
 
 
 ## 1. 问题说明
@@ -23,7 +23,7 @@
 
 如下图：
 
-![在远端构建和运行](/ooooo-notes/images/remote-build-and-run-in-idea-01.png "在远端构建和运行")
+![在远端构建和运行](/ooooo-notes/images/remote-build-and-run-in-idea-01.png &#34;在远端构建和运行&#34;)
 
 
 1. 新建一个**target配置**。
@@ -33,6 +33,12 @@
 
 如下图：
 
-![在远端构建和运行](/ooooo-notes/images/remote-build-and-run-in-idea-02.png "在远端构建和运行")
+![在远端构建和运行](/ooooo-notes/images/remote-build-and-run-in-idea-02.png &#34;在远端构建和运行&#34;)
 
+
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%9C%A8-idea-%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%BF%9C%E7%AB%AF-build-%E5%92%8C-run/  
 

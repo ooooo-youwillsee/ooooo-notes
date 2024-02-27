@@ -1,9 +1,9 @@
 # 20 client 获取配置
 
 
-> nacos 基于 2.2.4 版本
+&gt; nacos 基于 2.2.4 版本
 
-> 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
+&gt; 这里的 `client` 是指 `nacos SDK`，也就是模块 `nacos-client`.
 
 ## 获取配置
 
@@ -39,7 +39,7 @@ private String getConfigInner(String tenant, String dataId, String group, long t
     // 是否从本地获取, 默认不是
     String content = LocalConfigInfoProcessor.getFailover(worker.getAgentName(), dataId, group, tenant);
     if (content != null) {
-        LOGGER.warn("[{}] [get-config] get failover ok, dataId={}, group={}, tenant={}, config={}",
+        LOGGER.warn(&#34;[{}] [get-config] get failover ok, dataId={}, group={}, tenant={}, config={}&#34;,
                 worker.getAgentName(), dataId, group, tenant, ContentUtils.truncateContent(content));
         cr.setContent(content);
         String encryptedDataKey = LocalEncryptedDataKeyProcessor
@@ -64,14 +64,14 @@ private String getConfigInner(String tenant, String dataId, String group, long t
         if (NacosException.NO_RIGHT == ioe.getErrCode()) {
             throw ioe;
         }
-        LOGGER.warn("[{}] [get-config] get from server error, dataId={}, group={}, tenant={}, msg={}",
+        LOGGER.warn(&#34;[{}] [get-config] get from server error, dataId={}, group={}, tenant={}, msg={}&#34;,
                 worker.getAgentName(), dataId, group, tenant, ioe.toString());
     }
 
     // 获取本地快照, 返回
     content = LocalConfigInfoProcessor.getSnapshot(worker.getAgentName(), dataId, group, tenant);
     if (content != null) {
-        LOGGER.warn("[{}] [get-config] get snapshot ok, dataId={}, group={}, tenant={}, config={}",
+        LOGGER.warn(&#34;[{}] [get-config] get snapshot ok, dataId={}, group={}, tenant={}, config={}&#34;,
                 worker.getAgentName(), dataId, group, tenant, ContentUtils.truncateContent(content));
     }
     cr.setContent(content);
@@ -83,3 +83,9 @@ private String getConfigInner(String tenant, String dataId, String group, long t
     return content;
 }
 ```
+
+---
+
+> 作者: 线偶  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/20-client-%E8%8E%B7%E5%8F%96%E9%85%8D%E7%BD%AE/  
+
