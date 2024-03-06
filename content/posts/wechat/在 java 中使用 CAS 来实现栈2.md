@@ -3,7 +3,7 @@ title: 在 java 中使用 CAS 来实现栈2
 date: 2022-11-13T08:00:00+08:00
 draft: false
 tags: [java]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 ## 1. 使用数组来实现栈

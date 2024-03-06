@@ -3,7 +3,7 @@ title: mybatis-plus 更新字段为 null 的坑
 date: 2023-11-07T08:00:00+08:00
 draft: false
 tags: [ mybatis ]
-categories: [ 随笔 ]
+collections: [ 随笔 ]
 ---
 
 ## 字段更新为null的代码

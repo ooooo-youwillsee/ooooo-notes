@@ -3,7 +3,7 @@ title: 在 windows 中 rsync 问题
 date: 2022-01-03T08:00:00+08:00
 draft: false
 tags: [resolution]
-categories: [随笔]
+collections: [随笔]
 ---
 
 

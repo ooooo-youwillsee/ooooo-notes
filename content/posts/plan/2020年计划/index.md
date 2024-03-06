@@ -3,7 +3,7 @@ title: "2020年学习计划"
 date: 2020-01-01T09:00:00+08:00
 draft: false
 tags: [learning]
-categories: [计划]
+collections: [计划]
 ---
 
 ## 0、持续学习者

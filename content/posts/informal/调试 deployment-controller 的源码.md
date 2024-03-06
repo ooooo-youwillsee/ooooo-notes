@@ -3,7 +3,7 @@ title: 调试 deployment-controller 的源码
 date: 2022-07-15T08:00:00+08:00
 draft: false
 tags: [k8s, cloud native, source code]
-categories: [随笔]
+collections: [随笔]
 ---
 
 > 1. `deployment` 资源是我们经常需要使用的，也是我们最应该熟悉的源码.

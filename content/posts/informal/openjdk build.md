@@ -3,7 +3,7 @@ title: openjdk build
 date: 2023-02-01T08:00:00+08:00
 draft: false
 tags: [jdk]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 相关命令

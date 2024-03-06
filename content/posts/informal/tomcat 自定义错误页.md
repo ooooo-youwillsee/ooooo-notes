@@ -3,7 +3,7 @@ title: tomcat 自定义错误页
 date: 2021-01-01T08:00:00+08:00
 draft: false
 tags: [resolution]
-categories: [随笔]
+collections: [随笔]
 ---
 
 在 `conf/server.xml` 中的 **Host**标签添加

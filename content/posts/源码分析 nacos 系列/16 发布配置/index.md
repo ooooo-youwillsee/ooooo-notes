@@ -3,7 +3,7 @@ title: 16 发布配置
 date: 2023-09-11T08:00:00+08:00
 draft: false
 tags: [ nacos, source code, 源码分析 nacos 系列 ]
-categories: [ 源码分析 nacos 系列 ]
+collections: [ 源码分析 nacos 系列 ]
 ---
 
 > nacos 基于 2.2.4 版本

@@ -3,7 +3,7 @@ title: 在 windows 中安装 wireshark 报错
 date: 2022-01-02T08:00:00+08:00
 draft: false
 tags: [resolution, wireshark]
-categories: [随笔]
+collections: [随笔]
 ---
 
 

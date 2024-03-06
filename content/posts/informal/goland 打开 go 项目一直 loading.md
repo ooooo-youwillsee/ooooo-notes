@@ -3,7 +3,7 @@ title: goland 打开 go 项目一直 loading
 date: 2023-03-20T08:00:00+08:00
 draft: false
 tags: [ide, goland]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. go list all 一直加载

@@ -3,7 +3,7 @@ title: 设置 docker 代理
 date: 2022-12-18T09:00:00+08:00
 draft: false
 tags: [docker, cloud native]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 配置 docker 代理

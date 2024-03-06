@@ -3,7 +3,7 @@ title: 实现 aop 原理
 date: 2023-12-18T08:00:00+08:00
 draft: false
 tags: [ spring boot, source code,源码分析 spring boot 系列 ]
-categories: [ 源码分析 spring boot 系列 ]
+collections: [ 源码分析 spring boot 系列 ]
 ---
 
 ## AopAutoConfiguration 自动配置类

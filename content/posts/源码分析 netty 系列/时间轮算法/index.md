@@ -3,7 +3,7 @@ title: 时间轮算法
 date: 2023-08-22T08:00:00+08:00
 draft: false
 tags: [ netty, source code, 源码分析 netty 系列 ]
-categories: [ 源码分析 netty 系列 ]
+collections: [ 源码分析 netty 系列 ]
 ---
 
 ## 时间轮的用法

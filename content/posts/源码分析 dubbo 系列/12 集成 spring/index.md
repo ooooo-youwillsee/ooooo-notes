@@ -3,7 +3,7 @@ title: 12 集成 spring
 date: 2023-12-24T08:00:00+08:00
 draft: false
 tags: [ dubbo, source code, 源码分析 dubbo 系列 ]
-categories: [ 源码分析 dubbo 系列 ]
+collections: [ 源码分析 dubbo 系列 ]
 ---
 
 > dubbo 基于 3.2.6 版本

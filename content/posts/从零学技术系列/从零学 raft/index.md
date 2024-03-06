@@ -3,7 +3,7 @@ title: 从零学 raft
 date: 2023-12-05T08:00:00+08:00
 draft: false
 tags: [ raft, 从零学技术系列 ]
-categories: [ 从零学技术系列 ]
+collections: [ 从零学技术系列 ]
 ---
 
 ## 为什么学

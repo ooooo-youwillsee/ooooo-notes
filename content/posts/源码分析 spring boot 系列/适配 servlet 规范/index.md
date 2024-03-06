@@ -3,7 +3,7 @@ title: 适配 servlet 规范
 date: 2023-11-18T08:00:00+08:00
 draft: false
 tags: [ spring boot, source code,源码分析 spring boot 系列 ]
-categories: [ 源码分析 spring boot 系列 ]
+collections: [ 源码分析 spring boot 系列 ]
 ---
 
 

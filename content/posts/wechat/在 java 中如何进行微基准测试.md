@@ -3,7 +3,7 @@ title: 在 java 中如何进行微基准测试 ?
 date: 2022-10-16T09:00:00+08:00
 draft: false
 tags: [java]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 ## 1. jmh 微基准测试

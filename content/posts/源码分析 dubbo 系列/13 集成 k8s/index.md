@@ -3,7 +3,7 @@ title: 13 集成 k8s
 date: 2023-12-25T08:00:00+08:00
 draft: false
 tags: [ dubbo, source code, 源码分析 dubbo 系列 ]
-categories: [ 源码分析 dubbo 系列 ]
+collections: [ 源码分析 dubbo 系列 ]
 ---
 
 > dubbo 基于 3.2.6 版本

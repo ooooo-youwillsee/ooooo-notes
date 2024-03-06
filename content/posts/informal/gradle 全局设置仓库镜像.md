@@ -3,7 +3,7 @@ title: gradle 全局设置仓库镜像
 date: 2021-01-02T08:00:00+08:00
 draft: false
 tags: [resolution]
-categories: [随笔]
+collections: [随笔]
 ---
 
 在 `~\.gradle` 目录下新建文件 `init.gradle`, 内容如下

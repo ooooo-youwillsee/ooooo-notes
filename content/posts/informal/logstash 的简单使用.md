@@ -3,7 +3,7 @@ title: logstash 的简单使用
 date: 2022-06-01T08:00:00+08:00
 draft: false
 tags: [logstash]
-categories: [随笔]
+collections: [随笔]
 ---
 
 

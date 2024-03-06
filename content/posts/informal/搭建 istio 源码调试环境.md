@@ -3,7 +3,7 @@ title: 搭建 istio 源码调试环境
 date: 2022-12-19T09:00:00+08:00
 draft: false
 tags: [istio, cloud native]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 前置条件

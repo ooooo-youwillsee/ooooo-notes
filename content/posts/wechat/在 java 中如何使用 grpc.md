@@ -3,7 +3,7 @@ title: 在 java 中如何使用 grpc
 date: 2022-10-22T09:00:00+08:00
 draft: false
 tags: [java, grpc]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 ## grpc 使用方式

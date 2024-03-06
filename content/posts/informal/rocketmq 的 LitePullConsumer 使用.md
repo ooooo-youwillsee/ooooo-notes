@@ -3,7 +3,7 @@ title: rocketmq 的 LitePullConsumer 使用
 date: 2023-07-07T08:00:00+08:00
 draft: false
 tags: [spring, rocketmq]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 代码

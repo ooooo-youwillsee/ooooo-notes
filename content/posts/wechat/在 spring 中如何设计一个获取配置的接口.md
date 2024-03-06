@@ -4,7 +4,7 @@ date: 2022-09-05T21:09:00+08:00
 lastmod: 2022-09-12T10:16:00+08:00
 draft: false
 tags: [java, spring, spring-extension]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 ## 1. 需求

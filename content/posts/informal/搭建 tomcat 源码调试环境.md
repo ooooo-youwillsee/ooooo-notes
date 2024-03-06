@@ -3,7 +3,7 @@ title: 搭建 tomcat 源码调试环境
 date: 2022-08-10T08:00:00+08:00
 draft: false
 tags: [tomcat, source code]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 下载代码

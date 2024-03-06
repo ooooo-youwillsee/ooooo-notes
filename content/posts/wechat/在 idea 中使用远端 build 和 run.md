@@ -4,7 +4,7 @@ date: 2022-09-12T08:14:00+08:00
 lastmod: 2022-09-12T08:14:00+08:00
 draft: false
 tags: [IDE]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 在 idea 中实际有一个非常有用的功能，那就是**远端构建**和**远端运行**。

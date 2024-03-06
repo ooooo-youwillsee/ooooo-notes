@@ -3,8 +3,10 @@ title: 09 dubbo 协议
 date: 2023-12-07T08:00:00+08:00
 draft: false
 tags: [ dubbo, source code, 源码分析 dubbo 系列 ]
-categories: [ 源码分析 dubbo 系列 ]
+collections: [ 源码分析 dubbo 系列 ]
 ---
+
+> dubbo 基于 3.2.6 版本
 
 > 在 `dubbo 2.x` 中，**最常用**的协议就是 `dubbo` 协议，我们有必要**弄懂**整个实现过程。
 

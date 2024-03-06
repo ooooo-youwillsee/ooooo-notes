@@ -3,7 +3,7 @@ title: 在 java 中如何获取 lambda 的方法名称?
 date: 2022-10-11T22:25:00+08:00
 draft: false
 tags: [IDE]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 我们在开发过程中，经常会使用 lambda 函数式编程，这样会更加简单。

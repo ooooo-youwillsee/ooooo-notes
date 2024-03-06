@@ -3,7 +3,7 @@ title: nacos 集群用 nginx 代理问题
 date: 2023-06-01T08:00:00+08:00
 draft: false
 tags: [nacos, spring]
-categories: [随笔]
+collections: [随笔]
 ---
 
 

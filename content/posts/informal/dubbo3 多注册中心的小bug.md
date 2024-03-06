@@ -3,7 +3,7 @@ title: dubbo3 多注册中心的小 bug
 date: 2023-07-03T08:00:00+08:00
 draft: false
 tags: [dubbo]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 配置

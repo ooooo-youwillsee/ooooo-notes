@@ -3,7 +3,7 @@ title: 从零学 dubbo
 date: 2023-11-24T08:00:00+08:00
 draft: false
 tags: [ dubbo, 从零学技术系列 ]
-categories: [ 从零学技术系列 ]
+collections: [ 从零学技术系列 ]
 ---
 
 ## 为什么学

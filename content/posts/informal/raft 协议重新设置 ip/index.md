@@ -3,7 +3,7 @@ title: raft 协议重新设置 ip
 date: 2023-09-08T08:00:00+08:00
 draft: false
 tags: [raft]
-categories: [随笔]
+collections: [随笔]
 ---
 
 raft 节点在机器ip变动之后，可能出现选主不成功的问题。

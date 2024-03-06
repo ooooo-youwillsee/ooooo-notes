@@ -3,7 +3,7 @@ title: 在 java 中如何解决类冲突问题
 date: 2022-10-18T09:00:00+08:00
 draft: false
 tags: [java]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 ## 1. 自定义 classloader

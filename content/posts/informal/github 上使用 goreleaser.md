@@ -3,7 +3,7 @@ title: github 上使用 goreleaser
 date: 2023-08-01T08:00:00+08:00
 draft: false
 tags: [ github, tools, goreleaser ]
-categories: [ 随笔 ]
+collections: [ 随笔 ]
 ---
 
 ## 1. goreleaser 的简单说明

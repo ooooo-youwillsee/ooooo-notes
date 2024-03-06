@@ -3,7 +3,7 @@ title: 如何使用 java 中 invoke 包?
 date: 2022-10-17T09:00:00+08:00
 draft: false
 tags: [java]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 ## 1. methodHandle 调用

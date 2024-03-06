@@ -3,7 +3,7 @@ title: 事务传播类型
 date: 2024-02-23T08:00:00+08:00
 draft: false
 tags: [ spring boot, source code,源码分析 spring boot 系列 ]
-categories: [ 源码分析 spring boot 系列 ]
+collections: [ 源码分析 spring boot 系列 ]
 ---
 
 > 只要涉及到**数据库操作**，必定就会使用 `@Transactional` 注解，其中有一个属性就是 **propagation(传播类型)**，掌握它的用法很重要。演示代码见末尾。

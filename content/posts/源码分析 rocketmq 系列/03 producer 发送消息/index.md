@@ -3,7 +3,7 @@ title: 03 producer 发送消息
 date: 2023-10-20T08:00:00+08:00
 draft: false
 tags: [ rocketmq, source code, 源码分析 rocketmq 系列 ]
-categories: [ 源码分析 rocketmq 系列 ]
+collections: [ 源码分析 rocketmq 系列 ]
 ---
 
 > rocketmq 基于 5.1.4 版本

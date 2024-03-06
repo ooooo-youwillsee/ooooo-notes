@@ -3,7 +3,7 @@ title: 在 windows 上调试 redis
 date: 2022-06-01T08:00:00+08:00
 draft: false
 tags: [redis]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. install wsl

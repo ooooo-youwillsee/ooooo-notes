@@ -3,7 +3,7 @@ title: k8s 的小问题
 date: 2023-03-21T08:00:00+08:00
 draft: false
 tags: [ k8s, cloud native ]
-categories: [ 随笔 ]
+collections: [ 随笔 ]
 ---
 
 ## 1. 文件夹权限

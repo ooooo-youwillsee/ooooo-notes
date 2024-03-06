@@ -3,7 +3,7 @@ title: docker 设置镜像源
 date: 2023-03-18T08:00:00+08:00
 draft: false
 tags: [docker]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ```shell

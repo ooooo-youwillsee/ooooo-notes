@@ -3,7 +3,7 @@ title: 在 docker 上安装 nfs
 date: 2022-03-01T08:00:00+08:00
 draft: false
 tags: [docker, nfs]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## install nfs in docker

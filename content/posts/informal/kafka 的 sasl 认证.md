@@ -3,7 +3,7 @@ title: kafka 的 SASL 认证
 date: 2023-08-01T08:00:00+08:00
 draft: false
 tags: [ kafka ]
-categories: [ 随笔 ]
+collections: [ 随笔 ]
 ---
 
 ## 1. 搭建 kafka 环境

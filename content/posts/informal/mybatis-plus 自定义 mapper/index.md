@@ -3,7 +3,7 @@ title: mybatis-plus 自定义 mapper
 date: 2023-06-08T08:00:00+08:00
 draft: false
 tags: [ spring, mybatis ]
-categories: [ 随笔 ]
+collections: [ 随笔 ]
 ---
 
 ## 1. 问题

@@ -3,7 +3,7 @@ title: 07 常用的 ActivityBehavior
 date: 2023-10-14T08:00:00+08:00
 draft: false
 tags: [ activiti, source code, 源码分析 activiti 系列 ]
-categories: [ 源码分析 activiti 系列 ]
+collections: [ 源码分析 activiti 系列 ]
 ---
 
 > activiti 基于 8.0.0 版本

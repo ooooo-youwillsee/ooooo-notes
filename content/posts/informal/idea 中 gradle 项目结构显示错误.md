@@ -3,7 +3,7 @@ title: idea 中 gradle 项目结构显示错误
 date: 2022-01-01T08:00:00+08:00
 draft: false
 tags: [resolution]
-categories: [随笔]
+collections: [随笔]
 ---
 
 > idea gradle project show duplicated file tree（project view and packages view）

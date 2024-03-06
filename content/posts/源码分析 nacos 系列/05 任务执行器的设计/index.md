@@ -3,7 +3,7 @@ title: 05 任务执行器的设计
 date: 2023-08-22T08:00:00+08:00
 draft: false
 tags: [ nacos, source code, 源码分析 nacos 系列 ]
-categories: [ 源码分析 nacos 系列 ]
+collections: [ 源码分析 nacos 系列 ]
 ---
 
 > nacos 基于 2.2.4 版本

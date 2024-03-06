@@ -3,7 +3,7 @@ title: linux 中的 cgroup 机制
 date: 2023-01-29T08:00:00+08:00
 draft: false
 tags: [linux]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 检查 cgroup 的版本

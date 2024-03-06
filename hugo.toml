@@ -72,13 +72,21 @@ enableEmoji = true
     weight = 2
     [menu.main.params]
 #      icon = "fa-solid fa-folder-tree"
+#  [[menu.main]]
+#    weight = 3
+#    identifier = "categories"
+#    pre = "<i class='fa fa-archive' aria-hidden='true'></i>"
+#    post = ""
+#    name = "分类"
+#    url = "../ooooo-notes/categories/"
+#    title = ""
   [[menu.main]]
-    weight = 3
-    identifier = "categories"
+    weight = 4
+    identifier = "collections"
     pre = "<i class='fa fa-archive' aria-hidden='true'></i>"
     post = ""
-    name = "分类"
-    url = "../ooooo-notes/categories/"
+    name = "合集"
+    url = "../ooooo-notes/collections/"
     title = ""
   [[menu.main]]
     identifier = "github"
@@ -88,7 +96,7 @@ enableEmoji = true
     name = ""
     url = "https://github.com/ooooo-youwillsee"
     title = "GitHub"
-    weight = 4
+    weight = 5
     [menu.main.params]
 #      icon = "fa-solid fa-tags"
 

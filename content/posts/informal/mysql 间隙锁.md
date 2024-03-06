@@ -3,7 +3,7 @@ title: mysql 间隙锁
 date: 2023-01-28T08:00:00+08:00
 draft: false
 tags: [mysql]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 准备数据

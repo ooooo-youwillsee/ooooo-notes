@@ -3,7 +3,7 @@ title: docker 单主机网络
 date: 2023-01-20T08:00:00+08:00
 draft: false
 tags: [docker, network]
-categories: [随笔]
+collections: [随笔]
 ---
 
 这篇文章主要简述 docker 中的 bridge 网络驱动是如何工作的。

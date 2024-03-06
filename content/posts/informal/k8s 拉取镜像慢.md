@@ -3,7 +3,7 @@ title: k8s 拉取镜像慢
 date: 2023-03-21T08:00:00+08:00
 draft: false
 tags: [k8s, containerd]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. 检查 kubelet 的 cri

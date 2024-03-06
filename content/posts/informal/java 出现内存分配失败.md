@@ -3,7 +3,7 @@ title: java 出现内存分配失败
 date: 2020-01-02T08:00:00+08:00
 draft: false
 tags: [resolution]
-categories: [随笔]
+collections: [随笔]
 ---
 
 [问题](https://community.cloudera.com/t5/Support-Questions/Storm-quot-Cannot-allocate-memory-quot-quot-insufficient/td-p/144449)

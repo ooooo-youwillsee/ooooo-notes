@@ -3,7 +3,7 @@ title: 从零学 leveldb
 date: 2023-10-08T08:00:00+08:00
 draft: false
 tags: [ leveldb, 从零学技术系列 ]
-categories: [ 从零学技术系列 ]
+collections: [ 从零学技术系列 ]
 ---
 
 ## 为什么学

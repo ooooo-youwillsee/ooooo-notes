@@ -3,7 +3,7 @@ title: vmware 一些设置
 date: 2023-03-17T08:00:00+08:00
 draft: false
 tags: [vmware, resolution]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## 1. enable enhanced keyboard

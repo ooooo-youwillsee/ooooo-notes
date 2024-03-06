@@ -3,7 +3,7 @@ title: 简单封装 thrift 协议
 date: 2023-09-13T08:00:00+08:00
 draft: false
 tags: [thrift]
-categories: [随笔]
+collections: [随笔]
 ---
 
 ## build.gradle 文件

@@ -3,7 +3,7 @@ title: "2021年学习计划"
 date: 2021-01-01T09:00:00+08:00
 draft: false
 tags: [learning]
-categories: [计划]
+collections: [计划]
 ---
 
 

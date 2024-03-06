@@ -4,7 +4,7 @@ date: 2022-09-05T21:09:01+08:00
 lastmod: 2022-09-05T21:01:00+08:00
 draft: false
 tags: [java, spring, spring-extension]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 在 spring 中，我们常常会基于**现有的代码**来扩展之前的功能，或者**换一个实现的方式**。

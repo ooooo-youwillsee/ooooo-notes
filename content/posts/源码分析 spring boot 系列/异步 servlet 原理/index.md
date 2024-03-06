@@ -3,7 +3,7 @@ title: 异步 servlet 原理
 date: 2024-01-06T08:00:00+08:00
 draft: false
 tags: [ spring boot, source code,源码分析 spring boot 系列 ]
-categories: [ 源码分析 spring boot 系列 ]
+collections: [ 源码分析 spring boot 系列 ]
 ---
 
 > 在 `servlet 3.0` 的规范中，有**异步servlet**特性，这个可以**增大吞吐量**。我们有必要看看 `spring` 是如何适配这个特性的。

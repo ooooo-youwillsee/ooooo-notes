@@ -4,7 +4,7 @@ date: 2022-09-05T18:00:00+08:00
 lastmod: 2022-09-05T21:01:00+08:00
 draft: false
 tags: [java, spring]
-categories: [微信文章]
+collections: [微信文章]
 ---
 
 作为一个 Java 开发，Spring 的技术可以说是必须要掌握的，不仅仅是会使用，而且要掌握原理，学会扩展。
