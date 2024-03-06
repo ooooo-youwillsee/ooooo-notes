@@ -3,7 +3,7 @@ title: "2024年学习计划"
 date: 2024-01-01T09:00:00+08:00
 draft: false
 tags: [ learning ]
-collections: [ 计划 ]
+collections: [ 个人计划 ]
 ---
 
 > :o: **进行中**

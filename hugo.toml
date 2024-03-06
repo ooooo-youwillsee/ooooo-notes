@@ -505,7 +505,7 @@ enableEmoji = true
 
   # FixIt 0.2.17 | NEW TagCloud config for tags page
   [params.tagcloud]
-    enable = false
+    enable = true
     min = 14 # Minimum font size in px
     max = 32 # Maximum font size in px
     peakCount = 10 # Maximum count of posts per tag
@@ -669,7 +669,7 @@ enableEmoji = true
     pageStyle = "normal"
     # FixIt 0.2.17 | CHANGED Auto Bookmark Support
     # If true, save the reading progress when closing the page.
-    autoBookmark = false
+    autoBookmark = true
     # FixIt 0.2.17 | NEW whether to enable wordCount
     wordCount = true
     # FixIt 0.2.17 | NEW whether to enable readingTime
