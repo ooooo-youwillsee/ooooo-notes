@@ -506,9 +506,9 @@ enableEmoji = true
   # FixIt 0.2.17 | NEW TagCloud config for tags page
   [params.tagcloud]
     enable = true
-    min = 14 # Minimum font size in px
-    max = 32 # Maximum font size in px
-    peakCount = 10 # Maximum count of posts per tag
+    min = 15 # Minimum font size in px
+    max = 30 # Maximum font size in px
+    peakCount = 15 # Maximum count of posts per tag
     orderby = "name" # Order of tags, optional values: ["name", "count"]
 
   # Home page config
