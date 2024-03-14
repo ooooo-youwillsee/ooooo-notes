@@ -21,7 +21,7 @@
 
 :zero::five:. [《Vim实用技巧（第2版）》](https://book.douban.com/subject/26967597/) :o:
 
-:zero::six:. [《C和指针》](https://book.douban.com/subject/3012360/)
+:zero::six:. [《C和指针》](https://book.douban.com/subject/3012360/) :white_check_mark:
 
 :zero::seven:. [《C专家编程》](https://book.douban.com/subject/2377310/)
 
@@ -33,11 +33,13 @@
 
 :one::one:. [x86汇编语言（第2版）](https://book.douban.com/subject/36238072/)
 
+:one::two:. [Rust实战](https://book.douban.com/subject/36059499/) :o:
+
 ## 2. 关于源码笔记
 
 :zero::one:. [《rocketmq 源码》](https://github.com/apache/rocketmq) :o:
 
-:zero::two:. [《dubbo 源码》](https://github.com/apache/dubbo) :o:
+:zero::two:. [《dubbo 源码》](https://github.com/apache/dubbo) :white_check_mark:
 
 :zero::three:. [《grpc-go 源码》](https://github.com/grpc/grpc-go)
 
