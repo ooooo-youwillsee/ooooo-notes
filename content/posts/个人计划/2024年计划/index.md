@@ -40,6 +40,9 @@ collections: [ 个人计划 ]
 
 :one::two:. [Rust实战](https://book.douban.com/subject/36059499/) :o:
 
+:one::three:. [期货及衍生品基础（第三版）](https://book.douban.com/subject/35729143/) :o:
+
+
 ## 2. 关于源码笔记
 
 :zero::one:. [《rocketmq 源码》](https://github.com/apache/rocketmq) :o:
