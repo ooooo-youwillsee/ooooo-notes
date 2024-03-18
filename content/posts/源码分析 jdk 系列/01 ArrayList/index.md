@@ -15,16 +15,16 @@ collections: [ 源码分析 jdk 系列 ]
 ```java
 public class ArrayListTest {
 
-  @Test
-  void test() {
-    List<String> ids = new ArrayList<>();
-    assertThat(ids.add("1")).isEqualTo(true);
-    assertThat(ids.add("2")).isEqualTo(true);
-    assertThat(ids.add("3")).isEqualTo(true);
-    assertThat(ids.remove("2")).isEqualTo(true);
-    assertThat(ids.set(0, "4")).isEqualTo("1");
-    assertThat(ids.get(0)).isEqualTo("4");
-  }
+    @Test
+    void test() {
+        List<String> ids = new ArrayList<>();
+        assertThat(ids.add("1")).isEqualTo(true);
+        assertThat(ids.add("2")).isEqualTo(true);
+        assertThat(ids.add("3")).isEqualTo(true);
+        assertThat(ids.remove("2")).isEqualTo(true);
+        assertThat(ids.set(0, "4")).isEqualTo("1");
+        assertThat(ids.get(0)).isEqualTo("4");
+    }
 }
 ```
 
