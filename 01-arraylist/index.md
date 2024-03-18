@@ -10,16 +10,16 @@
 ```java
 public class ArrayListTest {
 
-  @Test
-  void test() {
-    List&lt;String&gt; ids = new ArrayList&lt;&gt;();
-    assertThat(ids.add(&#34;1&#34;)).isEqualTo(true);
-    assertThat(ids.add(&#34;2&#34;)).isEqualTo(true);
-    assertThat(ids.add(&#34;3&#34;)).isEqualTo(true);
-    assertThat(ids.remove(&#34;2&#34;)).isEqualTo(true);
-    assertThat(ids.set(0, &#34;4&#34;)).isEqualTo(&#34;1&#34;);
-    assertThat(ids.get(0)).isEqualTo(&#34;4&#34;);
-  }
+    @Test
+    void test() {
+        List&lt;String&gt; ids = new ArrayList&lt;&gt;();
+        assertThat(ids.add(&#34;1&#34;)).isEqualTo(true);
+        assertThat(ids.add(&#34;2&#34;)).isEqualTo(true);
+        assertThat(ids.add(&#34;3&#34;)).isEqualTo(true);
+        assertThat(ids.remove(&#34;2&#34;)).isEqualTo(true);
+        assertThat(ids.set(0, &#34;4&#34;)).isEqualTo(&#34;1&#34;);
+        assertThat(ids.get(0)).isEqualTo(&#34;4&#34;);
+    }
 }
 ```
 
