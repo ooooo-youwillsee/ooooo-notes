@@ -20,7 +20,7 @@
 </span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>planContinueProcessOperation</span><span class=p>(</span><span class=n>ExecutionEntity</span><span class=w> </span><span class=n>execution</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 最终会执行 ContinueProcessOperation#run 方法</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>planOperation</span><span class=p>(</span><span class=k>new</span><span class=w> </span><span class=n>ContinueProcessOperation</span><span class=p>(</span><span class=n>commandContext</span><span class=p>,</span><span class=w> </span><span class=n>execution</span><span class=p>));</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#run</code></p><div class=highlight id=id-1><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#run</code></p><div class=highlight id=id-2><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -49,7 +49,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ActivitiException</span><span class=p>(</span><span class=s>&#34;Programmatic error: no current flow element found or invalid type: &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>currentFlowElement</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34;. Halting.&#34;</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#continueThroughFlowNode</code></p><div class=highlight id=id-2><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#continueThroughFlowNode</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -94,7 +94,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 异步执行, 不会等待</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>executeAsynchronous</span><span class=p>(</span><span class=n>flowNode</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#executeSynchronous</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#executeSynchronous</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -171,7 +171,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// behavior 为 null，会流转到下个节点</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Context</span><span class=p>.</span><span class=na>getAgenda</span><span class=p>().</span><span class=na>planTakeOutgoingSequenceFlowsOperation</span><span class=p>(</span><span class=n>execution</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.bpmn.behavior.FlowNodeActivityBehavior#execute</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.bpmn.behavior.FlowNodeActivityBehavior#execute</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -208,7 +208,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>                                       </span><span class=kt>boolean</span><span class=w> </span><span class=n>throwExceptionIfExecutionStuck</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 执行 TakeOutgoingSequenceFlowsOperation#run 方法</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>getAgenda</span><span class=p>().</span><span class=na>planTakeOutgoingSequenceFlowsOperation</span><span class=p>(</span><span class=n>execution</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>);</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.TakeOutgoingSequenceFlowsOperation#run</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.TakeOutgoingSequenceFlowsOperation#run</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -245,7 +245,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 处理连线, 会执行 planContinueProcessOperation</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>handleSequenceFlow</span><span class=p>();</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.TakeOutgoingSequenceFlowsOperation#leaveFlowNode</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.TakeOutgoingSequenceFlowsOperation#leaveFlowNode</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -382,7 +382,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>Context</span><span class=p>.</span><span class=na>getAgenda</span><span class=p>().</span><span class=na>planContinueProcessOperation</span><span class=p>(</span><span class=n>outgoingExecution</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#continueThroughSequenceFlow</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.agenda.ContinueProcessOperation#continueThroughSequenceFlow</code></p><div class=highlight id=id-8><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
