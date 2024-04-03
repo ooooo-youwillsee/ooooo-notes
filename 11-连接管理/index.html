@@ -97,7 +97,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>LOGGER</span><span class=p>.</span><span class=na>error</span><span class=p>(</span><span class=s>&#34;[{}]Fail to connect to server!,error={}&#34;</span><span class=p>,</span><span class=w> </span><span class=n>GrpcClient</span><span class=p>.</span><span class=na>this</span><span class=p>.</span><span class=na>getName</span><span class=p>(),</span><span class=w> </span><span class=n>e</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=server-接受连接 class=heading-element><a href=#server-%e6%8e%a5%e5%8f%97%e8%bf%9e%e6%8e%a5 class=heading-mark></a>server 接受连接</h2><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.GrpcBiStreamRequestAcceptor#requestBiStream</code></p><div class=highlight id=id-1><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=server-接受连接 class=heading-element><a href=#server-%e6%8e%a5%e5%8f%97%e8%bf%9e%e6%8e%a5 class=heading-mark></a>server 接受连接</h2><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.GrpcBiStreamRequestAcceptor#requestBiStream</code></p><div class=highlight id=id-2><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -176,7 +176,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.ConnectionManager#register</code></p><div class=highlight id=id-2><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.ConnectionManager#register</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -239,7 +239,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.ClientConnectionEventListenerRegistry#notifyClientConnected</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.ClientConnectionEventListenerRegistry#notifyClientConnected</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -304,7 +304,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>Loggers</span><span class=p>.</span><span class=na>REMOTE</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=s>&#34;[ClientConnectionEventListenerRegistry] registry listener - &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>listener</span><span class=p>.</span><span class=na>getClass</span><span class=p>()</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>.</span><span class=na>getSimpleName</span><span class=p>());</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>clientConnectionEventListeners</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>listener</span><span class=p>);</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=reloadclient-重置连接 class=heading-element><a href=#reloadclient-%e9%87%8d%e7%bd%ae%e8%bf%9e%e6%8e%a5 class=heading-mark></a>reloadClient 重置连接</h2><p>源码位置: <code>com.alibaba.nacos.core.controller.ServerLoaderController#reloadSingle</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=reloadclient-重置连接 class=heading-element><a href=#reloadclient-%e9%87%8d%e7%bd%ae%e8%bf%9e%e6%8e%a5 class=heading-mark></a>reloadClient 重置连接</h2><p>源码位置: <code>com.alibaba.nacos.core.controller.ServerLoaderController#reloadSingle</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
 </span><span class=lnt>4
@@ -319,7 +319,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 发送 ConnectResetRequest 请求，重置客户端</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>connectionManager</span><span class=p>.</span><span class=na>loadSingle</span><span class=p>(</span><span class=n>connectionId</span><span class=p>,</span><span class=w> </span><span class=n>redirectAddress</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>ResponseEntity</span><span class=p>.</span><span class=na>ok</span><span class=p>().</span><span class=na>body</span><span class=p>(</span><span class=s>&#34;success&#34;</span><span class=p>);</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.ConnectionManager#loadSingle</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.remote.ConnectionManager#loadSingle</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -368,7 +368,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.common.remote.client.RpcClient.ConnectResetRequestHandler</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.common.remote.client.RpcClient.ConnectResetRequestHandler</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -431,7 +431,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>return</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=server-断开连接检查 class=heading-element><a href=#server-%e6%96%ad%e5%bc%80%e8%bf%9e%e6%8e%a5%e6%a3%80%e6%9f%a5 class=heading-mark></a>server 断开连接检查</h2><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.AddressTransportFilter#transportTerminated</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=server-断开连接检查 class=heading-element><a href=#server-%e6%96%ad%e5%bc%80%e8%bf%9e%e6%8e%a5%e6%a3%80%e6%9f%a5 class=heading-mark></a>server 断开连接检查</h2><p>源码位置: <code>com.alibaba.nacos.core.remote.grpc.AddressTransportFilter#transportTerminated</code></p><div class=highlight id=id-8><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
