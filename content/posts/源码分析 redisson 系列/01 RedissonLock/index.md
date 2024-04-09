@@ -1,5 +1,5 @@
 ---
-title: 01 分布式锁 RedissonLock
+title: 01 RedissonLock
 date: 2024-04-08T08:00:00+08:00
 draft: false
 tags: [ redisson, source code, 源码分析 redisson 系列 ]
@@ -8,7 +8,7 @@ collections: [ 源码分析 redisson 系列 ]
 
 > `redisson` 基于 `org.redisson:redisson-spring-data-27:3.27.2` 版本
 
-> 在 `java` 中，操作 `redis` 一般都会选择 `redisson` 框架, 我们需要了解**常用功能的实现原理**。
+> 在 `java` 中，操作 `redis` 一般都会选择 `redisson` 框架, 我们需要了解**常用功能的实现原理**, 这次来介绍 `RedissonLock`。
 
 ## 使用方式
 
