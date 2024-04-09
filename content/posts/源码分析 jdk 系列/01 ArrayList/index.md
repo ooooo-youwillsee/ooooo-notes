@@ -2,7 +2,7 @@
 title: 01 ArrayList
 date: 2024-03-18T08:00:00+08:00
 draft: false
-tags: [ java, source code, 源码分析 jdk 系列 ]
+tags: [ jdk, source code, 源码分析 jdk 系列 ]
 collections: [ 源码分析 jdk 系列 ]
 ---
 

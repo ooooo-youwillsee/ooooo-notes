@@ -2,7 +2,7 @@
 title: openjdk build
 date: 2023-02-01T08:00:00+08:00
 draft: false
-tags: [ java ]
+tags: [ jdk ]
 collections: [随笔]
 ---
 
