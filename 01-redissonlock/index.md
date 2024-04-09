@@ -1,9 +1,9 @@
-# 01 分布式锁 RedissonLock
+# 01 RedissonLock
 
 
 &gt; `redisson` 基于 `org.redisson:redisson-spring-data-27:3.27.2` 版本
 
-&gt; 在 `java` 中，操作 `redis` 一般都会选择 `redisson` 框架, 我们需要了解**常用功能的实现原理**。
+&gt; 在 `java` 中，操作 `redis` 一般都会选择 `redisson` 框架, 我们需要了解**常用功能的实现原理**, 这次来介绍 `RedissonLock`。
 
 ## 使用方式
 
@@ -231,5 +231,5 @@ protected RFuture&lt;Boolean&gt; unlockInnerAsync(long threadId, String requestI
 ---
 
 > 作者: 线偶  
-> URL: https://ooooo-youwillsee.github.io/ooooo-notes/01-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81-redissonlock/  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/01-redissonlock/  
 
