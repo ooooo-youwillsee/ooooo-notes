@@ -71,7 +71,7 @@ func (n *Node) call(targetNode *Node, members map[ID]*Node) error {
 
 ## 示例代码
 
-[labs-gossip-protocol](https://github.com/ooooo-youwillsee/labs-gossip-protocol)
+[demo-gossip-protocol](https://github.com/ooooo-youwillsee/demo-gossip-protocol)
 
 ---
 

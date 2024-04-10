@@ -12,12 +12,9 @@ public class RepeatTask extends AbstractTask {
 
     private final long maxDelay;
 
-    private final TimeUnit timeUnit;
-
     public RepeatTask(Runnable runnable, long maxDelay, TimeUnit timeUnit) {
         super(runnable);
-        this.maxDelay = maxDelay;
-        this.timeUnit = timeUnit;
+        this.maxDelay = timeUnit.toMillis(maxDelay);
     }
 
     @Override
@@ -28,7 +25,7 @@ public class RepeatTask extends AbstractTask {
         } finally {
             long diff = System.currentTimeMillis() - prevTime;
             diff = Long.max(maxDelay - diff, 0);
-            taskExecutor.schedule(this, diff, timeUnit);
+            taskExecutor.schedule(this, diff, TimeUnit.MILLISECONDS);
         }
     }
 }
