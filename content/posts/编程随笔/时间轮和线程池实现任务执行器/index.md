@@ -1,5 +1,5 @@
 ---
-title: 使用时间轮和线程池实现一个任务执行器
+title: 时间轮和线程池实现任务执行器
 date: 2024-03-24T08:00:00+08:00
 draft: false
 tags: [ java ]
@@ -17,12 +17,9 @@ public class RepeatTask extends AbstractTask {
 
     private final long maxDelay;
 
-    private final TimeUnit timeUnit;
-
     public RepeatTask(Runnable runnable, long maxDelay, TimeUnit timeUnit) {
         super(runnable);
-        this.maxDelay = maxDelay;
-        this.timeUnit = timeUnit;
+        this.maxDelay = timeUnit.toMillis(maxDelay);
     }
 
     @Override
@@ -33,7 +30,7 @@ public class RepeatTask extends AbstractTask {
         } finally {
             long diff = System.currentTimeMillis() - prevTime;
             diff = Long.max(maxDelay - diff, 0);
-            taskExecutor.schedule(this, diff, timeUnit);
+            taskExecutor.schedule(this, diff, TimeUnit.MILLISECONDS);
         }
     }
 }
