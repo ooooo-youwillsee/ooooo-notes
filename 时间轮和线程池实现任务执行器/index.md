@@ -1,4 +1,4 @@
-# 使用时间轮和线程池实现一个任务执行器
+# 时间轮和线程池实现任务执行器
 
 
 &gt; java 的线程池可以充当一个**任务执行器**的，但是有时候不符合我们的要求，所以需要自定义开发。&lt;br/&gt;
@@ -70,5 +70,5 @@ private void init() {
 ---
 
 > 作者: 线偶  
-> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E4%BD%BF%E7%94%A8%E6%97%B6%E9%97%B4%E8%BD%AE%E5%92%8C%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8/  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E6%97%B6%E9%97%B4%E8%BD%AE%E5%92%8C%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E5%99%A8/  
 

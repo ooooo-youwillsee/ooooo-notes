@@ -149,7 +149,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=k>new</span><span class=w> </span><span class=n>DistroVerifyExecuteTask</span><span class=p>(</span><span class=n>agent</span><span class=p>,</span><span class=w> </span><span class=n>verifyData</span><span class=p>,</span><span class=w> </span><span class=n>member</span><span class=p>.</span><span class=na>getAddress</span><span class=p>(),</span><span class=w> </span><span class=n>type</span><span class=p>));</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.consistency.ephemeral.distro.v2.DistroClientDataProcessor#getVerifyData</code></p><div class=highlight id=id-1><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.consistency.ephemeral.distro.v2.DistroClientDataProcessor#getVerifyData</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -198,7 +198,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>result</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.distributed.distro.task.verify.DistroVerifyExecuteTask#run</code></p><div class=highlight id=id-2><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.core.distributed.distro.task.verify.DistroVerifyExecuteTask#run</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -231,7 +231,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=p>.</span><span class=na>error</span><span class=p>(</span><span class=s>&#34;[DISTRO-FAILED] verify data for type {} to {} failed.&#34;</span><span class=p>,</span><span class=w> </span><span class=n>resourceType</span><span class=p>,</span><span class=w> </span><span class=n>targetServer</span><span class=p>,</span><span class=w> </span><span class=n>e</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.remote.rpc.handler.DistroDataRequestHandler#handle</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.remote.rpc.handler.DistroDataRequestHandler#handle</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -306,7 +306,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>result</span><span class=p>.</span><span class=na>setErrorInfo</span><span class=p>(</span><span class=n>ResponseCode</span><span class=p>.</span><span class=na>FAIL</span><span class=p>.</span><span class=na>getCode</span><span class=p>(),</span><span class=w> </span><span class=s>&#34;[DISTRO-FAILED] distro data verify failed&#34;</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>result</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.core.v2.client.manager.impl.EphemeralIpPortClientManager#verifyClient</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.core.v2.client.manager.impl.EphemeralIpPortClientManager#verifyClient</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -345,7 +345,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 验证不通过，返回 false, 最终会返回错误码</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.consistency.ephemeral.distro.v2.DistroClientTransportAgent.DistroVerifyCallbackWrapper#onResponse</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.consistency.ephemeral.distro.v2.DistroClientTransportAgent.DistroVerifyCallbackWrapper#onResponse</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -376,7 +376,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>NamingTpsMonitor</span><span class=p>.</span><span class=na>distroVerifyFail</span><span class=p>(</span><span class=n>member</span><span class=p>.</span><span class=na>getAddress</span><span class=p>(),</span><span class=w> </span><span class=n>member</span><span class=p>.</span><span class=na>getIp</span><span class=p>());</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>distroCallback</span><span class=p>.</span><span class=na>onFailed</span><span class=p>(</span><span class=kc>null</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=distroloaddatatask-加载数据 class=heading-element><a href=#distroloaddatatask-%e5%8a%a0%e8%bd%bd%e6%95%b0%e6%8d%ae class=heading-mark></a>DistroLoadDataTask 加载数据</h2><p>源码位置: <code>com.alibaba.nacos.core.distributed.distro.task.load.DistroLoadDataTask#run</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=distroloaddatatask-加载数据 class=heading-element><a href=#distroloaddatatask-%e5%8a%a0%e8%bd%bd%e6%95%b0%e6%8d%ae class=heading-mark></a>DistroLoadDataTask 加载数据</h2><p>源码位置: <code>com.alibaba.nacos.core.distributed.distro.task.load.DistroLoadDataTask#run</code></p><div class=highlight id=id-8><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -443,7 +443,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>loadCompletedMap</span><span class=p>.</span><span class=na>put</span><span class=p>(</span><span class=n>each</span><span class=p>,</span><span class=w> </span><span class=n>loadAllDataSnapshotFromRemote</span><span class=p>(</span><span class=n>each</span><span class=p>));</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=distrofilter-拦截请求 class=heading-element><a href=#distrofilter-%e6%8b%a6%e6%88%aa%e8%af%b7%e6%b1%82 class=heading-mark></a>DistroFilter 拦截请求</h2><p>源码位置: <code>com.alibaba.nacos.naming.web.DistroFilter#doFilter</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=distrofilter-拦截请求 class=heading-element><a href=#distrofilter-%e6%8b%a6%e6%88%aa%e8%af%b7%e6%b1%82 class=heading-mark></a>DistroFilter 拦截请求</h2><p>源码位置: <code>com.alibaba.nacos.naming.web.DistroFilter#doFilter</code></p><div class=highlight id=id-9><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -612,7 +612,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>                </span><span class=s>&#34;Server failed, &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>ExceptionUtil</span><span class=p>.</span><span class=na>getAllExceptionMsg</span><span class=p>(</span><span class=n>e</span><span class=p>));</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.core.DistroMapper#responsible</code></p><div class=highlight id=id-8><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>com.alibaba.nacos.naming.core.DistroMapper#responsible</code></p><div class=highlight id=id-10><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4

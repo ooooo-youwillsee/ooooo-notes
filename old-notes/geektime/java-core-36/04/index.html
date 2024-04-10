@@ -206,7 +206,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>		</span><span class=n>closed</span><span class=p>.</span><span class=na>set</span><span class=p>(</span><span class=kc>true</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w> 		</span><span class=n>consumer</span><span class=p>.</span><span class=na>wakeup</span><span class=p>();</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w> 	</span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div></li></ul><p>方案二：</p><p>​ 消费者程序使用单或多线程获取消息，同时创建多个消费线程执行消息处理逻辑；</p><p>优点：</p><ul><li>高伸缩性，自由调节消息获取和消息处理的线程数；</li></ul><p>缺点：</p><ul><li><p>实现难度大；</p></li><li><p>由于消息获取和消息处理解耦，会破坏消息在分区中的顺序；</p></li><li><p>会使得整个消息消费链路被拉长，位移提交可能会出错，导致重复消费；</p><div class=highlight id=id-9><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div></li></ul><p>方案二：</p><p>​ 消费者程序使用单或多线程获取消息，同时创建多个消费线程执行消息处理逻辑；</p><p>优点：</p><ul><li>高伸缩性，自由调节消息获取和消息处理的线程数；</li></ul><p>缺点：</p><ul><li><p>实现难度大；</p></li><li><p>由于消息获取和消息处理解耦，会破坏消息在分区中的顺序；</p></li><li><p>会使得整个消息消费链路被拉长，位移提交可能会出错，导致重复消费；</p><div class=highlight id=id-1><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
