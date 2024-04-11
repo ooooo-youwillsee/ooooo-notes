@@ -142,7 +142,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 执行 behavior</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>boundaryEventBehavior</span><span class=p>.</span><span class=na>execute</span><span class=p>(</span><span class=n>childExecutionEntity</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior#execute</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior#execute</code></p><div class=highlight id=id-1><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -187,7 +187,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 会新增一条 ACT_RU_TIMER_JOB 表</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>processEngineConfiguration</span><span class=p>.</span><span class=na>getTimerJobEntityManager</span><span class=p>().</span><span class=na>insert</span><span class=p>(</span><span class=n>timerJob</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>..</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>从上面的代码可以看出，当遇到 <code>BoundaryEvent</code> 时，数据库就会插入<strong>两条数据</strong>，分别为 <code>ACT_RU_EXECUTION</code> 和 <code>ACT_RU_TIMER_JOB</code>。当前节点如果<strong>停住</strong>了，这些数据就会<strong>持久化</strong>到数据库中。</p><h2 id=轮询-timerjob class=heading-element><a href=#%e8%bd%ae%e8%af%a2-timerjob class=heading-mark></a>轮询 timerJob</h2><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.AcquireTimerJobsRunnable#run</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>从上面的代码可以看出，当遇到 <code>BoundaryEvent</code> 时，数据库就会插入<strong>两条数据</strong>，分别为 <code>ACT_RU_EXECUTION</code> 和 <code>ACT_RU_TIMER_JOB</code>。当前节点如果<strong>停住</strong>了，这些数据就会<strong>持久化</strong>到数据库中。</p><h2 id=轮询-timerjob class=heading-element><a href=#%e8%bd%ae%e8%af%a2-timerjob class=heading-mark></a>轮询 timerJob</h2><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.AcquireTimerJobsRunnable#run</code></p><div class=highlight id=id-2><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -266,7 +266,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=p>...</span><span class=na>省略等待的代码</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>log</span><span class=p>.</span><span class=na>info</span><span class=p>(</span><span class=s>&#34;{} stopped async job due acquisition&#34;</span><span class=p>);</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.cmd.AcquireTimerJobsCmd#execute</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.cmd.AcquireTimerJobsCmd#execute</code></p><div class=highlight id=id-3><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -297,7 +297,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>acquiredJobs</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultJobManager#moveTimerJobToExecutableJob</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultJobManager#moveTimerJobToExecutableJob</code></p><div class=highlight id=id-4><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -328,7 +328,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=k>return</span><span class=w> </span><span class=n>executableJob</span><span class=p>;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>从上面的代码可以看出，先会筛选<strong>到期</strong>的 <code>timerJob</code>, 然后<strong>移动</strong>到 <code>job</code> 中，然后再触发<strong>执行</strong>。</p><h2 id=执行-job class=heading-element><a href=#%e6%89%a7%e8%a1%8c-job class=heading-mark></a>执行 job</h2><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor#executeAsyncJob</code></p><div class=highlight id=id-8><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>从上面的代码可以看出，先会筛选<strong>到期</strong>的 <code>timerJob</code>, 然后<strong>移动</strong>到 <code>job</code> 中，然后再触发<strong>执行</strong>。</p><h2 id=执行-job class=heading-element><a href=#%e6%89%a7%e8%a1%8c-job class=heading-mark></a>执行 job</h2><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor#executeAsyncJob</code></p><div class=highlight id=id-5><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -393,7 +393,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>temporaryJobQueue</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>job</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=kc>true</span><span class=p>;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable#run</code></p><div class=highlight id=id-9><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable#run</code></p><div class=highlight id=id-6><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -438,7 +438,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 解锁 job</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>unlockJobIfNeeded</span><span class=p>();</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable#executeJob</code></p><div class=highlight id=id-10><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable#executeJob</code></p><div class=highlight id=id-7><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -471,7 +471,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>String</span><span class=w> </span><span class=n>message</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s>&#34;Job &#34;</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=n>jobId</span><span class=w> </span><span class=o>+</span><span class=w> </span><span class=s>&#34; failed&#34;</span><span class=p>;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>log</span><span class=p>.</span><span class=na>error</span><span class=p>(</span><span class=n>message</span><span class=p>,</span><span class=w> </span><span class=n>exception</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultJobManager#execute</code></p><div class=highlight id=id-11><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultJobManager#execute</code></p><div class=highlight id=id-8><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -498,7 +498,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ActivitiException</span><span class=p>(</span><span class=s>&#34;Only jobs with type JobEntity are supported to be executed&#34;</span><span class=p>);</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultJobManager#executeTimerJob</code></p><div class=highlight id=id-12><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>org.activiti.engine.impl.asyncexecutor.DefaultJobManager#executeTimerJob</code></p><div class=highlight id=id-9><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
