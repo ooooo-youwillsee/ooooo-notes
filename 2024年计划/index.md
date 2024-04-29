@@ -33,7 +33,7 @@
 
 :one::one:. [x86汇编语言（第2版）](https://book.douban.com/subject/36238072/)
 
-:one::two:. [Rust实战](https://book.douban.com/subject/36059499/) :o:
+:one::two:. [Rust实战](https://book.douban.com/subject/36059499/) :white_check_mark:
 
 :one::three:. [期货及衍生品基础（第三版）](https://book.douban.com/subject/35729143/) :o:
 
