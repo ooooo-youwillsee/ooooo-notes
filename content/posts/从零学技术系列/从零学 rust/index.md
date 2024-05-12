@@ -19,3 +19,9 @@ collections: [ 从零学技术系列 ]
 3. [Asynchronous Programming in Rust](https://rust-lang.github.io/async-book/)
 4. [The Rustonomicon](https://doc.rust-lang.org/stable/nomicon/)
 
+代码：
+
+1. [robinson](https://github.com/mbrubeck/robinson) web引擎
+2. [toydb](https://github.com/erikgrinaker/toydb) 分布式数据库
+3. [r9cc](https://github.com/utam0k/r9cc) c99编译器
+
