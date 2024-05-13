@@ -1,4 +1,4 @@
-# 事务传播类型
+# spring tx 传播类型
 
 
 &gt; 只要涉及到**数据库操作**，必定就会使用 `@Transactional` 注解，其中有一个属性就是 **propagation(传播类型)**，掌握它的用法很重要。演示代码见末尾。
@@ -281,5 +281,5 @@ private TransactionStatus handleExistingTransaction(
 ---
 
 > 作者: 线偶  
-> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E4%BA%8B%E5%8A%A1%E4%BC%A0%E6%92%AD%E7%B1%BB%E5%9E%8B/  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/spring-tx-%E4%BC%A0%E6%92%AD%E7%B1%BB%E5%9E%8B/  
 

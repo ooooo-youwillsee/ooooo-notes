@@ -1,4 +1,4 @@
-# 实现 aop 原理
+# spring aop 原理
 
 
 ## AopAutoConfiguration 自动配置类
@@ -354,5 +354,5 @@ protected Object createProxy(Class&lt;?&gt; beanClass, @Nullable String beanName
 ---
 
 > 作者: 线偶  
-> URL: https://ooooo-youwillsee.github.io/ooooo-notes/%E5%AE%9E%E7%8E%B0-aop-%E5%8E%9F%E7%90%86/  
+> URL: https://ooooo-youwillsee.github.io/ooooo-notes/spring-aop-%E5%8E%9F%E7%90%86/  
 
