@@ -1,5 +1,5 @@
 ---
-title: 事务传播类型
+title: spring tx 传播类型
 date: 2024-02-23T08:00:00+08:00
 draft: false
 tags: [ spring boot, source code,源码分析 spring boot 系列 ]
