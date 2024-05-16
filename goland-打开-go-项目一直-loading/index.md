@@ -1,4 +1,4 @@
-# goland 打开 go 项目一直 loading
+# Goland 打开 Go 项目一直 Loading
 
 
 ## 1. go list all 一直加载

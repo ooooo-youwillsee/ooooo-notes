@@ -1,4 +1,4 @@
-# 在 windows 上调试 redis
+# 在 Windows 上调试 Redis
 
 
 ## 1. install wsl

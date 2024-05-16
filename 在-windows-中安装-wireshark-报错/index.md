@@ -1,4 +1,4 @@
-# 在 windows 中安装 wireshark 报错
+# 在 Windows 中安装 Wireshark 报错
 
 
 

@@ -1,4 +1,4 @@
-# spring mvc 请求流程
+# Spring Mvc 请求流程
 
 
 &gt; `spring mvc` 原理真的必须懂。

@@ -1,4 +1,4 @@
-# 异步 servlet 原理
+# 异步 Servlet 原理
 
 
 &gt; 在 `servlet 3.0` 的规范中，有**异步servlet**特性，这个可以**增大吞吐量**。我们有必要看看 `spring` 是如何适配这个特性的。

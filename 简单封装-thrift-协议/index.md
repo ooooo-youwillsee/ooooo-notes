@@ -1,4 +1,4 @@
-# 简单封装 thrift 协议
+# 简单封装 Thrift 协议
 
 
 ## build.gradle 文件

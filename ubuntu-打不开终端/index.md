@@ -1,4 +1,4 @@
-# ubuntu 打不开终端
+# Ubuntu 打不开终端
 
 
 

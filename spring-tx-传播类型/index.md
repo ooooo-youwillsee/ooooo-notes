@@ -1,4 +1,4 @@
-# spring tx 传播类型
+# Spring Tx 传播类型
 
 
 &gt; 只要涉及到**数据库操作**，必定就会使用 `@Transactional` 注解，其中有一个属性就是 **propagation(传播类型)**，掌握它的用法很重要。演示代码见末尾。

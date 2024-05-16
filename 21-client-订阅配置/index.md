@@ -1,4 +1,4 @@
-# 21 client 订阅配置
+# 21 Client 订阅配置
 
 
 &gt; nacos 基于 2.2.4 版本

@@ -1,4 +1,4 @@
-# vmware 一些设置
+# Vmware 一些设置
 
 
 ## 1. enable enhanced keyboard

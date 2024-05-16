@@ -1,4 +1,4 @@
-# 01 搭建 rocketmq 源码调试环境
+# 01 搭建 Rocketmq 源码调试环境
 
 
 &gt; rocketmq 基于 5.1.4 版本

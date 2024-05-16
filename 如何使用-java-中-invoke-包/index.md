@@ -1,4 +1,4 @@
-# 如何使用 java 中 invoke 包?
+# 如何使用 Java 中 Invoke 包?
 
 
 ## 1. methodHandle 调用

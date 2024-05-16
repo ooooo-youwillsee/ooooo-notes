@@ -1,4 +1,4 @@
-# java 出现内存分配失败
+# Java 出现内存分配失败
 
 
 [问题](https://community.cloudera.com/t5/Support-Questions/Storm-quot-Cannot-allocate-memory-quot-quot-insufficient/td-p/144449)

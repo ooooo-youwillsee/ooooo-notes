@@ -1,4 +1,4 @@
-# github page 图片无法访问
+# Github Page 图片无法访问
 
 
 &gt; 我在 chrome 安装了 `SwitchyOmega` 代理插件，导致资源加载有问题。

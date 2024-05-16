@@ -1,4 +1,4 @@
-# kafka 的 SASL 认证
+# Kafka 的 SASL 认证
 
 
 ## 1. 搭建 kafka 环境

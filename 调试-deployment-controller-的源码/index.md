@@ -1,4 +1,4 @@
-# 调试 deployment-controller 的源码
+# 调试 Deployment-Controller 的源码
 
 
 &gt; 1. `deployment` 资源是我们经常需要使用的，也是我们最应该熟悉的源码.

@@ -1,4 +1,4 @@
-# 20 client 获取配置
+# 20 Client 获取配置
 
 
 &gt; nacos 基于 2.2.4 版本

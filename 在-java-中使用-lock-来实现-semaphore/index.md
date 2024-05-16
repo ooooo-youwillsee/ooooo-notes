@@ -1,4 +1,4 @@
-# 在 java 中使用 Lock 来实现 Semaphore
+# 在 Java 中使用 Lock 来实现 Semaphore
 
 
 ## 1. 使用 Lock 来实现 Semaphore

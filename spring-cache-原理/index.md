@@ -1,4 +1,4 @@
-# spring cache 原理
+# Spring Cache 原理
 
 
 &gt; `spring cache` 是**最常见**的功能之一，有必要了解其原理。

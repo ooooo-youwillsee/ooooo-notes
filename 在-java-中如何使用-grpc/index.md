@@ -1,4 +1,4 @@
-# 在 java 中如何使用 grpc
+# 在 Java 中如何使用 Grpc
 
 
 ## grpc 使用方式

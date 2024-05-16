@@ -1,4 +1,4 @@
-# 在 js 中统一设置请求参数的另一种方法
+# 在 Js 中统一设置请求参数的另一种方法
 
 
 - 重写方法`XMLHttpRequest.prototype.send`

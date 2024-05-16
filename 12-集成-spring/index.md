@@ -1,4 +1,4 @@
-# 12 集成 spring
+# 12 集成 Spring
 
 
 &gt; dubbo 基于 3.2.6 版本

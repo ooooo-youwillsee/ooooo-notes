@@ -1,4 +1,4 @@
-# ubuntu add static ip
+# Ubuntu Add Static Ip
 
 
 

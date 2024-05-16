@@ -1,4 +1,4 @@
-# 设置 docker 代理
+# 设置 Docker 代理
 
 
 ## 1. 配置 docker 代理

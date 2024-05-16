@@ -1,4 +1,4 @@
-# 01 搭建 activiti 源码调试环境
+# 01 搭建 Activiti 源码调试环境
 
 
 &gt; activiti 基于 8.0.0 版本

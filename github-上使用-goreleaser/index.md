@@ -1,4 +1,4 @@
-# github 上使用 goreleaser
+# Github 上使用 Goreleaser
 
 
 ## 1. goreleaser 的简单说明

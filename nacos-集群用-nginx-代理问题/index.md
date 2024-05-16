@@ -1,4 +1,4 @@
-# nacos 集群用 nginx 代理问题
+# Nacos 集群用 Nginx 代理问题
 
 
 

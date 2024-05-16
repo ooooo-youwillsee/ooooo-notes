@@ -1,4 +1,4 @@
-# zsh 添加插件后，不生效
+# Zsh 添加插件后，不生效
 
 
 &gt; 执行命令 `rm -rf ~/.zcompdump*`

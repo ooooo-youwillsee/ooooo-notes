@@ -1,4 +1,4 @@
-# tomcat 自定义错误页
+# Tomcat 自定义错误页
 
 
 在 `conf/server.xml` 中的 **Host**标签添加

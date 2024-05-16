@@ -1,4 +1,4 @@
-# 02 broker 注册 namesvr
+# 02 Broker 注册 Namesvr
 
 
 &gt; rocketmq 基于 5.1.4 版本

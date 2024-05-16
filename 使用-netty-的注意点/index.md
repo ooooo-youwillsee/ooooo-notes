@@ -1,4 +1,4 @@
-# 使用 netty 的注意点
+# 使用 Netty 的注意点
 
 
 ## 1. `HttpHelloWorldServerHandler` 为啥需要使用 `SimpleChannelInboundHandler` ?

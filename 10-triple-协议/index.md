@@ -1,4 +1,4 @@
-# 10 triple 协议
+# 10 Triple 协议
 
 
 &gt; dubbo 基于 3.2.6 版本

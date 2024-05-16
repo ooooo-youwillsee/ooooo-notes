@@ -1,4 +1,4 @@
-# idea 中 gradle 项目结构显示错误
+# Idea 中 Gradle 项目结构显示错误
 
 
 &gt; idea gradle project show duplicated file tree（project view and packages view）

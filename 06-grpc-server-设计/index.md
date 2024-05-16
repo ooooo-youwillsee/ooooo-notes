@@ -1,4 +1,4 @@
-# 06 grpc server 设计
+# 06 Grpc Server 设计
 
 
 &gt; nacos 基于 2.2.4 版本

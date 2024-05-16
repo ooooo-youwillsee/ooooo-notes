@@ -1,4 +1,4 @@
-# spring boot 启动流程
+# Spring Boot 启动流程
 
 
 &gt; `spring boot` 启动流程必须懂。

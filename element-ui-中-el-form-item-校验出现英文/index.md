@@ -1,4 +1,4 @@
-# element-ui 中 el-form-item 校验出现英文
+# Element-Ui 中 El-Form-Item 校验出现英文
 
 
 &gt; 去掉属性 required，添加 rules 规则 `{ required: true, message: &#39;请输入姓名&#39;, trigger: &#39;blur&#39; }`

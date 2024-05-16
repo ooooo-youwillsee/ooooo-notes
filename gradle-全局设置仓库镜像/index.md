@@ -1,4 +1,4 @@
-# gradle 全局设置仓库镜像
+# Gradle 全局设置仓库镜像
 
 
 在 `~\.gradle` 目录下新建文件 `init.gradle`, 内容如下

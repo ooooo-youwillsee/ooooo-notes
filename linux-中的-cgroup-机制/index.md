@@ -1,4 +1,4 @@
-# linux 中的 cgroup 机制
+# Linux 中的 Cgroup 机制
 
 
 ## 1. 检查 cgroup 的版本
