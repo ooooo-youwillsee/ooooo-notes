@@ -6,7 +6,7 @@ tags: [ spring boot, source code,源码分析 spring boot 系列 ]
 collections: [ 源码分析 spring boot 系列 ]
 ---
 
-> `spring mvc` 原理真的必须懂。
+> `spring mvc` 原理真的必须懂, 之前写的[源码导读](https://www.processon.com/view/61a36f72e0b34d5e7fd8388c)。
 
 
 ## DispatcherServlet
