@@ -1,7 +1,7 @@
 # Spring Mvc 请求流程
 
 
-&gt; `spring mvc` 原理真的必须懂。
+&gt; `spring mvc` 原理真的必须懂, 之前写的[源码导读](https://www.processon.com/view/61a36f72e0b34d5e7fd8388c)。
 
 
 ## DispatcherServlet
