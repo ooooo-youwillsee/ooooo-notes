@@ -1,0 +1,433 @@
+<!doctype html><html itemscope itemtype=http://schema.org/WebPage lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=2"><meta name=robots content="noodp"><title>07 ThreadPoolExecutor - 线偶的IT笔记</title><meta name=author content="线偶">
+<meta name=author-link content><meta name=description content="jdk 基于 8 版本 在平时的开发中，我们经常会用到 ThreadPoolExecutor, 需要了解源码。 使用方式 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 public class ThreadPoolTest { @Test void test() { ThreadPoolExecutor executor = new ThreadPoolExecutor( 2, 10, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new"><meta name=keywords content='jdk,source code,源码分析 jdk 系列'><meta itemprop=name content="07 ThreadPoolExecutor"><meta itemprop=description content="jdk 基于 8 版本 在平时的开发中，我们经常会用到 ThreadPoolExecutor, 需要了解源码。 使用方式 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 public class ThreadPoolTest { @Test void test() { ThreadPoolExecutor executor = new ThreadPoolExecutor( 2, 10, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new"><meta itemprop=datePublished content="2024-05-21T08:00:00+08:00"><meta itemprop=dateModified content="2024-05-21T08:00:00+08:00"><meta itemprop=wordCount content="1382"><meta itemprop=image content="https://ooooo-youwillsee.github.io/logo.png"><meta itemprop=keywords content="Jdk,Source Code,源码分析 Jdk 系列"><meta property="og:url" content="https://ooooo-youwillsee.github.io/ooooo-notes/07-threadpoolexecutor/"><meta property="og:site_name" content="线偶的IT笔记"><meta property="og:title" content="07 ThreadPoolExecutor"><meta property="og:description" content="jdk 基于 8 版本 在平时的开发中，我们经常会用到 ThreadPoolExecutor, 需要了解源码。 使用方式 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 public class ThreadPoolTest { @Test void test() { ThreadPoolExecutor executor = new ThreadPoolExecutor( 2, 10, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new"><meta property="og:locale" content="zh_CN"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2024-05-21T08:00:00+08:00"><meta property="article:modified_time" content="2024-05-21T08:00:00+08:00"><meta property="article:tag" content="Jdk"><meta property="article:tag" content="Source Code"><meta property="article:tag" content="源码分析 Jdk 系列"><meta property="og:image" content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://ooooo-youwillsee.github.io/logo.png"><meta name=twitter:title content="07 ThreadPoolExecutor"><meta name=twitter:description content="jdk 基于 8 版本 在平时的开发中，我们经常会用到 ThreadPoolExecutor, 需要了解源码。 使用方式 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 public class ThreadPoolTest { @Test void test() { ThreadPoolExecutor executor = new ThreadPoolExecutor( 2, 10, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new"><meta name=application-name content="线偶的IT笔记"><meta name=apple-mobile-web-app-title content="线偶的IT笔记"><meta name=theme-color data-light=#f8f8f8 data-dark=#252627 content="#f8f8f8"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=canonical href=https://ooooo-youwillsee.github.io/ooooo-notes/07-threadpoolexecutor/><link rel=prev href=https://ooooo-youwillsee.github.io/ooooo-notes/spring-bean-%E5%88%9D%E5%A7%8B%E5%8C%96/><link rel=stylesheet href=/ooooo-notes/css/style.min.css><link rel=preload href=/ooooo-notes/lib/fontawesome-free/all.min.css as=style onload='this.removeAttribute("onload"),this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/fontawesome-free/all.min.css></noscript><link rel=preload href=/ooooo-notes/lib/animate/animate.min.css as=style onload='this.removeAttribute("onload"),this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"07 ThreadPoolExecutor","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/07-threadpoolexecutor\/"},"genre":"posts","keywords":"jdk, source code, 源码分析 jdk 系列","wordcount":1382,"url":"https:\/\/ooooo-youwillsee.github.io\/ooooo-notes\/07-threadpoolexecutor\/","datePublished":"2024-05-21T08:00:00+08:00","dateModified":"2024-05-21T08:00:00+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"线偶"},"description":""}</script></head><body data-header-desktop=sticky data-header-mobile=auto><script>(window.localStorage?.getItem("theme")?localStorage.getItem("theme")==="dark":"auto"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"auto"==="dark")&&document.body.setAttribute("data-theme","dark")</script><div class=wrapper data-page-style=normal><header class="desktop animate__faster" id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span><span class=header-title-text>线偶</span></a><span class="typeit header-subtitle"><template>Hello World</template></span></div><nav><ul class=menu><li class=menu-item><a class=menu-link href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章</a></li><li class=menu-item><a class=menu-link href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签</a></li><li class=menu-item><a class=menu-link href=/ooooo-notes/collections/><i class='fa fa-archive' aria-hidden=true></i> 合集</a></li><li class=menu-item><a class=menu-link href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreferrer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a></li><li class="menu-item delimiter"></li><li class="menu-item search" id=search-desktop><input type=text placeholder=搜索文章标题或内容…… id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fa-solid fa-search fa-fw" aria-hidden=true></i>
+</a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fa-solid fa-times-circle fa-fw" aria-hidden=true></i>
+</a><span class="search-button search-loading" id=search-loading-desktop><i class="fa-solid fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></li><li class="menu-item theme-switch" title=切换主题><i class="fa-solid fa-adjust fa-fw" aria-hidden=true></i></li></ul></nav></div></header><header class="mobile animate__faster" id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ooooo-notes/ title=线偶的IT笔记><span class=header-title-pre><i class='far fa-kiss-wink-heart fa-fw' aria-hidden=true></i></span><span class=header-title-text>线偶</span></a><span class="typeit header-subtitle"><template>Hello World</template></span></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><nav><ul class=menu id=menu-mobile><li class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容…… id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fa-solid fa-search fa-fw" aria-hidden=true></i>
+</a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fa-solid fa-times-circle fa-fw" aria-hidden=true></i>
+</a><span class="search-button search-loading" id=search-loading-mobile><i class="fa-solid fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></li><li class=menu-item><a class=menu-link href=/ooooo-notes/posts/><i class='fa fa-list' aria-hidden=true></i> 文章</a></li><li class=menu-item><a class=menu-link href=/ooooo-notes/tags/><i class='fa fa-tags' aria-hidden=true></i> 标签</a></li><li class=menu-item><a class=menu-link href=/ooooo-notes/collections/><i class='fa fa-archive' aria-hidden=true></i> 合集</a></li><li class=menu-item><a class=menu-link href=https://github.com/ooooo-youwillsee title=GitHub rel="noopener noreferrer" target=_blank><i class='fab fa-github fa-fw' aria-hidden=true></i></a></li><li class="menu-item menu-system"><span class="menu-system-item theme-switch" title=切换主题><i class="fa-solid fa-adjust fa-fw" aria-hidden=true></i></span></li></ul></nav></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><nav aria-label=breadcrumb class="breadcrumb-container sticky"><ol class=breadcrumb><li class=breadcrumb-item><a href=/ooooo-notes/posts/ title=Posts>文章</a></li><li class="breadcrumb-item active" aria-current=page>07 ThreadPoolExecutor</li></ol></nav><main class=container><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label=合集><div class="details collection-details open"><div class="details-summary collection-summary"><i class="fa-solid fa-layer-group fa-fw" aria-hidden=true></i>
+<span class=collection-name data-collections=合集>源码分析 Jdk 系列</span>
+<span class=collection-count>6</span><i class="details-icon fa-solid fa-angle-right fa-fw" aria-hidden=true></i></div><div class="details-content collection-content"><nav><ul class=collection-list><li class=collection-item><a href=/ooooo-notes/01-arraylist/ title="01 ArrayList">01 ArrayList</a></li><li class=collection-item><a href=/ooooo-notes/02-linkedlist/ title="02 LinkedList">02 LinkedList</a></li><li class=collection-item><a href=/ooooo-notes/03-hashmap/ title="03 HashMap">03 HashMap</a></li><li class=collection-item><a href=/ooooo-notes/04-linkedhashmap/ title="04 LinkedHashMap">04 LinkedHashMap</a></li><li class=collection-item><a href=/ooooo-notes/05-treemap/ title="05 TreeMap">05 TreeMap</a></li><li class=collection-item><span class=active title="07 ThreadPoolExecutor">07 ThreadPoolExecutor</span></li></ul><div class=collection-nav-simple><a href=/ooooo-notes/05-treemap/ class=collection-nav-item rel=prev title="05 TreeMap"><i class="fa-solid fa-angle-left fa-fw" aria-hidden=true></i></a><span class=text-secondary>6/6</span><i class="fa-solid fa-angle-right fa-fw collection-nav-item text-secondary" aria-hidden=true></i></div></nav></div></div></aside><article class="page single"><div class=header><h1 class="single-title animate__animated animate__flipInX"><span>07 ThreadPoolExecutor</span></h1></div><div class=post-meta><div class=post-meta-line><span class=post-author><span class=author><i class="fa-solid fa-user-circle" aria-hidden=true></i>
+线偶</span></span><span class=post-included-in>&nbsp;收录于 <a href=/ooooo-notes/collections/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-jdk-%E7%B3%BB%E5%88%97/ class=post-collection title="合集 - 源码分析 Jdk 系列"><i class="fa-solid fa-layer-group fa-fw" aria-hidden=true></i> 源码分析 Jdk 系列</a></span></div><div class=post-meta-line><span title="发布于 2024-05-21 08:00:00"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden=true></i><time datetime=2024-05-21>2024-05-21</time></span>&nbsp;<span title="1382 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden=true></i>约 1400 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden=true></i>预计阅读 3 分钟</span>&nbsp;</div></div><div class="details toc" id=toc-static data-kept=false><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fa-solid fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#使用方式>使用方式</a></li><li><a href=#new>new</a></li><li><a href=#submit>submit</a></li><li><a href=#runworker>runWorker</a></li></ul></nav></div></div><div class=content id=content><blockquote><p>jdk 基于 8 版本</p></blockquote><blockquote><p>在平时的开发中，我们经常会用到 <code>ThreadPoolExecutor</code>, 需要了解<strong>源码</strong>。</p></blockquote><h2 id=使用方式 class=heading-element><span>使用方式</span>
+<a href=#%e4%bd%bf%e7%94%a8%e6%96%b9%e5%bc%8f class=heading-mark><svg class="octicon octicon-link" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5.0 114.95 4.95l-2.5 2.5a3.5 3.5.0 01-4.95.0.751.751.0 01.018-1.042.751.751.0 011.042-.018 1.998 1.998.0 002.83.0l2.5-2.5a2.002 2.002.0 00-2.83-2.83l-1.25 1.25a.751.751.0 01-1.042-.018.751.751.0 01-.018-1.042zm-4.69 9.64a1.998 1.998.0 002.83.0l1.25-1.25a.751.751.0 011.042.018.751.751.0 01.018 1.042l-1.25 1.25a3.5 3.5.0 11-4.95-4.95l2.5-2.5a3.5 3.5.0 014.95.0.751.751.0 01-.018 1.042.751.751.0 01-1.042.018 1.998 1.998.0 00-2.83.0l-2.5 2.5a1.998 1.998.0 000 2.83z"/></svg></a></h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>ThreadPoolTest</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@Test</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>void</span><span class=w> </span><span class=nf>test</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>ThreadPoolExecutor</span><span class=w> </span><span class=n>executor</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ThreadPoolExecutor</span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>2</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>10</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>60</span><span class=p>,</span><span class=w> </span><span class=n>TimeUnit</span><span class=p>.</span><span class=na>SECONDS</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>new</span><span class=w> </span><span class=n>LinkedBlockingQueue</span><span class=o>&lt;&gt;</span><span class=p>(),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>new</span><span class=w> </span><span class=n>CustomizableThreadFactory</span><span class=p>(</span><span class=s>&#34;test-&#34;</span><span class=p>),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>new</span><span class=w> </span><span class=n>ThreadPoolExecutor</span><span class=p>.</span><span class=na>CallerRunsPolicy</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>executor</span><span class=p>.</span><span class=na>submit</span><span class=p>(()</span><span class=w> </span><span class=o>-&gt;</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;xxxx&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>});</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>executor</span><span class=p>.</span><span class=na>shutdown</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=new class=heading-element><span>new</span>
+<a href=#new class=heading-mark><svg class="octicon octicon-link" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5.0 114.95 4.95l-2.5 2.5a3.5 3.5.0 01-4.95.0.751.751.0 01.018-1.042.751.751.0 011.042-.018 1.998 1.998.0 002.83.0l2.5-2.5a2.002 2.002.0 00-2.83-2.83l-1.25 1.25a.751.751.0 01-1.042-.018.751.751.0 01-.018-1.042zm-4.69 9.64a1.998 1.998.0 002.83.0l1.25-1.25a.751.751.0 011.042.018.751.751.0 01.018 1.042l-1.25 1.25a3.5 3.5.0 11-4.95-4.95l2.5-2.5a3.5 3.5.0 014.95.0.751.751.0 01-.018 1.042.751.751.0 01-1.042.018 1.998 1.998.0 00-2.83.0l-2.5 2.5a1.998 1.998.0 000 2.83z"/></svg></a></h2><blockquote><p>创建线程池。</p></blockquote><p>源码位置: <code>java.util.concurrent.ThreadPoolExecutor#ThreadPoolExecutor</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 参数说明</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// corePoolSize: 核心线程池大小</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// maximumPoolSize: 最大线程池大小</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// keepAliveTime: 非核心线程存活时间</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// workQueue: 任务队列</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// threadFactory: 线程工厂，可以给线程命名</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>// handler: 拒绝策略</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=nf>ThreadPoolExecutor</span><span class=p>(</span><span class=kt>int</span><span class=w> </span><span class=n>corePoolSize</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                          </span><span class=kt>int</span><span class=w> </span><span class=n>maximumPoolSize</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                          </span><span class=kt>long</span><span class=w> </span><span class=n>keepAliveTime</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                          </span><span class=n>TimeUnit</span><span class=w> </span><span class=n>unit</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                          </span><span class=n>BlockingQueue</span><span class=o>&lt;</span><span class=n>Runnable</span><span class=o>&gt;</span><span class=w> </span><span class=n>workQueue</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                          </span><span class=n>ThreadFactory</span><span class=w> </span><span class=n>threadFactory</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                          </span><span class=n>RejectedExecutionHandler</span><span class=w> </span><span class=n>handler</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 下面都是简单的赋值，没啥要说明的</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>corePoolSize</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=n>0</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>maximumPoolSize</span><span class=w> </span><span class=o>&lt;=</span><span class=w> </span><span class=n>0</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>maximumPoolSize</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=n>corePoolSize</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>keepAliveTime</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=n>0</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>IllegalArgumentException</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>workQueue</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>threadFactory</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>handler</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>NullPointerException</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>acc</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>getSecurityManager</span><span class=p>()</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=w> </span><span class=o>?</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=kc>null</span><span class=w> </span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>AccessController</span><span class=p>.</span><span class=na>getContext</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>corePoolSize</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>corePoolSize</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>maximumPoolSize</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>maximumPoolSize</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>workQueue</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>workQueue</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>keepAliveTime</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>unit</span><span class=p>.</span><span class=na>toNanos</span><span class=p>(</span><span class=n>keepAliveTime</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>threadFactory</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>threadFactory</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>this</span><span class=p>.</span><span class=na>handler</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>handler</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><blockquote><p>参数说明：<br>新创建的线程池，线程池<strong>不会预热</strong>，所以<strong>线程数为零</strong>。<br>当有<strong>任务提交</strong>了，判断<strong>核心线程数</strong>是否有剩余。<br>如果<strong>核心线程数</strong>有，启动核心线程来执行任务，如果<strong>核心线程数</strong>没有，加入到<strong>任务队列</strong>。<br>如果<strong>任务队列</strong>没有满，把任务放入到<strong>任务队列</strong>中，方法结束。如果<strong>任务队列</strong>满了，判断<strong>非核心线程数</strong>是否有剩余。<br>如果<strong>非核心线程数</strong>有，启动非核心线程数来执行任务，如果<strong>非核心线程数</strong>没有，执行<strong>拒绝策略</strong>。<br></p></blockquote><h2 id=submit class=heading-element><span>submit</span>
+<a href=#submit class=heading-mark><svg class="octicon octicon-link" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5.0 114.95 4.95l-2.5 2.5a3.5 3.5.0 01-4.95.0.751.751.0 01.018-1.042.751.751.0 011.042-.018 1.998 1.998.0 002.83.0l2.5-2.5a2.002 2.002.0 00-2.83-2.83l-1.25 1.25a.751.751.0 01-1.042-.018.751.751.0 01-.018-1.042zm-4.69 9.64a1.998 1.998.0 002.83.0l1.25-1.25a.751.751.0 011.042.018.751.751.0 01.018 1.042l-1.25 1.25a3.5 3.5.0 11-4.95-4.95l2.5-2.5a3.5 3.5.0 014.95.0.751.751.0 01-.018 1.042.751.751.0 01-1.042.018 1.998 1.998.0 00-2.83.0l-2.5 2.5a1.998 1.998.0 000 2.83z"/></svg></a></h2><blockquote><p>提交任务</p></blockquote><p>源码位置: <code>java.util.concurrent.AbstractExecutorService#submit(java.lang.Runnable)</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=n>Future</span><span class=o>&lt;?&gt;</span><span class=w> </span><span class=n>submit</span><span class=p>(</span><span class=n>Runnable</span><span class=w> </span><span class=n>task</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>task</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w> </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>NullPointerException</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 创建 future,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>RunnableFuture</span><span class=o>&lt;</span><span class=n>Void</span><span class=o>&gt;</span><span class=w> </span><span class=n>ftask</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>newTaskFor</span><span class=p>(</span><span class=n>task</span><span class=p>,</span><span class=w> </span><span class=kc>null</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 执行 task</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>execute</span><span class=p>(</span><span class=n>ftask</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>ftask</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>java.util.concurrent.ThreadPoolExecutor#execute</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>execute</span><span class=p>(</span><span class=n>Runnable</span><span class=w> </span><span class=n>command</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>c</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 获取当前的线程数, 小于核心线程数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>workerCountOf</span><span class=p>(</span><span class=n>c</span><span class=p>)</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=n>corePoolSize</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 尝试添加新线程来执行任务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>addWorker</span><span class=p>(</span><span class=n>command</span><span class=p>,</span><span class=w> </span><span class=kc>true</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 添加失败，核心线程数满了</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>c</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 尝试加入任务队列</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>isRunning</span><span class=p>(</span><span class=n>c</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>workQueue</span><span class=p>.</span><span class=na>offer</span><span class=p>(</span><span class=n>command</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>recheck</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 如果不是 running 状态，移除任务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>isRunning</span><span class=p>(</span><span class=n>recheck</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>remove</span><span class=p>(</span><span class=n>command</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 执行拒绝策略</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>reject</span><span class=p>(</span><span class=n>command</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>workerCountOf</span><span class=p>(</span><span class=n>recheck</span><span class=p>)</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>0</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 添加非核心线程</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>addWorker</span><span class=p>(</span><span class=kc>null</span><span class=p>,</span><span class=w> </span><span class=kc>false</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 任务队列满了，尝试添加非核心线程来执行任务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=o>!</span><span class=n>addWorker</span><span class=p>(</span><span class=n>command</span><span class=p>,</span><span class=w> </span><span class=kc>false</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 非核心线程数满了，执行拒绝策略</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>reject</span><span class=p>(</span><span class=n>command</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>java.util.concurrent.ThreadPoolExecutor#addWorker</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>private</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=nf>addWorker</span><span class=p>(</span><span class=n>Runnable</span><span class=w> </span><span class=n>firstTask</span><span class=p>,</span><span class=w> </span><span class=kt>boolean</span><span class=w> </span><span class=n>core</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 使用 CAS 来增加当前线程数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>retry</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>for</span><span class=w> </span><span class=p>(;;)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>for</span><span class=w> </span><span class=p>(;;)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=kt>int</span><span class=w> </span><span class=n>wc</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>workerCountOf</span><span class=p>(</span><span class=n>c</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>wc</span><span class=w> </span><span class=o>&gt;=</span><span class=w> </span><span class=n>CAPACITY</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>wc</span><span class=w> </span><span class=o>&gt;=</span><span class=w> </span><span class=p>(</span><span class=n>core</span><span class=w> </span><span class=o>?</span><span class=w> </span><span class=n>corePoolSize</span><span class=w> </span><span class=p>:</span><span class=w> </span><span class=n>maximumPoolSize</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>return</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>compareAndIncrementWorkerCount</span><span class=p>(</span><span class=n>c</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>break</span><span class=w> </span><span class=n>retry</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>c</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>();</span><span class=w>  </span><span class=c1>// Re-read ctl</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>runStateOf</span><span class=p>(</span><span class=n>c</span><span class=p>)</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=n>rs</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>continue</span><span class=w> </span><span class=n>retry</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 创建新的 worker</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>w</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Worker</span><span class=p>(</span><span class=n>firstTask</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kd>final</span><span class=w> </span><span class=n>Thread</span><span class=w> </span><span class=n>t</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>w</span><span class=p>.</span><span class=na>thread</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>t</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=kd>final</span><span class=w> </span><span class=n>ReentrantLock</span><span class=w> </span><span class=n>mainLock</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>mainLock</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>mainLock</span><span class=p>.</span><span class=na>lock</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=kt>int</span><span class=w> </span><span class=n>rs</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>runStateOf</span><span class=p>(</span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>());</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 添加到 workers 中</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>rs</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=n>SHUTDOWN</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=p>(</span><span class=n>rs</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>SHUTDOWN</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>firstTask</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=kc>null</span><span class=p>))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>t</span><span class=p>.</span><span class=na>isAlive</span><span class=p>())</span><span class=w> </span><span class=c1>// precheck that t is startable</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>IllegalThreadStateException</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>workers</span><span class=p>.</span><span class=na>add</span><span class=p>(</span><span class=n>w</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=kt>int</span><span class=w> </span><span class=n>s</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>workers</span><span class=p>.</span><span class=na>size</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=c1>// 更新当前最大线程数</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>s</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>largestPoolSize</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                        </span><span class=n>largestPoolSize</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>s</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>workerAdded</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>true</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>finally</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>mainLock</span><span class=p>.</span><span class=na>unlock</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 添加成功，启动线程</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>workerAdded</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>t</span><span class=p>.</span><span class=na>start</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>workerStarted</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>true</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>finally</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=n>workerStarted</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><h2 id=runworker class=heading-element><span>runWorker</span>
+<a href=#runworker class=heading-mark><svg class="octicon octicon-link" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5.0 114.95 4.95l-2.5 2.5a3.5 3.5.0 01-4.95.0.751.751.0 01.018-1.042.751.751.0 011.042-.018 1.998 1.998.0 002.83.0l2.5-2.5a2.002 2.002.0 00-2.83-2.83l-1.25 1.25a.751.751.0 01-1.042-.018.751.751.0 01-.018-1.042zm-4.69 9.64a1.998 1.998.0 002.83.0l1.25-1.25a.751.751.0 011.042.018.751.751.0 01.018 1.042l-1.25 1.25a3.5 3.5.0 11-4.95-4.95l2.5-2.5a3.5 3.5.0 014.95.0.751.751.0 01-.018 1.042.751.751.0 01-1.042.018 1.998 1.998.0 00-2.83.0l-2.5 2.5a1.998 1.998.0 000 2.83z"/></svg></a></h2><blockquote><p>执行任务。</p></blockquote><p>源码位置: <code>java.util.concurrent.ThreadPoolExecutor#runWorker</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>final</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>runWorker</span><span class=p>(</span><span class=n>Worker</span><span class=w> </span><span class=n>w</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 从任务队列中获取任务, 如果 task 为 null，当前线程会终止</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=n>task</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>null</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=p>(</span><span class=n>task</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getTask</span><span class=p>())</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>w</span><span class=p>.</span><span class=na>lock</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 如果是 STOP 状态，打断当前线程，停止执行</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>((</span><span class=n>runStateAtLeast</span><span class=p>(</span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>(),</span><span class=w> </span><span class=n>STOP</span><span class=p>)</span><span class=w> </span><span class=o>||</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                 </span><span class=p>(</span><span class=n>Thread</span><span class=p>.</span><span class=na>interrupted</span><span class=p>()</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=n>runStateAtLeast</span><span class=p>(</span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>(),</span><span class=w> </span><span class=n>STOP</span><span class=p>)))</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=o>!</span><span class=n>wt</span><span class=p>.</span><span class=na>isInterrupted</span><span class=p>())</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>wt</span><span class=p>.</span><span class=na>interrupt</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=c1>// 空实现</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>beforeExecute</span><span class=p>(</span><span class=n>wt</span><span class=p>,</span><span class=w> </span><span class=n>task</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>Throwable</span><span class=w> </span><span class=n>thrown</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=c1>// 执行任务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>task</span><span class=p>.</span><span class=na>run</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w> </span><span class=k>catch</span><span class=w> </span><span class=p>(</span><span class=n>RuntimeException</span><span class=w> </span><span class=n>x</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w> </span><span class=k>finally</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=c1>// 空实现</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                    </span><span class=n>afterExecute</span><span class=p>(</span><span class=n>task</span><span class=p>,</span><span class=w> </span><span class=n>thrown</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>finally</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>completedAbruptly</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w> </span><span class=k>finally</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>processWorkerExit</span><span class=p>(</span><span class=n>w</span><span class=p>,</span><span class=w> </span><span class=n>completedAbruptly</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div><p>源码位置: <code>java.util.concurrent.ThreadPoolExecutor#getTask</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 获取任务，如果为 null，当前线程就要终止</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>private</span><span class=w> </span><span class=n>Runnable</span><span class=w> </span><span class=nf>getTask</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>boolean</span><span class=w> </span><span class=n>timedOut</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w> </span><span class=c1>// Did the last poll() time out?</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>for</span><span class=w> </span><span class=p>(;;)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>c</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ctl</span><span class=p>.</span><span class=na>get</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>rs</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>runStateOf</span><span class=p>(</span><span class=n>c</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 如果 SHUTDOWN 状态，任务队列为空，应该减少 worker</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>rs</span><span class=w> </span><span class=o>&gt;=</span><span class=w> </span><span class=n>SHUTDOWN</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=p>(</span><span class=n>rs</span><span class=w> </span><span class=o>&gt;=</span><span class=w> </span><span class=n>STOP</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>workQueue</span><span class=p>.</span><span class=na>isEmpty</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>decrementWorkerCount</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>wc</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>workerCountOf</span><span class=p>(</span><span class=n>c</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// 控制是否要结束线程</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kt>boolean</span><span class=w> </span><span class=n>timed</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>allowCoreThreadTimeOut</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>wc</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>corePoolSize</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=c1>// timedOut 为 true，表示没有任务了</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>((</span><span class=n>wc</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>maximumPoolSize</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=p>(</span><span class=n>timed</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>timedOut</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=p>(</span><span class=n>wc</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>1</span><span class=w> </span><span class=o>||</span><span class=w> </span><span class=n>workQueue</span><span class=p>.</span><span class=na>isEmpty</span><span class=p>()))</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// CAS 减少 worker</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>compareAndDecrementWorkerCount</span><span class=p>(</span><span class=n>c</span><span class=p>))</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>return</span><span class=w> </span><span class=kc>null</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>continue</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>try</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c1>// 获取任务，对于非核心线程是 poll 方法, 对核心线程是 take 方法</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>Runnable</span><span class=w> </span><span class=n>r</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>timed</span><span class=w> </span><span class=o>?</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>workQueue</span><span class=p>.</span><span class=na>poll</span><span class=p>(</span><span class=n>keepAliveTime</span><span class=p>,</span><span class=w> </span><span class=n>TimeUnit</span><span class=p>.</span><span class=na>NANOSECONDS</span><span class=p>)</span><span class=w> </span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=n>workQueue</span><span class=p>.</span><span class=na>take</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>r</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=kc>null</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=k>return</span><span class=w> </span><span class=n>r</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>timedOut</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>true</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>catch</span><span class=w> </span><span class=p>(</span><span class=n>InterruptedException</span><span class=w> </span><span class=n>retry</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>timedOut</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=kc>false</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span></span></span></code></pre></td></tr></table></div></div></div><div class=collection-card><div class="collection-title text-secondary">收录于 <a href=/ooooo-notes/collections/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-jdk-%E7%B3%BB%E5%88%97/><i class="fa-solid fa-layer-group fa-fw" aria-hidden=true></i> <span>合集・源码分析 Jdk 系列</span></span></a> 6</div><div class=collection-nav><a href=/ooooo-notes/05-treemap/ class=collection-nav-item rel=prev title="05 TreeMap"><i class="fa-solid fa-angle-left fa-fw" aria-hidden=true></i><span>05 TreeMap</span></a></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span title="更新于 2024-05-21 08:00:00">更新于 2024-05-21&nbsp;</span></div><div class=post-info-license><span><a rel="license external nofollow noopener noreferrer" href=https://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a></span></div></div><div class=post-info-line><div class=post-info-md><span><a href=/ooooo-notes/07-threadpoolexecutor/index.md title=阅读原始文档 class=link-to-markdown>阅读原始文档</a></span><span><a href="https://github.com/ooooo-youwillsee/ooooo-notes/blob/main/content/posts/%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%20jdk%20%e7%b3%bb%e5%88%97/07%20ThreadPoolExecutor/index.md?plain=1" title=查看源码 target=_blank rel="external nofollow noopener noreferrer" class=link-to-source>查看源码</a></span><span><a href=https://github.com/ooooo-youwillsee/ooooo-notes/edit/main/content/posts/%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%20jdk%20%e7%b3%bb%e5%88%97/07%20ThreadPoolExecutor/index.md title=编辑此页 target=_blank rel="external nofollow noopener noreferrer" class=link-to-edit>编辑此页</a></span><span><a href="https://github.com/ooooo-youwillsee/ooooo-notes/issues/new?title=[BUG]%2007+ThreadPoolExecutor&amp;body=%7cField%7cValue%7c%0A%7c-%7c-%7c%0A%7cTitle%7c07+ThreadPoolExecutor%7c%0A%7cURL%7chttps://ooooo-youwillsee.github.io/ooooo-notes/07-threadpoolexecutor/%7c%0A%7cFilename%7chttps://github.com/ooooo-youwillsee/ooooo-notes/blob/main/content/posts/%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%20jdk%20%e7%b3%bb%e5%88%97/07%20ThreadPoolExecutor/index.md?plain=1%7c" title=报告问题 target=_blank rel="external nofollow noopener noreferrer" class=link-to-report>报告问题</a></span></div><div class=post-info-share><span><a href=javascript:void(0); title="分享到 Twitter" data-sharer=twitter data-url=https://ooooo-youwillsee.github.io/ooooo-notes/07-threadpoolexecutor/ data-title="07 ThreadPoolExecutor" data-hashtags="jdk,source code,源码分析 jdk 系列"><i class="fa-brands fa-twitter fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); title="分享到 Facebook" data-sharer=facebook data-url=https://ooooo-youwillsee.github.io/ooooo-notes/07-threadpoolexecutor/ data-hashtag=jdk><i class="fa-brands fa-facebook-square fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); title="分享到 微博" data-sharer=weibo data-url=https://ooooo-youwillsee.github.io/ooooo-notes/07-threadpoolexecutor/ data-title="07 ThreadPoolExecutor"><i class="fa-brands fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fa-solid fa-tags fa-fw me-1" aria-hidden=true></i><a href=/ooooo-notes/tags/jdk/ class=post-tag title="标签 - Jdk">Jdk</a><a href=/ooooo-notes/tags/source-code/ class=post-tag title="标签 - Source Code">Source Code</a><a href=/ooooo-notes/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-jdk-%E7%B3%BB%E5%88%97/ class=post-tag title="标签 - 源码分析 Jdk 系列">源码分析 Jdk 系列</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/ooooo-notes/>主页</a></span></section></div><div class=post-nav><a href=/ooooo-notes/spring-bean-%E5%88%9D%E5%A7%8B%E5%8C%96/ class=post-nav-item rel=prev title="Spring Bean 初始化"><i class="fa-solid fa-angle-left fa-fw" aria-hidden=true></i>Spring Bean 初始化</a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk rel="external nofollow noopener noreferrer">Gitalk</a>.</noscript></div></article><aside class=toc id=toc-auto aria-label=目录><h2 class=toc-title>目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden=true></i></h2><div class=toc-content id=toc-content-auto></div></aside></main><footer class=footer><div class=footer-container><div class="footer-line powered">由 <a href=https://gohugo.io/ target=_blank rel="external nofollow noopener noreferrer" title="Hugo 0.126.1"><img class=hugo-icon src=/ooooo-notes/images/hugo.min.svg alt="Hugo logo"> Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/hugo-fixit/FixIt target=_blank rel=external title="FixIt v0.3.6"><img class=fixit-icon src=/ooooo-notes/images/fixit.min.svg alt="FixIt logo"> FixIt</a></div><div class="footer-line copyright" itemscope itemtype=http://schema.org/CreativeWork><i class="fa-regular fa-copyright fa-fw" aria-hidden=true></i>
+<span itemprop=copyrightYear>2022 - 2024</span><span class=author itemprop=copyrightHolder>
+<a href=/ooooo-notes/>线偶</a></span><span class="license footer-divider"><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div><div class="footer-line visitor"><span id=busuanzi_container_site_uv title=总访客数><i class="fa-regular fa-user fa-fw" aria-hidden=true></i>&nbsp;<span id=busuanzi_value_site_uv><i class="fa-solid fa-spinner fa-spin fa-fw" aria-hidden=true></i></span></span><span id=busuanzi_container_site_pv class=footer-divider title=总访问量><i class="fa-regular fa-eye fa-fw" aria-hidden=true></i>&nbsp;<span id=busuanzi_value_site_pv><i class="fa-solid fa-spinner fa-spin fa-fw" aria-hidden=true></i></span></span></div></div></footer></div><div class=widgets><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role=button aria-label=回到顶部><i class="fa-solid fa-arrow-up fa-fw" aria-hidden=true></i><span class=variant-numeric>0%</span></div><div class="fixed-button view-comments d-none" role=button aria-label=查看评论><i class="fa-solid fa-comment fa-fw" aria-hidden=true></i></div></div><div id=mask></div><div class=reading-progress-bar style=left:0;top:0></div><noscript><div class=noscript-warning>FixIt 主题在启用 JavaScript 的情况下效果最佳。</div></noscript></div><link rel=stylesheet href=/ooooo-notes/lib/gitalk/gitalk.min.css><link rel=stylesheet href=/ooooo-notes/lib/lightgallery/css/lightgallery-bundle.min.css><link rel=preload href=/ooooo-notes/lib/katex/katex.min.css as=style onload='this.removeAttribute("onload"),this.rel="stylesheet"'><noscript><link rel=stylesheet href=/ooooo-notes/lib/katex/katex.min.css></noscript><link rel=stylesheet href=/ooooo-notes/lib/cookieconsent/cookieconsent.min.css><link rel=stylesheet href=/ooooo-notes/lib/pace/themes/blue/pace-theme-minimal.css><script src=/ooooo-notes/lib/gitalk/gitalk.min.js></script><script src=/ooooo-notes/lib/autocomplete/autocomplete.min.js defer></script><script src=/ooooo-notes/lib/fuse/fuse.min.js defer></script><script src=/ooooo-notes/lib/twemoji/twemoji.min.js defer></script><script src=/ooooo-notes/lib/lightgallery/lightgallery.min.js defer></script><script src=/ooooo-notes/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js defer></script><script src=/ooooo-notes/lib/lightgallery/plugins/zoom/lg-zoom.min.js defer></script><script src=/ooooo-notes/lib/sharer/sharer.min.js async defer></script><script src=/ooooo-notes/lib/typeit/index.umd.js defer></script><script src=/ooooo-notes/lib/katex/katex.min.js defer></script><script src=/ooooo-notes/lib/katex/auto-render.min.js defer></script><script src=/ooooo-notes/lib/katex/copy-tex.min.js defer></script><script src=/ooooo-notes/lib/katex/mhchem.min.js defer></script><script src=/ooooo-notes/lib/cookieconsent/cookieconsent.min.js defer></script><script src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js async defer></script><script src=/ooooo-notes/lib/pace/pace.min.js async defer></script><script>window.config={autoBookmark:!0,code:{copyTitle:"复制到剪贴板",editLockTitle:"锁定可编辑代码块",editUnLockTitle:"解锁可编辑代码块",editable:!0,maxShownLines:100},comment:{enable:!0,expired:!1,gitalk:{admin:["ooooo-youwillsee"],clientID:"9fcbefe148801287b34f",clientSecret:"3833b0f8bda400fb1ea7093446f340821394e501",id:"2024-05-21T08:00:00+08:00",owner:"ooooo-youwillsee",repo:"ooooo-notes-gitalk",title:"07 ThreadPoolExecutor"}},cookieconsent:{content:{dismiss:"同意",link:"了解更多",message:"本网站使用 Cookies 来改善您的浏览体验。"},enable:!0,palette:{button:{background:"#f0f0f0"},popup:{background:"#1aa3ff"}},theme:"edgeless"},lightgallery:!0,math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{distance:100,findAllMatches:!1,fuseIndexURL:"/ooooo-notes/index.json",highlightTag:"em",ignoreFieldNorm:!1,ignoreLocation:!1,isCaseSensitive:!1,location:0,maxResultLength:10,minMatchCharLength:2,noResultsFound:"没有找到结果",snippetLength:30,threshold:.3,type:"fuse",useExtendedSearch:!1},twemoji:!0,typeit:{cursorChar:"|",cursorSpeed:1e3,duration:-1,loop:!1,speed:100},version:"v0.3.6"}</script><script src=/ooooo-notes/js/theme.min.js defer></script></body></html>
