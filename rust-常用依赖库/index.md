@@ -7,7 +7,7 @@
 2. once_cell: `OnceCell` 和 `Lazy`
 3. clap: 命令行支持
 4. axum: http 服务
-5. tokio: 异步运行时 
+5. tokio: 异步运行时
 6. serde: 序列化
 7. serde_json: json 序列化
 8. log: 日志门面
@@ -16,6 +16,9 @@
 11. chrono: 日期和时间
 12. quick-xml: 读写 xml
 13. sqlx: 异步 sql 访问
+14. dotenvy: 支持加载 .env 文件
+15. cargo-watch: 热加载代码，二进制程序
+16. cargo-expand: 展开宏代码，二进制程序
 
 ---
 
