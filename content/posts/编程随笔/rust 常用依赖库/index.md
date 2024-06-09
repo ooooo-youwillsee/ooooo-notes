@@ -24,3 +24,7 @@ collections: [ 随笔 ]
 14. dotenvy: 支持加载 .env 文件
 15. cargo-watch: 热加载代码，二进制程序
 16. cargo-expand: 展开宏代码，二进制程序
+17. evalexpr: 解析表达式
+18. reqwest: http 客户端
+19. tower: 请求和响应抽象层 
+20. tower-http: http 中间件实现
