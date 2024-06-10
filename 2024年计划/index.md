@@ -37,6 +37,10 @@
 
 :one::three:. [期货及衍生品基础（第三版）](https://book.douban.com/subject/35729143/) :o:
 
+:one::four:. [代码整洁之道](https://book.douban.com/subject/34986245/) :white_check_mark:
+
+:one::five:. [Rust程序设计（第2版）](https://book.douban.com/subject/36547630/) :white_check_mark:
+
 
 ## 2. 关于源码笔记
 
