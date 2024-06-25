@@ -46,6 +46,7 @@ collections: [ 个人计划 ]
 
 :one::five:. [Rust程序设计（第2版）](https://book.douban.com/subject/36547630/) :white_check_mark:
 
+:one::six:. [微习惯](https://book.douban.com/subject/26877306/) :white_check_mark:
 
 ## 2. 关于源码笔记
 
