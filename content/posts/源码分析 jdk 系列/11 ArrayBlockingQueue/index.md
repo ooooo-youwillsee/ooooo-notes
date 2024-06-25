@@ -8,7 +8,7 @@ collections: [ 源码分析 jdk 系列 ]
 
 > jdk 基于 8 版本
 
-> 在平时的开发中，我们可能会用到 `ArrayBlockingQueue`, 是**并发安全**的。
+> 在平时的开发中，我们可能会用到 `ArrayBlockingQueue`, 它是基于**循环数组**来实现的，是**并发安全**的。
 
 ## 使用方式
 
@@ -28,8 +28,46 @@ public class ArrayBlockingQueueTest {
 
 > 添加元素，依赖锁来保证并发安全。
 
+源码位置: `java.util.concurrent.ArrayBlockingQueue#offer(E)`
 
+```java
+public boolean offer(E e) {
+    checkNotNull(e);
+    final ReentrantLock lock = this.lock;
+    // 加锁
+    lock.lock();
+    try {
+        if (count == items.length)
+            return false;
+        else {
+            // 添加到队列尾部
+            enqueue(e);
+            return true;
+        }
+    } finally {
+        // 解锁
+        lock.unlock();
+    }
+}
+```
 
 ## poll
 
 > 移除元素，依赖锁来保证并发安全。
+
+源码位置: `java.util.concurrent.ArrayBlockingQueue#poll()`
+
+```java
+public E poll() {
+    final ReentrantLock lock = this.lock;
+    // 加锁
+    lock.lock();
+    try {
+        // 移除队列头部
+        return (count == 0) ? null : dequeue();
+    } finally {
+        // 解锁
+        lock.unlock();
+    }
+}
+```
