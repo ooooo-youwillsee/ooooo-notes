@@ -6,16 +6,17 @@
 application.yaml:
 
 ```yaml
-# 配置 log 实现
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
-# 配置 log level
 logging:
   level:
     com.ooooo.dao.mapper: debug
 ```
+
+参考
+1. [spring boot logging](https://docs.spring.io/spring-boot/docs/2.7.18/reference/html/features.html#features.logging.log-levels)
 
 ## 原理
 
