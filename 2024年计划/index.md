@@ -43,6 +43,10 @@
 
 :one::six:. [微习惯](https://book.douban.com/subject/26877306/) :white_check_mark:
 
+:one::seven:. [build sqlite from scratch in c](https://cstack.github.io/db_tutorial)
+
+:one::eight:. [1小时就懂的沟通课](https://book.douban.com/subject/35256631/) :white_check_mark:
+
 ## 2. 关于源码笔记
 
 :zero::one:. [《rocketmq 源码》](https://github.com/apache/rocketmq) :o:
