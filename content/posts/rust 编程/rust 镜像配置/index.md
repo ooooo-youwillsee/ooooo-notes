@@ -3,7 +3,7 @@ title: rust 镜像配置
 date: 2024-05-24T08:00:00+08:00
 draft: false
 tags: [rust]
-collections: [随笔]
+collections: [rust 编程]
 ---
 
 > 解决 rust 依赖加载太慢的问题。

@@ -3,7 +3,7 @@ title: rust axum 测试类
 date: 2024-06-10T08:00:00+08:00
 draft: false
 tags: [ rust ]
-collections: [ 随笔 ]
+collections: [ rust 编程 ]
 ---
 
 ## multipart 测试类

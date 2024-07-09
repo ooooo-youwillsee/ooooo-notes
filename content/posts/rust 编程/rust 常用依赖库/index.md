@@ -3,7 +3,7 @@ title: rust 常用依赖库
 date: 2024-06-01T08:00:00+08:00
 draft: false
 tags: [ rust ]
-collections: [ 随笔 ]
+collections: [ rust 编程 ]
 ---
 
 > 介绍常用的依赖库，**持续更新**...

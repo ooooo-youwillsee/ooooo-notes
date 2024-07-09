@@ -3,7 +3,7 @@ title: rust openssl 依赖
 date: 2024-06-09T08:00:00+08:00
 draft: false
 tags: [ rust ]
-collections: [ 随笔 ]
+collections: [ rust 编程 ]
 ---
 
 > 在 window 上使用 openssl, 会遇到错误 **failed to run custom build command for `openssl-sys v0.9.102`**.
