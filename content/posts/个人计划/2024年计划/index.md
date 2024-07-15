@@ -48,7 +48,7 @@ collections: [ 个人计划 ]
 
 :one::six:. [微习惯](https://book.douban.com/subject/26877306/) :white_check_mark:
 
-:one::seven:. [build sqlite from scratch in c](https://cstack.github.io/db_tutorial)
+:one::seven:. [build sqlite from scratch in c](https://cstack.github.io/db_tutorial) :white_check_mark:
 
 :one::eight:. [1小时就懂的沟通课](https://book.douban.com/subject/35256631/) :white_check_mark:
 
