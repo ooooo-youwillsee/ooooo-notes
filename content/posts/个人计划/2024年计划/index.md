@@ -30,7 +30,7 @@ collections: [ 个人计划 ]
 
 :zero::seven:. [《C专家编程》](https://book.douban.com/subject/2377310/)
 
-:zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/)
+:zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/) :o:
 
 :zero::nine:. [Rust 编程第一课](https://time.geekbang.org/column/intro/100085301) :o:
 
@@ -51,6 +51,8 @@ collections: [ 个人计划 ]
 :one::seven:. [build sqlite from scratch in c](https://cstack.github.io/db_tutorial) :white_check_mark:
 
 :one::eight:. [1小时就懂的沟通课](https://book.douban.com/subject/35256631/) :white_check_mark:
+
+:one::nine:. [Linux内核完全剖析](https://book.douban.com/subject/3229243/) :o:
 
 ## 2. 关于源码笔记
 
