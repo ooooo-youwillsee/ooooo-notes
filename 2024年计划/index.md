@@ -25,7 +25,7 @@
 
 :zero::seven:. [《C专家编程》](https://book.douban.com/subject/2377310/)
 
-:zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/) :o:
+:zero::eight:. [《C陷阱与缺陷》](https://book.douban.com/subject/2778632/) :white_check_mark:
 
 :zero::nine:. [Rust 编程第一课](https://time.geekbang.org/column/intro/100085301) :o:
 
