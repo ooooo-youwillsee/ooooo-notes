@@ -1,8 +1,4 @@
-[submodule "themes/LoveIt"]
-	path = themes/LoveIt
-	url = git@github.com:dillonzq/LoveIt.git
-	branch = master
 [submodule "themes/FixIt"]
 	path = themes/FixIt
 	url = git@github.com:hugo-fixit/FixIt.git
-  branch = master
+    branch = main
